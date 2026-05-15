@@ -2,25 +2,24 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #2c2235;
+  --brand-pink: #ff0083;
+  --brand-dark: #2c2235;
+  --brand-beige: #fffbee;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-beige: var(--brand-beige);
+  --font-sans: var(--font-nunito-body);
+  --font-heading: var(--font-nunito-heading);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-nunito-body), sans-serif;
 }
