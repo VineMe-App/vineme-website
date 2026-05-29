@@ -54,8 +54,8 @@ export default function Footer() {
           </div>
 
           <p className="mt-3 text-xs leading-6 text-neutral-500">
-            With thanks to Jacob Hughes-Hallett · Christina Ajose · Tof Onaeko
-            · Tom Oakley · Julie Ip · Oj Tayo · Freddy Law · Aimee Kyffin, who have poured their time, talent, effort and prayer into making VineMe what it is.
+            Built with the time, talent, effort and prayer of Oliver Youle · Jacob Hughes-Hallett · Christina Ajose · Tof Onaeko
+            · Tom Oakley · Julie Ip · Oj Tayo · Freddy Law · Aimee Kyffin
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500 md:hidden">

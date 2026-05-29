@@ -31,7 +31,7 @@ export default function EntryModal() {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-brand-dark px-6 py-8">
       <div className="flex min-h-full items-center justify-center">
-        <div className="w-full max-w-xl rounded-lg bg-brand-dark p-6 text-center text-white shadow-2xl sm:p-8">
+        <div className="w-full max-w-xl p-6 text-center text-white sm:p-8">
           <Image
             src="/images/vineme-assets/LOGO/vineme_svg-09.svg"
             alt="VineMe"

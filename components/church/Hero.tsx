@@ -14,8 +14,8 @@ export default function Hero() {
       <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <h1 className="font-heading text-5xl font-black leading-[1.05] text-brand-dark sm:text-6xl lg:text-7xl">
-            We don&apos;t have a capacity problem. We have a{" "}
-            <span className="text-brand-pink">connection gap.</span>
+            Are you sure your problem is capacity? We think you have a{" "}
+            <span className="text-brand-pink">connection gap!</span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-brand-dark/80 sm:text-xl">
           Your church is growing, but growth shifts the pastoral problem.
