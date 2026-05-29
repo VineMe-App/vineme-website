@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Nunito } from "next/font/google";
 import EntryModal from "@/components/shared/EntryModal";
 import Navbar from "@/components/shared/Navbar";
@@ -40,6 +41,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
         <EntryModal />
+        <Analytics />
       </body>
     </html>
   );
