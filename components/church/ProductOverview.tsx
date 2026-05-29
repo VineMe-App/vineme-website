@@ -50,6 +50,7 @@ export default function ProductOverview() {
           </div>
         </div>
 
+        <div className="flex flex-col">
         {/* MOBILE: two-phone fan */}
         <div className="relative mx-auto h-[420px] w-full max-w-sm md:hidden">
           <div className="absolute left-1/2 top-0 z-10 -translate-x-[calc(25%-25px)] rotate-[12deg]">
@@ -106,6 +107,14 @@ export default function ProductOverview() {
               priority
             />
           </div>
+        </div>
+
+        <p className="-mt-8 max-w-2xl text-center text-lg leading-8 text-brand-dark/80 sm:text-xl md:mt-2 md:translate-x-[50px]">
+          I am the Vine, you are the branches
+          <span className="block text-brand-pink md:inline">
+            {" "}John 15:5
+          </span>
+        </p>
         </div>
       </div>
     </section>

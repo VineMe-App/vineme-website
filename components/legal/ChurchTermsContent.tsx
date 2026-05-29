@@ -17,7 +17,7 @@ export default function ChurchTermsContent() {
       </LegalP>
       <LegalP>
         VineMe International Limited, a company registered in England and Wales
-        (company number: [INSERT NUMBER]), whose registered address is 85 Great
+        (company number: 15753981), whose registered address is 85 Great
         Portland Street, First Floor, London, W1W 7LT (&ldquo;VineMe&rdquo;); and
       </LegalP>
       <LegalP>

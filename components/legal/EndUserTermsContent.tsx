@@ -31,8 +31,9 @@ export default function EndUserTermsContent() {
 
       <LegalH2>1. About VineMe</LegalH2>
       <LegalP>
-        VineMe International Limited is a company registered in England and
-        Wales.
+        VineMe International Limited is a company registered in England and Wales
+        (company number: 15753981), whose registered address is 85 Great
+        Portland Street, First Floor, London, W1W 7LT
       </LegalP>
       <LegalP>
         Email:{" "}

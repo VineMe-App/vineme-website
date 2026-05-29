@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
         <p>God bless,</p>
         <p style="margin: 0;">Olly, VineMe Founder<br/>
         <a href="mailto:connect@vineme.app" style="color: #FF0083;">connect@vineme.app</a><br/>
-        <a href="https://vineme.app" style="color: #FF0083;">https://vineme.app</a></p>
+        <a href="https://getvineme.app" style="color: #FF0083;">https://getvineme.app</a></p>
         <div style="margin-top: 10;">
           <img src="cid:vineme-logo" alt="VineMe" style="height: 60px; width: auto;" />
         </div>

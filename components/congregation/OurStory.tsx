@@ -78,7 +78,7 @@ export default function OurStory() {
             Built from what we&apos;ve received.
           </h2>
 
-          <div className="mt-8 grid items-start gap-10 lg:grid-cols-[1fr_0.95fr]">
+          <div className="mt-4 grid items-start gap-10 lg:mt-8 lg:grid-cols-[1fr_0.95fr]">
             <div className="order-2 lg:order-1">
             <div className="lg:hidden">
               <div className="overflow-hidden rounded-lg shadow-xl shadow-brand-dark/10">
@@ -134,6 +134,12 @@ export default function OurStory() {
             </div>
 
             <div className="order-1 lg:order-2">
+            <p className="mx-auto mb-2 max-w-2xl text-center text-lg leading-8 text-brand-dark/80 sm:text-xl lg:mx-0 lg:mb-4 lg:text-left">
+            I am the Vine, you are the branches
+            <span className="block text-brand-pink lg:inline">
+              {" "}John 15:5
+            </span>
+          </p>
               <div className="space-y-4 text-lg font-normal leading-8 text-brand-dark/70">
               <p>
                 For years, our connect groups have been the most incredible
