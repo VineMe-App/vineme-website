@@ -31,9 +31,7 @@ export default function LoginPage() {
           <AdminLoginForm />
 
           <p className="mt-5 text-sm leading-6 text-brand-dark/60">
-            Only users whose VineMe profile includes{" "}
-            <span className="font-black text-brand-dark">church_admin</span> in
-            their roles can access the dashboard.
+            Only pastoral staff can use login.
           </p>
         </div>
       </div>
