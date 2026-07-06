@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "vineme-entry-choice";
-type AudienceChoice = "church" | "find";
+type AudienceChoice = "church" | "find" | "login";
 
 export default function EntryModal() {
   const [checked, setChecked] = useState(false);
@@ -13,7 +13,7 @@ export default function EntryModal() {
     if (!onHome) return;
 
     const stored = localStorage.getItem(STORAGE_KEY) as AudienceChoice | null;
-    if (stored === "church" || stored === "find") {
+    if (stored === "church" || stored === "find" || stored === "login") {
       window.location.href = `/${stored}`;
     } else {
       const frame = window.requestAnimationFrame(() => setChecked(true));
@@ -57,6 +57,13 @@ export default function EntryModal() {
               className="min-h-12 w-full rounded-md border border-brand-pink bg-brand-pink px-6 py-3 font-bold text-white transition-colors hover:bg-white hover:text-brand-pink"
             >
               I&apos;m looking for a group
+            </button>
+            <button
+              type="button"
+              onClick={() => handleChoice("login")}
+              className="min-h-12 w-full rounded-md border border-white bg-white px-6 py-3 font-bold text-brand-pink transition-colors hover:border-brand-pink hover:bg-brand-pink hover:text-white"
+            >
+              Login
             </button>
           </div>
         </div>

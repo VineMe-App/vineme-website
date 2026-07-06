@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 const navItems = [
   { href: "/church", label: "I lead a church" },
   { href: "/find", label: "I'm looking for a group" },
+  { href: "/login", label: "Login" },
 ];
 
 export default function Navbar() {
