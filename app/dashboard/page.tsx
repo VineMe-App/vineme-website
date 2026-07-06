@@ -1,3 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  createBrowserSupabaseClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/client";
+
 const users = [
   {
     name: "Amara Lewis",
@@ -30,6 +38,91 @@ const users = [
 ];
 
 export default function DashboardPage() {
+  const [accessState, setAccessState] = useState<
+    "checking" | "allowed" | "denied" | "unconfigured"
+  >("checking");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkAdminAccess() {
+      if (!isSupabaseConfigured()) {
+        setAccessState("unconfigured");
+        return;
+      }
+
+      const supabase = createBrowserSupabaseClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("users")
+        .select("roles")
+        .eq("id", session.user.id)
+        .single();
+
+      const roles = Array.isArray(profile?.roles) ? profile.roles : [];
+
+      if (!isMounted) return;
+
+      if (roles.includes("church_admin")) {
+        setAccessState("allowed");
+      } else {
+        await supabase.auth.signOut();
+        setAccessState("denied");
+      }
+    }
+
+    void checkAdminAccess();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (accessState !== "allowed") {
+    const isDenied = accessState === "denied";
+    const isUnconfigured = accessState === "unconfigured";
+
+    return (
+      <section className="bg-brand-beige px-5 py-16 sm:px-6 lg:py-24">
+        <div className="mx-auto max-w-xl rounded-3xl bg-white p-8 text-center shadow-2xl shadow-brand-dark/10">
+          <p className="text-sm font-black uppercase tracking-[0.24em] text-brand-pink">
+            VineMe dashboard
+          </p>
+          <h1 className="mt-4 font-heading text-4xl font-black text-brand-dark">
+            {isDenied
+              ? "Church admin access required"
+              : isUnconfigured
+                ? "Dashboard login is not configured"
+                : "Checking your access..."}
+          </h1>
+          <p className="mt-4 leading-7 text-brand-dark/70">
+            {isDenied
+              ? "Your VineMe user profile needs church_admin in roles before you can view this dashboard."
+              : isUnconfigured
+                ? "Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable passwordless admin login."
+                : "We are confirming your VineMe session and church admin role."}
+          </p>
+          {isDenied || isUnconfigured ? (
+            <a
+              href="/login"
+              className="mt-6 inline-block rounded-xl bg-brand-pink px-6 py-4 font-black text-white shadow-lg shadow-brand-pink/20 transition-colors hover:bg-brand-dark"
+            >
+              Back to sign in
+            </a>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-white px-5 py-10 sm:px-6 lg:py-14">
       <div className="mx-auto w-full max-w-6xl">

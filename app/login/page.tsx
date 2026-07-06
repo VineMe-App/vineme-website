@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import AdminLoginForm from "@/components/auth/AdminLoginForm";
 
 export default function LoginPage() {
   return (
@@ -13,8 +13,8 @@ export default function LoginPage() {
             Welcome back to your church connection hub.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-brand-dark/75">
-            Sign in to view your user database, track connection requests, and
-            connect VineMe with ChurchSuite.
+            Sign in with a one-time email code. Access is restricted to users
+            marked as church admins in VineMe.
           </p>
         </div>
 
@@ -28,50 +28,12 @@ export default function LoginPage() {
             priority
           />
 
-          <form className="space-y-5">
-            <div>
-              <label
-                htmlFor="email"
-                className="text-sm font-black text-brand-dark"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@church.org"
-                className="mt-2 w-full rounded-xl border border-brand-dark/15 px-4 py-3 text-brand-dark outline-none transition-colors placeholder:text-brand-dark/35 focus:border-brand-pink"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="text-sm font-black text-brand-dark"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter your password"
-                className="mt-2 w-full rounded-xl border border-brand-dark/15 px-4 py-3 text-brand-dark outline-none transition-colors placeholder:text-brand-dark/35 focus:border-brand-pink"
-              />
-            </div>
-
-            <Link
-              href="/dashboard"
-              className="block w-full rounded-xl bg-brand-pink px-6 py-4 text-center font-black text-white shadow-lg shadow-brand-pink/20 transition-colors hover:bg-brand-dark"
-            >
-              Sign in to VineMe
-            </Link>
-          </form>
+          <AdminLoginForm />
 
           <p className="mt-5 text-sm leading-6 text-brand-dark/60">
-            Demo sign in for preview. Authentication can be wired to the live
-            VineMe user system next.
+            Only users whose VineMe profile includes{" "}
+            <span className="font-black text-brand-dark">church_admin</span> in
+            their roles can access the dashboard.
           </p>
         </div>
       </div>
