@@ -6,12 +6,30 @@ import {
   isSupabaseConfigured,
 } from "@/lib/supabase/client";
 
-type LoginStep = "email" | "code";
+type LoginStep = "identifier" | "code";
+type LoginMethod = "email" | "phone";
+
+function parseIdentifier(value: string) {
+  const trimmed = value.trim();
+
+  if (trimmed.includes("@")) {
+    return {
+      method: "email" as const,
+      value: trimmed.toLowerCase(),
+    };
+  }
+
+  return {
+    method: "phone" as const,
+    value: trimmed.replace(/[\s()-]/g, ""),
+  };
+}
 
 export default function AdminLoginForm() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
+  const [loginMethod, setLoginMethod] = useState<LoginMethod>("email");
   const [code, setCode] = useState("");
-  const [step, setStep] = useState<LoginStep>("email");
+  const [step, setStep] = useState<LoginStep>("identifier");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,9 +44,17 @@ export default function AdminLoginForm() {
       return;
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail) {
-      setError("Enter your church admin email address.");
+    const parsedIdentifier = parseIdentifier(identifier);
+    if (!parsedIdentifier.value) {
+      setError("Enter your church admin email address or phone number.");
+      return;
+    }
+
+    if (
+      parsedIdentifier.method === "phone" &&
+      !parsedIdentifier.value.startsWith("+")
+    ) {
+      setError("Enter your phone number in international format, e.g. +447...");
       return;
     }
 
@@ -36,21 +62,34 @@ export default function AdminLoginForm() {
 
     try {
       const supabase = createBrowserSupabaseClient();
-      const { error: signInError } = await supabase.auth.signInWithOtp({
-        email: normalizedEmail,
-        options: {
-          shouldCreateUser: false,
-        },
-      });
+      const { error: signInError } =
+        parsedIdentifier.method === "email"
+          ? await supabase.auth.signInWithOtp({
+              email: parsedIdentifier.value,
+              options: {
+                shouldCreateUser: false,
+              },
+            })
+          : await supabase.auth.signInWithOtp({
+              phone: parsedIdentifier.value,
+              options: {
+                shouldCreateUser: false,
+              },
+            });
 
       if (signInError) {
         setError(signInError.message);
         return;
       }
 
-      setEmail(normalizedEmail);
+      setIdentifier(parsedIdentifier.value);
+      setLoginMethod(parsedIdentifier.method);
       setStep("code");
-      setMessage("We sent a sign-in code to your email.");
+      setMessage(
+        parsedIdentifier.method === "email"
+          ? "We sent a sign-in code to your email."
+          : "We sent a sign-in code to your phone."
+      );
     } catch {
       setError("Something went wrong sending your sign-in code.");
     } finally {
@@ -65,7 +104,7 @@ export default function AdminLoginForm() {
 
     const trimmedCode = code.trim();
     if (!trimmedCode) {
-      setError("Enter the code from your email.");
+      setError("Enter the code we sent you.");
       return;
     }
 
@@ -73,11 +112,18 @@ export default function AdminLoginForm() {
 
     try {
       const supabase = createBrowserSupabaseClient();
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: trimmedCode,
-        type: "email",
-      });
+      const { data, error: verifyError } =
+        loginMethod === "email"
+          ? await supabase.auth.verifyOtp({
+              email: identifier,
+              token: trimmedCode,
+              type: "email",
+            })
+          : await supabase.auth.verifyOtp({
+              phone: identifier,
+              token: trimmedCode,
+              type: "sms",
+            });
 
       if (verifyError || !data.user) {
         setError(verifyError?.message ?? "We could not verify that code.");
@@ -111,7 +157,7 @@ export default function AdminLoginForm() {
       <form className="space-y-5" onSubmit={handleVerifyCode}>
         <div>
           <label htmlFor="code" className="text-sm font-black text-brand-dark">
-            Email verification code
+            Verification code
           </label>
           <input
             id="code"
@@ -137,14 +183,14 @@ export default function AdminLoginForm() {
         <button
           type="button"
           onClick={() => {
-            setStep("email");
+            setStep("identifier");
             setCode("");
             setError("");
             setMessage("");
           }}
           className="w-full text-sm font-black text-brand-pink hover:text-brand-dark"
         >
-          Use a different email
+          Use a different email or phone
         </button>
 
         {message ? (
@@ -160,19 +206,25 @@ export default function AdminLoginForm() {
   return (
     <form className="space-y-5" onSubmit={handleSendCode}>
       <div>
-        <label htmlFor="email" className="text-sm font-black text-brand-dark">
-          Church admin email address
+        <label
+          htmlFor="identifier"
+          className="text-sm font-black text-brand-dark"
+        >
+          Church admin email or phone
         </label>
         <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@church.org"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          id="identifier"
+          name="identifier"
+          type="text"
+          autoComplete="username"
+          placeholder="you@church.org or +447..."
+          value={identifier}
+          onChange={(event) => setIdentifier(event.target.value)}
           className="mt-2 w-full rounded-xl border border-brand-dark/15 px-4 py-3 text-brand-dark outline-none transition-colors placeholder:text-brand-dark/35 focus:border-brand-pink"
         />
+        <p className="mt-2 text-xs leading-5 text-brand-dark/55">
+          Use international format for phone numbers, e.g. +447...
+        </p>
       </div>
 
       <button

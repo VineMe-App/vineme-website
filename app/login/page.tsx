@@ -13,8 +13,8 @@ export default function LoginPage() {
             Welcome back to your church connection hub.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-brand-dark/75">
-            Sign in with a one-time email code. Access is restricted to users
-            marked as church admins in VineMe.
+            Sign in with a one-time code sent by email or SMS. Access is
+            restricted to users marked as church admins in VineMe.
           </p>
         </div>
 
