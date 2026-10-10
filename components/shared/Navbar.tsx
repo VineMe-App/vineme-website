@@ -32,6 +32,8 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
+  if (pathname.startsWith("/dashboard")) return null;
+
   return (
     <header
       ref={navRef}
