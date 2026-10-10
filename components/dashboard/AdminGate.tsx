@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AdminProvider, type AdminContextValue } from "@/lib/dashboard/admin-context";
 import {
   createBrowserSupabaseClient,
   isSupabaseConfigured,
@@ -19,6 +20,7 @@ type AccessState = "checking" | "allowed" | "denied" | "unconfigured";
 
 export function AdminGate({ children }: { children: React.ReactNode }) {
   const [accessState, setAccessState] = useState<AccessState>("checking");
+  const [admin, setAdmin] = useState<AdminContextValue | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -41,7 +43,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
 
       const { data: profile } = await supabase
         .from("users")
-        .select("roles")
+        .select("roles, church_id, service_id, first_name, name")
         .eq("id", session.user.id)
         .single();
 
@@ -49,7 +51,33 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
 
       if (!isMounted) return;
 
-      if (roles.includes("church_admin")) {
+      if (roles.includes("church_admin") && profile?.church_id) {
+        const [church, service] = await Promise.all([
+          supabase
+            .from("churches")
+            .select("name")
+            .eq("id", profile.church_id)
+            .single(),
+          profile.service_id
+            ? supabase
+                .from("services")
+                .select("name")
+                .eq("id", profile.service_id)
+                .single()
+            : Promise.resolve({ data: null }),
+        ]);
+
+        if (!isMounted) return;
+
+        setAdmin({
+          supabase,
+          userId: session.user.id,
+          churchId: profile.church_id,
+          churchName: church.data?.name ?? null,
+          serviceName: service.data?.name ?? null,
+          firstName:
+            profile.first_name || profile.name?.split(" ")[0] || "there",
+        });
         setAccessState("allowed");
       } else {
         await supabase.auth.signOut();
@@ -64,12 +92,14 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  if (accessState === "allowed") {
+  if (accessState === "allowed" && admin) {
     return (
-      <div className="min-h-screen bg-muted">
-        <DashboardNav />
-        <main>{children}</main>
-      </div>
+      <AdminProvider value={admin}>
+        <div className="min-h-screen bg-muted">
+          <DashboardNav />
+          <main>{children}</main>
+        </div>
+      </AdminProvider>
     );
   }
 
@@ -92,7 +122,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
           </CardTitle>
           <CardDescription className="text-base leading-7">
             {isDenied
-              ? "Your VineMe user profile needs church_admin in roles before you can view this dashboard."
+              ? "Your VineMe user profile needs church_admin in roles, and a church, before you can view this dashboard."
               : isUnconfigured
                 ? "Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable passwordless admin login."
                 : "We are confirming your VineMe session and church admin role."}

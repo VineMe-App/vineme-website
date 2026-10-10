@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,16 +20,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { memberStatusVariants, members } from "@/lib/dashboard/sample-data";
-import { getInitials } from "@/lib/dashboard/utils";
-
-const stats = [
-  ["Total users", "428"],
-  ["Pending follow-ups", "37"],
-  ["Groups at capacity", "12"],
-];
+import { useAdmin } from "@/lib/dashboard/admin-context";
+import { fetchOverview } from "@/lib/dashboard/queries";
+import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
+import { getInitials, memberStatusVariants } from "@/lib/dashboard/utils";
 
 export default function DashboardPage() {
+  const { churchName } = useAdmin();
+  const query = useDashboardQuery(fetchOverview);
+  const overview = query.data;
+  const stats = [
+    ["Total users", overview?.totalPeople],
+    ["Pending follow-ups", overview?.pendingFollowUps],
+    ["Groups at capacity", overview?.groupsAtCapacity],
+  ];
+
   return (
     <section className="px-5 py-10 sm:px-6 lg:py-14">
       <div className="mx-auto w-full max-w-6xl">
@@ -38,7 +45,7 @@ export default function DashboardPage() {
           <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h1 className="font-heading text-4xl font-bold sm:text-5xl">
-                Church connection overview
+                {churchName ?? "Church connection overview"}
               </h1>
               <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">
                 Manage your VineMe user database, track people still waiting,
@@ -65,7 +72,7 @@ export default function DashboardPage() {
                   {label}
                 </p>
                 <p className="mt-3 font-heading text-4xl font-bold text-foreground">
-                  {value}
+                  {value ?? "-"}
                 </p>
               </CardPanel>
             </Card>
@@ -77,7 +84,9 @@ export default function DashboardPage() {
             <CardFrameHeader>
               <CardFrameTitle>User database</CardFrameTitle>
               <CardFrameDescription>
-                A preview of the people and roles your church team can manage.
+                {query.status === "error"
+                  ? "We could not load your people. Refresh to try again."
+                  : "The newest people at your church. See everyone under Members."}
               </CardFrameDescription>
             </CardFrameHeader>
             <Table variant="card" className="min-w-[640px]">
@@ -90,8 +99,8 @@ export default function DashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.slice(0, 4).map((user) => (
-                  <TableRow key={user.email}>
+                {(overview?.members ?? []).map((user) => (
+                  <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
@@ -99,14 +108,9 @@ export default function DashboardPage() {
                             {getInitials(user.name)}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="font-medium text-foreground">
-                            {user.name}
-                          </p>
-                          <p className="text-muted-foreground text-xs">
-                            {user.email}
-                          </p>
-                        </div>
+                        <p className="font-medium text-foreground">
+                          {user.name}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell>

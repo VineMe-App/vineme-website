@@ -30,7 +30,7 @@ brand styling and must not use anything described here.
 | `/dashboard/members` | Searchable members table |
 | `/dashboard/settings` | Integrations, starting with the ChurchSuite link form |
 
-Sample data lives in `lib/dashboard/sample-data.ts`; shared components in
+Live data comes from `lib/dashboard/queries.ts` (one fetch function per page, run through `useDashboardQuery`); shared components in
 `components/dashboard/`.
 
 ## Navigation
@@ -168,6 +168,17 @@ Rules:
 ## Open items
 
 - No sign-out or account menu yet (the avatar is static).
-- Follow-ups, groups and members use sample data; changes in the Sheet editor
-  are local state only and are not persisted.
-- Dashboard data is still sample data and the ChurchSuite form does not submit.
+- Overview, follow-ups, groups and members read live Supabase data. Changes in
+  the follow-up Sheet editor (steps, notes, add to group, archive) are local
+  state only and are not saved. Saving needs server-side functions that check
+  the church (see `docs/supabase/security-findings.md` on the auth-journey
+  branch).
+- Follow-up steps map to `group_memberships.journey_status`: 1 reached out,
+  2 spoken to (shown as Invited), 3 attended group. Step dates come from
+  `journey_status_change` notes; the overdue window is
+  `FOLLOW_UP_WINDOW_DAYS` (7) in `lib/dashboard/queries.ts`, an assumption.
+- Groups have an `at_capacity` flag but no capacity number, so the groups page
+  shows member counts, not "n of N places".
+- Email addresses, referral notes and "From your email" are not available to the
+  app (the `referrals` table has no read policy), so they are not shown.
+- The ChurchSuite form does not submit.

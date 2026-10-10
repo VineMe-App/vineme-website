@@ -27,7 +27,7 @@ import {
   getFirstOpenStep,
   getRequestedLabel,
 } from "@/lib/dashboard/follow-up-utils";
-import type { FollowUp, FollowUpStep } from "@/lib/dashboard/sample-data";
+import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
 import { getInitials } from "@/lib/dashboard/utils";
 import { cn } from "@/lib/utils";
 
@@ -119,24 +119,37 @@ function FollowUpEditor({
             >
               Contact
             </h3>
-            <p className="mt-1 font-medium">{person.phone}</p>
-            <div className="mt-3 flex gap-2">
-              <Button variant="outline" render={<a href={`tel:${person.phone}`} />}>
-                Call
-              </Button>
-              <Button
-                variant="outline"
-                render={
-                  <a
-                    href={`https://wa.me/${phoneDigits}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  />
-                }
-              >
-                WhatsApp
-              </Button>
-            </div>
+            {person.phone ? (
+              <>
+                <p className="mt-1 font-medium">{person.phone}</p>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    variant="outline"
+                    render={<a href={`tel:${person.phone}`} />}
+                  >
+                    Call
+                  </Button>
+                  <Button
+                    variant="outline"
+                    render={
+                      <a
+                        href={`https://wa.me/${phoneDigits}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      />
+                    }
+                  >
+                    WhatsApp
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p className="mt-1 text-muted-foreground">
+                {person.phoneLookedUp
+                  ? "No phone number on file."
+                  : "Looking up their number..."}
+              </p>
+            )}
           </section>
 
           <section aria-labelledby="sheet-progress">

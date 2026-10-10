@@ -6,3 +6,9 @@ export function getInitials(name: string): string {
     .slice(0, 2)
     .toUpperCase();
 }
+
+export const memberStatusVariants = {
+  Connected: "success",
+  "Pending follow-up": "warning",
+  "Looking for a group": "info",
+} as const;

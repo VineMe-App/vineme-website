@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { adminUser } from "@/lib/dashboard/sample-data";
+import { useAdmin } from "@/lib/dashboard/admin-context";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
 
 export function DashboardNav() {
   const pathname = usePathname();
+  const { firstName } = useAdmin();
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
@@ -72,8 +73,8 @@ export function DashboardNav() {
           })}
         </ul>
 
-        <Avatar className="size-9" aria-label={adminUser.firstName}>
-          <AvatarFallback>{adminUser.initial}</AvatarFallback>
+        <Avatar className="size-9" aria-label={firstName}>
+          <AvatarFallback>{firstName.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
       </nav>
     </header>

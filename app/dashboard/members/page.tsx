@@ -18,14 +18,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { memberStatusVariants, members } from "@/lib/dashboard/sample-data";
-import { getInitials } from "@/lib/dashboard/utils";
+import { fetchMembers } from "@/lib/dashboard/queries";
+import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
+import { getInitials, memberStatusVariants } from "@/lib/dashboard/utils";
 
 export default function MembersPage() {
   const [query, setQuery] = useState("");
+  const result = useDashboardQuery(fetchMembers);
+  const members = result.data ?? [];
   const normalisedQuery = query.trim().toLowerCase();
   const visibleMembers = members.filter((member) =>
-    [member.name, member.email, member.group, member.role].some((value) =>
+    [member.name, member.group, member.role, member.status].some((value) =>
       value.toLowerCase().includes(normalisedQuery),
     ),
   );
@@ -42,7 +45,11 @@ export default function MembersPage() {
           <CardFrameHeader>
             <CardFrameTitle>All members</CardFrameTitle>
             <CardFrameDescription>
-              {visibleMembers.length} of {members.length} people
+              {result.status === "loading"
+                ? "Loading..."
+                : result.status === "error"
+                  ? "We could not load your members. Refresh to try again."
+                  : `${visibleMembers.length} of ${members.length} people`}
             </CardFrameDescription>
           </CardFrameHeader>
           <div className="px-6 pb-4">
@@ -50,7 +57,7 @@ export default function MembersPage() {
               type="search"
               name="member-search"
               aria-label="Search members"
-              placeholder="Search by name, email, group or role"
+              placeholder="Search by name, group, role or status"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
@@ -72,12 +79,16 @@ export default function MembersPage() {
                     colSpan={5}
                     className="py-8 text-center text-muted-foreground"
                   >
-                    No members match &ldquo;{query}&rdquo;.
+                    {result.status === "ready" && members.length === 0
+                      ? "No members yet."
+                      : result.status === "ready"
+                        ? <>No members match &ldquo;{query}&rdquo;.</>
+                        : "Loading..."}
                   </TableCell>
                 </TableRow>
               ) : (
                 visibleMembers.map((member) => (
-                  <TableRow key={member.email}>
+                  <TableRow key={member.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
@@ -85,14 +96,9 @@ export default function MembersPage() {
                             {getInitials(member.name)}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="font-medium text-foreground">
-                            {member.name}
-                          </p>
-                          <p className="text-muted-foreground text-xs">
-                            {member.email}
-                          </p>
-                        </div>
+                        <p className="font-medium text-foreground">
+                          {member.name}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell>

@@ -1,36 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FollowUpSection } from "@/components/dashboard/FollowUpSection";
 import { FollowUpSheet } from "@/components/dashboard/FollowUpSheet";
 import { Card, CardPanel } from "@/components/ui/card";
 import {
+  compareByUrgency,
   getFollowUpSection,
+  getFollowUpStage,
   type FollowUpSectionId,
+  type FollowUpStage,
 } from "@/lib/dashboard/follow-up-utils";
-import {
-  adminUser,
-  followUps,
-  type FollowUp,
-  type FollowUpStep,
-} from "@/lib/dashboard/sample-data";
+import { useAdmin } from "@/lib/dashboard/admin-context";
+import { fetchContactPhone, fetchFollowUps } from "@/lib/dashboard/queries";
+import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
+import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 
-const sections: {
-  id: FollowUpSectionId;
+const stages: {
+  id: FollowUpStage;
   title: string;
   note: string;
   variant: "followUp" | "attended";
 }[] = [
   {
-    id: "needs-attention",
-    title: "Needs your attention",
-    note: "Outside the follow-up window",
+    id: "not-reached",
+    title: "Not reached out yet",
+    note: "Nobody has contacted them",
     variant: "followUp",
   },
   {
-    id: "on-track",
-    title: "On track",
-    note: "Within the follow-up window",
+    id: "reached-out",
+    title: "Reached out",
+    note: "Next: invite them to the group",
+    variant: "followUp",
+  },
+  {
+    id: "invited",
+    title: "Invited",
+    note: "Waiting for them to attend",
     variant: "followUp",
   },
   {
@@ -42,9 +49,63 @@ const sections: {
 ];
 
 export default function FollowUpsPage() {
-  const [people, setPeople] = useState<FollowUp[]>(followUps);
+  const query = useDashboardQuery(fetchFollowUps);
+
+  if (query.status === "loading") {
+    return (
+      <PageMessage>Loading your follow-ups...</PageMessage>
+    );
+  }
+  if (query.status === "error") {
+    return (
+      <PageMessage>
+        We could not load your follow-ups. Refresh to try again.
+      </PageMessage>
+    );
+  }
+
+  return <FollowUpsView initialPeople={query.data} />;
+}
+
+function PageMessage({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="px-5 py-10 sm:px-6 lg:py-14">
+      <p className="mx-auto w-full max-w-6xl text-muted-foreground">
+        {children}
+      </p>
+    </section>
+  );
+}
+
+function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
+  const admin = useAdmin();
+  const [people, setPeople] = useState<FollowUp[]>(initialPeople);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  // Phone numbers are private, so look one up only when its sheet opens.
+  useEffect(() => {
+    const target = people.find((person) => person.id === selectedId);
+    if (!target || target.phoneLookedUp) return;
+
+    let isMounted = true;
+    fetchContactPhone(admin, target.userId)
+      .catch(() => "")
+      .then((phone) => {
+        if (!isMounted) return;
+        setPeople((current) =>
+          current.map((person) =>
+            person.id === target.id
+              ? { ...person, phone, phoneLookedUp: true }
+              : person,
+          ),
+        );
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [admin, people, selectedId]);
 
   const updatePerson = (id: string, update: (person: FollowUp) => FollowUp) => {
     setPeople((current) =>
@@ -87,6 +148,10 @@ export default function FollowUpsPage() {
   const activePeople = people.filter((person) => person.outcome === "active");
   const bySection = (sectionId: FollowUpSectionId) =>
     activePeople.filter((person) => getFollowUpSection(person) === sectionId);
+  const byStage = (stage: FollowUpStage) =>
+    activePeople
+      .filter((person) => getFollowUpStage(person) === stage)
+      .sort(compareByUrgency);
 
   const stats = [
     { label: "Need attention", count: bySection("needs-attention").length },
@@ -104,16 +169,17 @@ export default function FollowUpsPage() {
           <div>
             <h1 className="font-heading text-balance text-3xl font-bold sm:text-4xl">
               {needsAttentionCount > 0
-                ? `Hi ${adminUser.firstName}, ${needsAttentionCount} ${
+                ? `Hi ${admin.firstName}, ${needsAttentionCount} ${
                     needsAttentionCount === 1 ? "person needs" : "people need"
                   } a follow-up`
-                : `Hi ${adminUser.firstName}, you're all caught up`}
+                : `Hi ${admin.firstName}, you're all caught up`}
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Beta Connect · Tower Bridge
+              {[admin.churchName, admin.serviceName].filter(Boolean).join(" · ")}
             </p>
             <p className="mt-1 text-muted-foreground text-sm">
-              Select a person, or press Review, to update their follow-up.
+              Select a person, or press Review, to see their follow-up. Changes
+              you make here are not saved yet.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -131,13 +197,13 @@ export default function FollowUpsPage() {
         </div>
 
         <div className="mt-8 space-y-8">
-          {sections.map((section) => (
+          {stages.map((section) => (
             <FollowUpSection
               key={section.id}
               title={section.title}
               note={section.note}
               variant={section.variant}
-              people={bySection(section.id)}
+              people={byStage(section.id)}
               onSelect={handleSelect}
               onAddToGroup={handleAddToGroup}
             />

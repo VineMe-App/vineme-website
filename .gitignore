@@ -42,3 +42,9 @@ next-env.d.ts
 .env*.local
 .env.local
 .env*.local
+
+# Local MCP config (contains an access token)
+.mcp.json
+
+# Supabase CLI local state
+supabase/.temp/

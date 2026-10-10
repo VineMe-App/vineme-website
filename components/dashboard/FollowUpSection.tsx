@@ -2,6 +2,7 @@
 
 import { ChevronRightIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { FollowUpStepper } from "@/components/dashboard/FollowUpStepper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,10 +20,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  getProgressLabel,
-  getRequestedLabel,
+  getRequestedAgo,
+  getStatusDetail,
 } from "@/lib/dashboard/follow-up-utils";
-import type { FollowUp } from "@/lib/dashboard/sample-data";
+import type { FollowUp } from "@/lib/dashboard/types";
 import { getInitials } from "@/lib/dashboard/utils";
 
 interface FollowUpSectionProps {
@@ -52,15 +53,15 @@ export function FollowUpSection({
           <span className="text-muted-foreground text-sm">{note}</span>
         </CardFrameAction>
       </CardFrameHeader>
-      <Table variant="card" className="min-w-[860px] table-fixed">
+      <Table variant="card" className="min-w-[900px] table-fixed">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[27%]">Person</TableHead>
-            <TableHead className="w-[22%]">Where they are</TableHead>
-            <TableHead className="w-[27%] text-right">
+            <TableHead className="w-[30%]">Person</TableHead>
+            <TableHead className="w-[28%]">Where they are</TableHead>
+            <TableHead className="w-[21%] text-right">
               {variant === "attended" ? "Status" : "Follow-up window"}
             </TableHead>
-            <TableHead className="w-[24%] text-right">
+            <TableHead className="w-[21%] text-right">
               <span className="sr-only">Actions</span>
             </TableHead>
           </TableRow>
@@ -72,20 +73,28 @@ export function FollowUpSection({
               className="cursor-pointer hover:bg-accent/50"
               onClick={() => onSelect(person.id)}
             >
-              <TableCell>
+              <TableCell className="whitespace-normal">
                 <div className="flex items-center gap-3">
-                  <Avatar>
+                  <Avatar className="shrink-0">
                     <AvatarFallback>{getInitials(person.name)}</AvatarFallback>
                   </Avatar>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium text-foreground">{person.name}</p>
-                    <p className="text-muted-foreground text-xs">
-                      {getRequestedLabel(person)}
+                    <p className="mt-1 text-muted-foreground text-xs leading-snug">
+                      {person.group}
+                    </p>
+                    <p className="text-muted-foreground text-xs leading-snug">
+                      {getRequestedAgo(person)}
                     </p>
                   </div>
                 </div>
               </TableCell>
-              <TableCell>{getProgressLabel(person)}</TableCell>
+              <TableCell>
+                <FollowUpStepper
+                  person={person}
+                  title={getStatusDetail(person)}
+                />
+              </TableCell>
               <TableCell className="text-right">
                 {variant === "attended" ? (
                   <Badge variant="success" size="lg">
