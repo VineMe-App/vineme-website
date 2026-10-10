@@ -20,7 +20,6 @@ interface NavItem {
   label: string;
   exact: boolean;
   icon: LucideIcon;
-  iconOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -29,7 +28,6 @@ const navItems: NavItem[] = [
     label: "Overview",
     exact: true,
     icon: House,
-    iconOnly: true,
   },
   {
     href: "/dashboard/follow-ups",
@@ -103,7 +101,6 @@ export function DashboardNav() {
                 <Link
                   href={item.href}
                   aria-current={isActive ? "page" : undefined}
-                  title={item.iconOnly ? item.label : undefined}
                   className={cn(
                     "flex items-center gap-2 whitespace-nowrap border-b-2 px-3 py-4 font-medium text-sm transition-colors",
                     isActive
@@ -112,9 +109,7 @@ export function DashboardNav() {
                   )}
                 >
                   <Icon aria-hidden="true" className="size-[18px] shrink-0" />
-                  <span className={item.iconOnly ? "sr-only" : undefined}>
-                    {item.label}
-                  </span>
+                  {item.label}
                 </Link>
               </li>
             );
