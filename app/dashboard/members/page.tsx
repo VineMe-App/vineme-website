@@ -1,5 +1,6 @@
 "use client";
 
+import { Search } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -52,8 +53,13 @@ export default function MembersPage() {
                   : `${visibleMembers.length} of ${members.length} people`}
             </CardFrameDescription>
           </CardFrameHeader>
-          <div className="px-6 pb-4">
+          <div className="relative px-6 pb-4">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute start-9 top-[calc(50%-0.5rem)] z-10 size-4 -translate-y-1/2 text-muted-foreground"
+            />
             <Input
+              className="[&_input]:ps-9"
               type="search"
               name="member-search"
               aria-label="Search members"
