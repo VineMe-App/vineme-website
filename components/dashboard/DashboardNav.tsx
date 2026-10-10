@@ -11,8 +11,10 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ChurchSwitcher } from "@/components/dashboard/ChurchSwitcher";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAdmin } from "@/lib/dashboard/admin-context";
+import { getInitials } from "@/lib/dashboard/utils";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -57,7 +59,7 @@ const navItems: NavItem[] = [
 
 export function DashboardNav() {
   const pathname = usePathname();
-  const { firstName } = useAdmin();
+  const { fullName } = useAdmin();
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
@@ -116,9 +118,19 @@ export function DashboardNav() {
           })}
         </ul>
 
-        <Avatar className="size-9" aria-label={firstName}>
-          <AvatarFallback>{firstName.charAt(0).toUpperCase()}</AvatarFallback>
-        </Avatar>
+        <div className="flex shrink-0 items-center gap-1">
+          <ChurchSwitcher />
+          <Link
+            href="/dashboard/profile"
+            aria-label={`Your profile, ${fullName}`}
+            aria-current={pathname === "/dashboard/profile" ? "page" : undefined}
+            className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <Avatar className="size-9">
+              <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
+            </Avatar>
+          </Link>
+        </div>
       </nav>
     </header>
   );

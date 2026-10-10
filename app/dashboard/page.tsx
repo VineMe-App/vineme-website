@@ -20,8 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PendingRequestsChart } from "@/components/dashboard/PendingRequestsChart";
 import { useAdmin } from "@/lib/dashboard/admin-context";
-import { fetchOverview } from "@/lib/dashboard/queries";
+import { fetchFollowUps, fetchOverview } from "@/lib/dashboard/queries";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 import { getInitials, memberStatusVariants } from "@/lib/dashboard/utils";
 
@@ -29,6 +30,7 @@ export default function DashboardPage() {
   const { churchName } = useAdmin();
   const query = useDashboardQuery(fetchOverview);
   const overview = query.data;
+  const followUps = useDashboardQuery(fetchFollowUps);
   const stats = [
     ["Total users", overview?.totalPeople],
     ["Pending follow-ups", overview?.pendingFollowUps],
@@ -77,6 +79,13 @@ export default function DashboardPage() {
               </CardPanel>
             </Card>
           ))}
+        </div>
+
+        <div className="mt-8">
+          <PendingRequestsChart
+            people={followUps.data}
+            hasError={followUps.status === "error"}
+          />
         </div>
 
         <div className="mt-8">

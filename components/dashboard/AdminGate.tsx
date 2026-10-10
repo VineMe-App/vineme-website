@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AdminProvider, type AdminContextValue } from "@/lib/dashboard/admin-context";
+import {
+  AdminProvider,
+  type AdminContextValue,
+  type ChurchOption,
+} from "@/lib/dashboard/admin-context";
+import { fetchAccessibleChurches } from "@/lib/dashboard/queries";
 import {
   createBrowserSupabaseClient,
   isSupabaseConfigured,
@@ -18,9 +23,65 @@ import {
 
 type AccessState = "checking" | "allowed" | "denied" | "unconfigured";
 
+const CHURCH_STORAGE_KEY = "vineme-dashboard-church";
+
+interface AdminBase {
+  supabase: AdminContextValue["supabase"];
+  userId: string;
+  firstName: string;
+  fullName: string;
+  homeChurchId: string;
+  homeServiceName: string | null;
+  churches: ChurchOption[];
+}
+
+function readSavedChurch(): string | null {
+  try {
+    return window.localStorage.getItem(CHURCH_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function saveChurch(churchId: string) {
+  try {
+    window.localStorage.setItem(CHURCH_STORAGE_KEY, churchId);
+  } catch {
+    // Storage can be blocked; the switcher still works for this visit.
+  }
+}
+
 export function AdminGate({ children }: { children: React.ReactNode }) {
   const [accessState, setAccessState] = useState<AccessState>("checking");
-  const [admin, setAdmin] = useState<AdminContextValue | null>(null);
+  const [base, setBase] = useState<AdminBase | null>(null);
+  const [activeChurchId, setActiveChurchId] = useState<string | null>(null);
+
+  const switchChurch = useCallback((churchId: string) => {
+    setActiveChurchId(churchId);
+    saveChurch(churchId);
+  }, []);
+
+  const admin = useMemo<AdminContextValue | null>(() => {
+    if (!base) return null;
+    const church =
+      base.churches.find((option) => option.id === activeChurchId) ??
+      base.churches.find((option) => option.id === base.homeChurchId) ??
+      base.churches[0];
+
+    return {
+      supabase: base.supabase,
+      userId: base.userId,
+      churchId: church.id,
+      churchName: church.name,
+      // The service belongs to the admin's own church only.
+      serviceName:
+        church.id === base.homeChurchId ? base.homeServiceName : null,
+      firstName: base.firstName,
+      fullName: base.fullName,
+      churches: base.churches,
+      switchChurch,
+    };
+  }, [base, activeChurchId, switchChurch]);
 
   useEffect(() => {
     let isMounted = true;
@@ -69,14 +130,24 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
 
         if (!isMounted) return;
 
-        setAdmin({
+        const home = { id: profile.church_id, name: church.data?.name ?? "Your church" };
+        const churches = await fetchAccessibleChurches({ supabase }, home, roles);
+
+        if (!isMounted) return;
+
+        const saved = readSavedChurch();
+        setActiveChurchId(
+          churches.some((option) => option.id === saved) ? saved : home.id,
+        );
+        setBase({
           supabase,
           userId: session.user.id,
-          churchId: profile.church_id,
-          churchName: church.data?.name ?? null,
-          serviceName: service.data?.name ?? null,
           firstName:
             profile.first_name || profile.name?.split(" ")[0] || "there",
+          fullName: profile.name || profile.first_name || "VineMe admin",
+          homeChurchId: home.id,
+          homeServiceName: service.data?.name ?? null,
+          churches,
         });
         setAccessState("allowed");
       } else {
@@ -97,7 +168,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
       <AdminProvider value={admin}>
         <div className="min-h-screen bg-muted">
           <DashboardNav />
-          <main>{children}</main>
+          <main key={admin.churchId}>{children}</main>
         </div>
       </AdminProvider>
     );

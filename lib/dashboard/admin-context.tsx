@@ -3,13 +3,23 @@
 import { createContext, useContext } from "react";
 import type { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
+export interface ChurchOption {
+  id: string;
+  name: string;
+}
+
 export interface AdminContextValue {
   supabase: ReturnType<typeof createBrowserSupabaseClient>;
   userId: string;
+  /** The church the dashboard is currently showing. */
   churchId: string;
   churchName: string | null;
   serviceName: string | null;
   firstName: string;
+  fullName: string;
+  /** Every church this admin may switch to, current one included. */
+  churches: ChurchOption[];
+  switchChurch: (churchId: string) => void;
 }
 
 const AdminContext = createContext<AdminContextValue | null>(null);

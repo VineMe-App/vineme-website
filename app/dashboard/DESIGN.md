@@ -167,7 +167,20 @@ Rules:
 
 ## Open items
 
-- No sign-out or account menu yet (the avatar is static).
+- The church icon beside the avatar (`components/dashboard/ChurchSwitcher.tsx`)
+  opens the church switcher; the avatar links to `/dashboard/profile`. A church
+  admin belongs to one church (`users.church_id`), so the switcher lists one
+  church; it lists every church only for a `superadmin`, and RLS does not yet
+  return other churches' data to them. Linking admins to several churches needs
+  a join table and policies.
+- The profile page mirrors the mobile app's profile screen: initials avatar,
+  name, editable bio (writes `users.bio` for your own row), church, service,
+  member since, a link to Settings, and Sign out. Left out on purpose: Friends
+  and "Open admin dashboard" (mobile-only), avatar upload, and Delete Account
+  (destructive; needs its own confirmation flow).
+- Installing a coss component with the CLI appends theme variables to
+  `app/globals.css` (it added `--destructive-foreground` and a `.dark` block for
+  `menu`). Revert those; the dashboard theme already defines the tokens.
 - Overview, follow-ups, groups and members read live Supabase data. Changes in
   the follow-up Sheet editor (steps, notes, add to group, archive) are local
   state only and are not saved. Saving needs server-side functions that check

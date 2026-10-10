@@ -307,6 +307,26 @@ export async function fetchFollowUps({
   });
 }
 
+/**
+ * Churches this admin may switch between. A church admin belongs to one
+ * church (`users.church_id`); only a superadmin can see them all. Extend this
+ * one function if admins are ever linked to several churches.
+ */
+export async function fetchAccessibleChurches(
+  { supabase }: Pick<AdminContextValue, "supabase">,
+  home: { id: string; name: string },
+  roles: string[],
+): Promise<{ id: string; name: string }[]> {
+  if (!roles.includes("superadmin")) return [home];
+
+  const { data, error } = await supabase
+    .from("churches")
+    .select("id, name")
+    .order("name", { ascending: true });
+  if (error || !data?.some((church) => church.id === home.id)) return [home];
+  return data as { id: string; name: string }[];
+}
+
 /** Phone number for a person, via the admin-only contact function. */
 export async function fetchContactPhone(
   { supabase }: AdminContextValue,

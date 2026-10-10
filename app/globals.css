@@ -99,6 +99,15 @@
   --border: --alpha(var(--color-black) / 8%);
   --input: color-mix(in srgb, var(--brand-dark) 15%, transparent);
   --ring: var(--brand-pink);
+  /*
+   * Chart ramp for ordered stages (pink, dark = most urgent). One hue,
+   * monotone lightness, validated with `validate_palette.js --ordinal`:
+   * light end 2.34:1 on white, every step >= 0.06 OKLCH L apart.
+   */
+  --chart-stage-1: #a60253;
+  --chart-stage-2: #d2056b;
+  --chart-stage-3: #ff0083;
+  --chart-stage-4: #fe7ea7;
   --sidebar: var(--color-neutral-50);
   --sidebar-foreground: color-mix(in srgb, var(--foreground) 64%, var(--sidebar));
   --sidebar-primary: var(--primary);
