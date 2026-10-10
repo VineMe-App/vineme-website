@@ -52,15 +52,15 @@ export function FollowUpSection({
           <span className="text-muted-foreground text-sm">{note}</span>
         </CardFrameAction>
       </CardFrameHeader>
-      <Table variant="card" className="min-w-[760px] table-fixed">
+      <Table variant="card" className="min-w-[860px] table-fixed">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[30%]">Person</TableHead>
-            <TableHead className="w-[26%]">Where they are</TableHead>
-            <TableHead className="w-[22%] text-right">
+            <TableHead className="w-[27%]">Person</TableHead>
+            <TableHead className="w-[22%]">Where they are</TableHead>
+            <TableHead className="w-[27%] text-right">
               {variant === "attended" ? "Status" : "Follow-up window"}
             </TableHead>
-            <TableHead className="w-[22%] text-right">
+            <TableHead className="w-[24%] text-right">
               <span className="sr-only">Actions</span>
             </TableHead>
           </TableRow>
