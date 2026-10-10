@@ -319,7 +319,7 @@ function DownloadsReport({ people }: { people: ReportPerson[] }) {
         >
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={months} style={chartFont} margin={{ top: 20 }}>
+              <BarChart data={months} style={chartFont} margin={{ top: 28 }}>
                 <CartesianGrid vertical={false} stroke="var(--border)" />
                 <XAxis dataKey="month" tick={axisTick} axisLine={false} tickLine={false} />
                 <YAxis
@@ -353,12 +353,19 @@ function DownloadsReport({ people }: { people: ReportPerson[] }) {
                     fill={outcome.color}
                     maxBarSize={40}
                     radius={
-                      outcome.key === "attended" ? [4, 4, 0, 0] : undefined
+                      outcome.key === "downloaded" ? [4, 4, 0, 0] : undefined
                     }
                   >
-                    {outcome.key === "attended" ? (
-                      <LabelList dataKey="total" content={TotalLabel} />
-                    ) : null}
+                    <LabelList
+                      dataKey="total"
+                      content={renderStackTotal(months, outcome.key, (row) =>
+                        row.downloaded
+                          ? "downloaded"
+                          : row.requested
+                            ? "requested"
+                            : "attended",
+                      )}
+                    />
                   </Bar>
                 ))}
               </BarChart>
@@ -373,34 +380,37 @@ function DownloadsReport({ people }: { people: ReportPerson[] }) {
   );
 }
 
-function TotalLabel({
-  x,
-  y,
-  width,
-  value,
-}: {
-  x?: number | string;
-  y?: number | string;
-  width?: number | string;
-  value?: unknown;
-}) {
-  const total = Number(value);
-  if (!total) return <text />;
-  const xPos = Number(x ?? 0);
-  const yPos = Number(y ?? 0);
-  const barWidth = Number(width ?? 0);
+function renderStackTotal<T extends { total: number }>(
+  rows: T[],
+  series: string,
+  topSeries: (row: T) => string,
+) {
+  return function StackTotal({
+    viewBox,
+    index,
+  }: {
+    viewBox?: { x?: number; y?: number; width?: number; cx?: number };
+    index?: number;
+  }) {
+    const row = index != null ? rows[index] : undefined;
+    if (!row?.total || !viewBox || topSeries(row) !== series) return <text />;
 
-  return (
-    <text
-      x={xPos + barWidth / 2}
-      y={yPos - 6}
-      textAnchor="middle"
-      fill="var(--foreground)"
-      fontSize={12}
-    >
-      {total}
-    </text>
-  );
+    const x = Number(viewBox.x ?? 0);
+    const y = Number(viewBox.y ?? 0);
+    const width = Number(viewBox.width ?? 0);
+
+    return (
+      <text
+        x={x + width / 2}
+        y={y - 8}
+        textAnchor="middle"
+        fill="var(--foreground)"
+        fontSize={12}
+      >
+        {row.total}
+      </text>
+    );
+  };
 }
 
 function PipelineReport({ people }: { people: ReportPerson[] }) {
@@ -632,7 +642,7 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
         >
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={months} style={chartFont} margin={{ top: 20 }}>
+              <BarChart data={months} style={chartFont} margin={{ top: 28 }}>
                 <CartesianGrid vertical={false} stroke="var(--border)" />
                 <XAxis dataKey="month" tick={axisTick} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={axisTick} axisLine={false} tickLine={false} width={28} />
@@ -651,9 +661,21 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
                     );
                   }}
                 />
-                <Bar dataKey="returning" name="Not a newcomer" stackId="joined" fill="var(--brand-dark)" maxBarSize={40} />
+                <Bar dataKey="returning" name="Not a newcomer" stackId="joined" fill="var(--brand-dark)" maxBarSize={40}>
+                  <LabelList
+                    dataKey="total"
+                    content={renderStackTotal(months, "returning", (row) =>
+                      row.newcomer ? "newcomer" : "returning",
+                    )}
+                  />
+                </Bar>
                 <Bar dataKey="newcomer" name="Newcomer" stackId="joined" fill="var(--brand-pink)" maxBarSize={40} radius={[4, 4, 0, 0]}>
-                  <LabelList dataKey="total" content={TotalLabel} />
+                  <LabelList
+                    dataKey="total"
+                    content={renderStackTotal(months, "newcomer", (row) =>
+                      row.newcomer ? "newcomer" : "returning",
+                    )}
+                  />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
