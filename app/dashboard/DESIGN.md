@@ -35,7 +35,7 @@ Live data comes from `lib/dashboard/queries.ts` (one fetch function per page, ru
 
 ## Navigation
 
-- Sticky top bar: logo, tabs (Overview, Follow-ups, My groups, Members, Settings),
+- Sticky top bar: logo, tabs (Home icon for Overview, Follow-ups, Groups, Members, Cog icon for Settings),
   avatar on the right. Active tab has a `border-b-2` underline and
   `aria-current="page"`. Tabs scroll horizontally on small screens.
 - Page background is `bg-muted` (light grey) so white coss cards stand out.

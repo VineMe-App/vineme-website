@@ -1,5 +1,6 @@
 "use client";
 
+import { House, Settings, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,12 +8,19 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAdmin } from "@/lib/dashboard/admin-context";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/dashboard", label: "Overview", exact: true },
+interface NavItem {
+  href: string;
+  label: string;
+  exact: boolean;
+  icon?: LucideIcon;
+}
+
+const navItems: NavItem[] = [
+  { href: "/dashboard", label: "Overview", exact: true, icon: House },
   { href: "/dashboard/follow-ups", label: "Follow-ups", exact: false },
-  { href: "/dashboard/groups", label: "My groups", exact: false },
+  { href: "/dashboard/groups", label: "Groups", exact: false },
   { href: "/dashboard/members", label: "Members", exact: false },
-  { href: "/dashboard/settings", label: "Settings", exact: false },
+  { href: "/dashboard/settings", label: "Settings", exact: false, icon: Settings },
 ];
 
 export function DashboardNav() {
@@ -54,19 +62,29 @@ export function DashboardNav() {
               ? pathname === item.href
               : pathname.startsWith(item.href);
 
+            const Icon = item.icon;
+
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   aria-current={isActive ? "page" : undefined}
+                  title={Icon ? item.label : undefined}
                   className={cn(
-                    "block whitespace-nowrap border-b-2 px-3 py-4 font-medium text-sm transition-colors",
+                    "flex items-center whitespace-nowrap border-b-2 px-3 py-4 font-medium text-sm transition-colors",
                     isActive
                       ? "border-foreground text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {item.label}
+                  {Icon ? (
+                    <>
+                      <Icon aria-hidden="true" className="size-[18px]" />
+                      <span className="sr-only">{item.label}</span>
+                    </>
+                  ) : (
+                    item.label
+                  )}
                 </Link>
               </li>
             );
