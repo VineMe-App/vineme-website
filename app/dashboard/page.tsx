@@ -1,9 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardFrame,
+  CardFrameDescription,
+  CardFrameHeader,
+  CardFrameTitle,
+  CardHeader,
+  CardPanel,
+  CardTitle,
+} from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   createBrowserSupabaseClient,
   isSupabaseConfigured,
@@ -39,6 +62,27 @@ const users = [
     group: "South Ken Evenings",
   },
 ];
+
+const statusVariants: Record<string, NonNullable<BadgeProps["variant"]>> = {
+  Connected: "success",
+  "Pending follow-up": "warning",
+  "Looking for a group": "info",
+};
+
+const stats = [
+  ["Total users", "428"],
+  ["Pending follow-ups", "37"],
+  ["Groups at capacity", "12"],
+];
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 export default function DashboardPage() {
   const [accessState, setAccessState] = useState<
@@ -95,33 +139,34 @@ export default function DashboardPage() {
 
     return (
       <section className="bg-brand-beige px-5 py-16 sm:px-6 lg:py-24">
-        <div className="mx-auto max-w-xl rounded-3xl bg-white p-8 text-center shadow-2xl shadow-brand-dark/10">
-          <p className="text-sm font-black uppercase tracking-[0.24em] text-brand-pink">
-            VineMe dashboard
-          </p>
-          <h1 className="mt-4 font-heading text-4xl font-black text-brand-dark">
-            {isDenied
-              ? "Church admin access required"
-              : isUnconfigured
-                ? "Dashboard login is not configured"
-                : "Checking your access..."}
-          </h1>
-          <p className="mt-4 leading-7 text-brand-dark/70">
-            {isDenied
-              ? "Your VineMe user profile needs church_admin in roles before you can view this dashboard."
-              : isUnconfigured
-                ? "Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable passwordless admin login."
-                : "We are confirming your VineMe session and church admin role."}
-          </p>
+        <Card className="mx-auto max-w-xl text-center">
+          <CardHeader className="justify-items-center gap-3 pt-8">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-pink">
+              VineMe dashboard
+            </p>
+            <CardTitle className="text-3xl leading-tight sm:text-4xl">
+              {isDenied
+                ? "Church admin access required"
+                : isUnconfigured
+                  ? "Dashboard login is not configured"
+                  : "Checking your access..."}
+            </CardTitle>
+            <CardDescription className="text-base leading-7">
+              {isDenied
+                ? "Your VineMe user profile needs church_admin in roles before you can view this dashboard."
+                : isUnconfigured
+                  ? "Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable passwordless admin login."
+                  : "We are confirming your VineMe session and church admin role."}
+            </CardDescription>
+          </CardHeader>
           {isDenied || isUnconfigured ? (
-            <a
-              href="/login"
-              className="mt-6 inline-block rounded-xl bg-brand-pink px-6 py-4 font-black text-white shadow-lg shadow-brand-pink/20 transition-colors hover:bg-brand-dark"
-            >
-              Back to sign in
-            </a>
+            <CardFooter className="justify-center pb-8">
+              <Button size="xl" render={<a href="/login" />}>
+                Back to sign in
+              </Button>
+            </CardFooter>
           ) : null}
-        </div>
+        </Card>
       </section>
     );
   }
@@ -130,12 +175,12 @@ export default function DashboardPage() {
     <section className="bg-white px-5 py-10 sm:px-6 lg:py-14">
       <div className="mx-auto w-full max-w-6xl">
         <div className="rounded-3xl bg-brand-dark p-6 text-white sm:p-8 lg:p-10">
-          <p className="text-sm font-black uppercase tracking-[0.24em] text-brand-pink">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-pink">
             VineMe dashboard
           </p>
           <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="font-heading text-4xl font-black sm:text-5xl">
+              <h1 className="font-heading text-4xl font-bold sm:text-5xl">
                 Church connection overview
               </h1>
               <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">
@@ -149,112 +194,107 @@ export default function DashboardPage() {
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {[
-            ["Total users", "428"],
-            ["Pending follow-ups", "37"],
-            ["Groups at capacity", "12"],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-brand-dark/10 bg-brand-beige p-6"
-            >
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-dark/55">
-                {label}
-              </p>
-              <p className="mt-3 font-heading text-4xl font-black text-brand-dark">
-                {value}
-              </p>
-            </div>
+          {stats.map(([label, value]) => (
+            <Card key={label}>
+              <CardPanel>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  {label}
+                </p>
+                <p className="mt-3 font-heading text-4xl font-bold text-foreground">
+                  {value}
+                </p>
+              </CardPanel>
+            </Card>
           ))}
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1.35fr_0.65fr]">
-          <div className="overflow-hidden rounded-3xl border border-brand-dark/10 bg-white shadow-xl shadow-brand-dark/5">
-            <div className="border-b border-brand-dark/10 p-6">
-              <h2 className="font-heading text-3xl font-black text-brand-dark">
-                User database
-              </h2>
-              <p className="mt-2 text-brand-dark/65">
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.35fr_0.65fr]">
+          <CardFrame>
+            <CardFrameHeader>
+              <CardFrameTitle>User database</CardFrameTitle>
+              <CardFrameDescription>
                 A preview of the people and roles your church team can manage.
-              </p>
-            </div>
+              </CardFrameDescription>
+            </CardFrameHeader>
+            <Table variant="card" className="min-w-[640px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Group</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.email}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarFallback>
+                            {getInitials(user.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {user.name}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>{user.group}</TableCell>
+                    <TableCell>
+                      <Badge variant={statusVariants[user.status] ?? "outline"}>
+                        {user.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardFrame>
 
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-left">
-                <thead className="bg-brand-beige text-sm font-black uppercase tracking-[0.14em] text-brand-dark/60">
-                  <tr>
-                    <th className="px-6 py-4">Name</th>
-                    <th className="px-6 py-4">Role</th>
-                    <th className="px-6 py-4">Group</th>
-                    <th className="px-6 py-4">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-brand-dark/10">
-                  {users.map((user) => (
-                    <tr key={user.email}>
-                      <td className="px-6 py-5">
-                        <p className="font-black text-brand-dark">
-                          {user.name}
-                        </p>
-                        <p className="text-sm text-brand-dark/55">
-                          {user.email}
-                        </p>
-                      </td>
-                      <td className="px-6 py-5 font-bold text-brand-dark/75">
-                        {user.role}
-                      </td>
-                      <td className="px-6 py-5 text-brand-dark/75">
-                        {user.group}
-                      </td>
-                      <td className="px-6 py-5">
-                        <span className="rounded-full bg-brand-pink/10 px-3 py-1 text-sm font-black text-brand-pink">
-                          {user.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Link to ChurchSuite</CardTitle>
+              <CardDescription>
+                Add your ChurchSuite API details so VineMe can sync people,
+                groups, and follow-up status.
+              </CardDescription>
+            </CardHeader>
+            <CardPanel>
+              <Form className="space-y-5">
+                <Field>
+                  <FieldLabel>ChurchSuite API key</FieldLabel>
+                  <Input
+                    name="churchsuite-api-key"
+                    type="password"
+                    placeholder="Paste API key"
+                  />
+                </Field>
 
-          <div className="rounded-3xl border border-brand-dark/10 bg-brand-beige p-6 shadow-xl shadow-brand-dark/5">
-            <h2 className="font-heading text-3xl font-black text-brand-dark">
-              Link to ChurchSuite
-            </h2>
-            <p className="mt-3 leading-7 text-brand-dark/70">
-              Add your ChurchSuite API details so VineMe can sync people,
-              groups, and follow-up status.
-            </p>
+                <Field>
+                  <FieldLabel>ChurchSuite site URL</FieldLabel>
+                  <Input
+                    name="churchsuite-site"
+                    type="url"
+                    placeholder="https://yourchurch.churchsuite.com"
+                  />
+                </Field>
 
-            <form className="mt-6 space-y-5">
-              <Field>
-                <FieldLabel>ChurchSuite API key</FieldLabel>
-                <Input
-                  name="churchsuite-api-key"
-                  type="password"
-                  placeholder="Paste API key"
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel>ChurchSuite site URL</FieldLabel>
-                <Input
-                  name="churchsuite-site"
-                  type="url"
-                  placeholder="https://yourchurch.churchsuite.com"
-                />
-              </Field>
-
-              <Button type="button" size="xl" className="w-full">
-                Link to ChurchSuite
-              </Button>
-            </form>
-
-            <p className="mt-5 text-sm leading-6 text-brand-dark/55">
+                <Button type="button" size="xl" className="w-full">
+                  Link to ChurchSuite
+                </Button>
+              </Form>
+            </CardPanel>
+            <CardFooter className="text-muted-foreground text-sm">
               API credentials are not submitted in this preview.
-            </p>
-          </div>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </section>

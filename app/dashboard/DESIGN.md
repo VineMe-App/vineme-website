@@ -29,13 +29,20 @@ brand styling and must not use anything described here.
   ```
 
   Review the diff afterwards. The CLI can append theme variables to
-  `app/globals.css`; move any `:root` additions under `.admin-theme` so the
-  marketing pages stay untouched.
-- Installed today: `button`, `input`, `field`, `label`, `form`, `spinner`.
+  `app/globals.css` (`:root` and a `.dark` block). Revert those and add any
+  new tokens under `.admin-theme` so the marketing pages stay untouched.
+- Installed today: `button`, `input`, `field`, `label`, `form`, `spinner`,
+  `card`, `table`, `badge`, `avatar`.
 - Use `Field` + `FieldLabel` + `Input` for form controls. Do not pass `id` /
   `htmlFor`; Base UI links the label and control automatically.
 - `Button` renders `type="button"` by default. Set `type="submit"` explicitly
   on submit buttons.
+- Panels: `Card` (+ `CardHeader`, `CardTitle`, `CardDescription`, `CardPanel`,
+  `CardFooter`). Tables and lists: `CardFrame` + `CardFrameHeader` wrapping
+  `Table variant="card"`.
+- Status: `Badge` with `success` (connected), `warning` (pending), `info`
+  (waiting). Always keep the text label.
+- People: `Avatar` + `AvatarFallback` with initials.
 - Prefer `Button` `loading` over hand-rolled spinners when a button is
   waiting on a request.
 
@@ -63,6 +70,8 @@ Rules:
   `text-muted-foreground`, `border-input`) inside coss components.
 - Do not hard-code hex values. Do not edit the `--brand-*` variables for the
   dashboard; change the mapping in `.admin-theme` instead.
+- `.admin-theme *` sets the default border colour to `--border` (coss expects
+  this; Tailwind's default is `currentColor`). Keep it in `@layer base`.
 - Dark mode is not supported. The `dark:` variants in coss files are inert.
 
 ## Typography
@@ -88,15 +97,16 @@ Rules:
 
 - Page container: `mx-auto w-full max-w-6xl`, horizontal padding `px-5 sm:px-6`,
   vertical `py-10 lg:py-14`.
-- Cards: `rounded-3xl` for large panels, `rounded-2xl` for stat tiles,
-  `border border-brand-dark/10`, soft shadow `shadow-xl shadow-brand-dark/5`.
+- Cards: use coss `Card` / `CardFrame` (rounded-2xl, subtle border and
+  shadow). The brand-dark hero card at the top of the overview is the one
+  custom surface (`rounded-3xl bg-brand-dark`).
 - Controls follow coss defaults (`rounded-lg`, 32-40px height). Use
   `size="xl"` for primary page-level buttons and `className="w-full"` for
   full-width form actions.
 - Grids: `gap-5` for stat tiles, `gap-8` between major panels; stack on
   mobile, two columns from `lg`.
-- Tables: wrap in `overflow-x-auto`, header row `bg-brand-beige`, row dividers
-  `divide-brand-dark/10`.
+- Tables: coss `Table variant="card"` inside `CardFrame`. Set a `min-w` on
+  wide tables; the frame scrolls horizontally on small screens.
 
 ## Content tone
 
