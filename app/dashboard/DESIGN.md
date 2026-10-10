@@ -8,13 +8,44 @@ brand styling and must not use anything described here.
 
 - `app/dashboard/layout.tsx` wraps every dashboard route in `.admin-theme`
   and loads Cal Sans. Nothing is applied globally.
+- `AdminThemeScope` mirrors the theme classes onto `<body>` while on
+  `/dashboard`, so portaled coss UI (Sheet, Select, Menu, ...) is themed too.
+- `AdminGate` (client) does the Supabase church-admin check once for the
+  whole area and renders `DashboardNav` plus the page. Pages do not repeat it.
+- The marketing `Navbar` returns `null` on `/dashboard*`; the dashboard has
+  its own nav.
 - `.admin-theme` lives in `app/globals.css`. It defines the coss ui colour
   tokens and overrides `--font-heading` and the base `font-family`.
-- Anything rendered outside that wrapper (the root-layout `Navbar`, `Footer`,
-  and portals appended to `<body>`) does not get the dashboard theme.
-- New dashboard routes go under `app/dashboard/` so they inherit the layout.
-  If an admin area ever needs its own shell (no marketing navbar), move it to
-  a route group such as `app/(admin)/` with its own layout.
+- New dashboard routes go under `app/dashboard/` so they inherit the layout,
+  the access check and the nav. Add the tab to `navItems` in
+  `components/dashboard/DashboardNav.tsx`.
+
+## Pages
+
+| Route | Purpose |
+|---|---|
+| `/dashboard` | Overview (home): header, stats, user preview, ChurchSuite link |
+| `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs your attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Clicking a row opens a Sheet editor |
+| `/dashboard/groups` | Group cards with capacity `Progress` and badges |
+| `/dashboard/members` | Searchable members table |
+
+Sample data lives in `lib/dashboard/sample-data.ts`; shared components in
+`components/dashboard/`.
+
+## Navigation
+
+- Sticky top bar: logo, tabs (Overview, Follow-ups, My groups, Members),
+  avatar on the right. Active tab has a `border-b-2` underline and
+  `aria-current="page"`. Tabs scroll horizontally on small screens.
+- Page background is `bg-muted` (light grey) so white coss cards stand out.
+
+## Sheet editor pattern
+
+- Use coss `Sheet` (`side="right"`) for editing a record from a list, not a
+  fixed side panel. Header = avatar, name, context; `SheetPanel` = scrolling
+  form; `SheetFooter` = primary action and destructive action.
+- Keep the selected id in state after closing so the exit animation does not
+  flash empty content. Key the editor by record id to reset local state.
 
 ## Component library: coss ui
 
@@ -32,7 +63,8 @@ brand styling and must not use anything described here.
   `app/globals.css` (`:root` and a `.dark` block). Revert those and add any
   new tokens under `.admin-theme` so the marketing pages stay untouched.
 - Installed today: `button`, `input`, `field`, `label`, `form`, `spinner`,
-  `card`, `table`, `badge`, `avatar`.
+  `card`, `table`, `badge`, `avatar`, `sheet`, `checkbox`, `select`,
+  `textarea`, `scroll-area`, `progress`.
 - Use `Field` + `FieldLabel` + `Input` for form controls. Do not pass `id` /
   `htmlFor`; Base UI links the label and control automatically.
 - `Button` renders `type="button"` by default. Set `type="submit"` explicitly
@@ -134,7 +166,7 @@ Rules:
 
 ## Open items
 
-- Navbar and footer still use the marketing style on dashboard routes.
-- First portaled component (Dialog, Select, Popover, Toast) needs its portal
-  container inside `.admin-theme`, or the theme class on a higher element.
+- No sign-out or account menu yet (the avatar is static).
+- Follow-ups, groups and members use sample data; changes in the Sheet editor
+  are local state only and are not persisted.
 - Dashboard data is still sample data and the ChurchSuite form does not submit.
