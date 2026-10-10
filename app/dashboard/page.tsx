@@ -245,10 +245,17 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{user.role}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" size="lg">
+                        {user.role}
+                      </Badge>
+                    </TableCell>
                     <TableCell>{user.group}</TableCell>
                     <TableCell>
-                      <Badge variant={statusVariants[user.status] ?? "outline"}>
+                      <Badge
+                        variant={statusVariants[user.status] ?? "outline"}
+                        size="lg"
+                      >
                         {user.status}
                       </Badge>
                     </TableCell>

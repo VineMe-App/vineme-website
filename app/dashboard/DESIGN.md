@@ -40,8 +40,9 @@ brand styling and must not use anything described here.
 - Panels: `Card` (+ `CardHeader`, `CardTitle`, `CardDescription`, `CardPanel`,
   `CardFooter`). Tables and lists: `CardFrame` + `CardFrameHeader` wrapping
   `Table variant="card"`.
-- Status: `Badge` with `success` (connected), `warning` (pending), `info`
-  (waiting). Always keep the text label.
+- Badges: always coss `Badge`, `size="lg"` in tables. Status uses `success`
+  (connected), `warning` (pending), `info` (waiting); roles use `secondary`.
+  Always keep the text label.
 - People: `Avatar` + `AvatarFallback` with initials.
 - Prefer `Button` `loading` over hand-rolled spinners when a button is
   waiting on a request.
