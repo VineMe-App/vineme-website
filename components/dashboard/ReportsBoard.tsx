@@ -729,7 +729,7 @@ const tabs = [
 export function ReportsBoard({ data }: { data: ReportsData }) {
   return (
     <Tabs defaultValue="downloads" className="mt-8 gap-0">
-      <div className="overflow-x-auto border-b">
+      <div className="overflow-x-auto overflow-y-hidden border-b pb-px">
         <TabsList variant="underline" className="w-max justify-start">
           {tabs.map((tab) => (
             <TabsTab key={tab.value} value={tab.value}>

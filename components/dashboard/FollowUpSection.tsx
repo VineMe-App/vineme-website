@@ -14,6 +14,7 @@ import {
   type FollowUpStage,
 } from "@/lib/dashboard/follow-up-utils";
 import type { FollowUp } from "@/lib/dashboard/types";
+import { cn } from "@/lib/utils";
 
 export type StageVariant = "followUp" | "attended";
 
@@ -42,6 +43,50 @@ function CountPill({ count }: { count: number }) {
       className="flex size-7 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground text-sm"
     >
       {count}
+    </span>
+  );
+}
+
+/**
+ * One stacked bar of overdue vs on track, for a dark accordion header. The
+ * caption carries the numbers so colour is never the only signal.
+ */
+function SlaBar({ overdue, onTrack }: { overdue: number; onTrack: number }) {
+  const segments = [
+    { label: "overdue", count: overdue, color: "var(--destructive)" },
+    { label: "on track", count: onTrack, color: "var(--success)" },
+  ].filter((segment) => segment.count > 0);
+  const summary = segments
+    .map((segment) => `${segment.count} ${segment.label}`)
+    .join(", ");
+
+  return (
+    <span className="hidden shrink-0 flex-col items-end gap-1.5 sm:flex">
+      <span
+        role="img"
+        aria-label={summary}
+        className="flex h-2.5 w-36 gap-0.5"
+      >
+        {segments.map((segment, index) => (
+          <span
+            key={segment.label}
+            className={cn(
+              index === 0 && "rounded-l-full",
+              index === segments.length - 1 && "rounded-r-full",
+            )}
+            style={{
+              flexGrow: segment.count,
+              flexBasis: 0,
+              background: segment.color,
+            }}
+          />
+        ))}
+      </span>
+      <span aria-hidden className="font-normal text-white/70 text-xs">
+        {segments.length === 0
+          ? "Nobody waiting"
+          : segments.map((segment) => `${segment.count} ${segment.label}`).join(" · ")}
+      </span>
     </span>
   );
 }
@@ -212,14 +257,7 @@ export function FollowUpLeaderSection({
             {groups.join(" · ")}
           </span>
         </span>
-        {overdue > 0 ? (
-          <span
-            aria-hidden
-            className="rounded-full bg-white/15 px-2.5 py-1 font-medium text-white text-xs"
-          >
-            {overdue} overdue
-          </span>
-        ) : null}
+        <SlaBar overdue={overdue} onTrack={people.length - overdue} />
         <CountPill count={people.length} />
       </AccordionTrigger>
 

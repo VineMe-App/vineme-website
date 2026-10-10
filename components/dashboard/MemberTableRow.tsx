@@ -1,4 +1,3 @@
-import { ChevronRightIcon } from "lucide-react";
 import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,13 +60,11 @@ export function MemberTableRow({
       ) : null}
       <TableCell className="text-right">
         <Button
-          variant="outline"
           size="sm"
           aria-label={`View ${member.name}`}
           aria-haspopup="dialog"
         >
           View
-          <ChevronRightIcon />
         </Button>
       </TableCell>
     </TableRow>

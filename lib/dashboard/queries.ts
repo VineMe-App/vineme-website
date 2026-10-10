@@ -379,6 +379,7 @@ export async function fetchFollowUps({
       name: one(row.member)?.name || "Unnamed",
       avatarUrl: one(row.member)?.avatar_url || null,
       group: one(row.groups)?.title ?? "Group",
+      groupId: row.group_id,
       leader: leadersByGroup.get(row.group_id)?.sort().join(" & ") || "No leader yet",
       requestedOn: formatDay(row.created_at),
       requestedAt: row.created_at,

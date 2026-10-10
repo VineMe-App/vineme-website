@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { XIcon } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +23,7 @@ import { useAdmin } from "@/lib/dashboard/admin-context";
 import { fetchContactPhone, fetchFollowUps } from "@/lib/dashboard/queries";
 import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
+import { cn } from "@/lib/utils";
 
 const stages: (StageMeta & { note: string })[] = [
   {
@@ -50,6 +53,15 @@ const stages: (StageMeta & { note: string })[] = [
 ];
 
 export default function FollowUpsPage() {
+  // useSearchParams needs a Suspense boundary on prerendered pages.
+  return (
+    <Suspense fallback={<PageMessage>Loading your follow-ups...</PageMessage>}>
+      <FollowUpsLoader />
+    </Suspense>
+  );
+}
+
+function FollowUpsLoader() {
   const query = useDashboardQuery(fetchFollowUps);
 
   if (query.status === "loading") {
@@ -80,10 +92,18 @@ function PageMessage({ children }: { children: React.ReactNode }) {
 
 function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
   const admin = useAdmin();
+  const router = useRouter();
+  const pathname = usePathname();
+  // `?group=<id>` narrows the page to one group, e.g. from the group sheet.
+  const groupFilterId = useSearchParams().get("group");
+  const filterGroupName = groupFilterId
+    ? (initialPeople.find((person) => person.groupId === groupFilterId)
+        ?.group ?? null)
+    : null;
   const [people, setPeople] = useState<FollowUp[]>(initialPeople);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [groupBy, setGroupBy] = useState<"stage" | "leader">("stage");
+  const [groupBy, setGroupBy] = useState<"stage" | "leader">("leader");
 
   // Phone numbers are private, so look one up only when its sheet opens.
   useEffect(() => {
@@ -147,7 +167,11 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
     setIsSheetOpen(false);
   };
 
-  const activePeople = people.filter((person) => person.outcome === "active");
+  const activePeople = people.filter(
+    (person) =>
+      person.outcome === "active" &&
+      (!groupFilterId || person.groupId === groupFilterId),
+  );
   const bySection = (sectionId: FollowUpSectionId) =>
     activePeople.filter((person) => getFollowUpSection(person) === sectionId);
   const byStage = (stage: FollowUpStage) =>
@@ -218,7 +242,31 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        {groupFilterId ? (
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3">
+            <p className="text-sm">
+              <span className="text-muted-foreground">Showing follow-ups for </span>
+              <span className="font-medium text-foreground">
+                {filterGroupName ?? "this group"}
+              </span>
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.replace(pathname)}
+            >
+              <XIcon aria-hidden="true" />
+              Clear filter
+            </Button>
+          </div>
+        ) : null}
+
+        <div
+          className={cn(
+            "flex flex-wrap items-center gap-3",
+            groupFilterId ? "mt-4" : "mt-8",
+          )}
+        >
           <span className="text-muted-foreground text-sm">Group by</span>
           <div
             role="group"
@@ -227,8 +275,8 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
           >
             {(
               [
-                ["stage", "Status"],
                 ["leader", "Group leader"],
+                ["stage", "Status"],
               ] as const
             ).map(([mode, label]) => (
               <Button
@@ -246,7 +294,7 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
 
         {groupBy === "stage" ? (
           <Accordion
-            key="stage"
+            key={`stage-${groupFilterId ?? "all"}`}
             className="mt-4 space-y-3"
             multiple
             defaultValue={[
@@ -268,7 +316,7 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
           </Accordion>
         ) : (
           <Accordion
-            key="leader"
+            key={`leader-${groupFilterId ?? "all"}`}
             className="mt-4 space-y-3"
             multiple
             defaultValue={byLeader.length > 0 ? [byLeader[0].leader] : []}

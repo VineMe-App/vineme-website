@@ -6,6 +6,7 @@ export interface FollowUp {
   name: string;
   avatarUrl?: string | null;
   group: string;
+  groupId: string;
   /** Active leader(s) of the group, or "No leader yet". */
   leader: string;
   requestedOn: string;

@@ -146,7 +146,9 @@ function GroupDetails({ group }: { group: Group }) {
           <Button
             size="xl"
             className="w-full"
-            render={<Link href="/dashboard/follow-ups" />}
+            render={
+              <Link href={`/dashboard/follow-ups?group=${group.id}`} />
+            }
           >
             Review follow-ups
           </Button>
