@@ -25,7 +25,7 @@ brand styling and must not use anything described here.
 | Route | Purpose |
 |---|---|
 | `/dashboard` | Overview (home): header, stats, user preview, ChurchSuite link |
-| `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs your attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Clicking a row opens a Sheet editor |
+| `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs your attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Each row ends with a "Review" button (chevron) and the whole row is clickable; both open a Sheet editor |
 | `/dashboard/groups` | Group cards with capacity `Progress` and badges |
 | `/dashboard/members` | Searchable members table |
 

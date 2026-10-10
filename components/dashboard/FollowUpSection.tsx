@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronRightIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,13 +52,16 @@ export function FollowUpSection({
           <span className="text-muted-foreground text-sm">{note}</span>
         </CardFrameAction>
       </CardFrameHeader>
-      <Table variant="card" className="min-w-[640px] table-fixed">
+      <Table variant="card" className="min-w-[760px] table-fixed">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[38%]">Person</TableHead>
-            <TableHead className="w-[28%]">Where they are</TableHead>
-            <TableHead className="w-[34%] text-right">
-              {variant === "attended" ? "Next step" : "Follow-up window"}
+            <TableHead className="w-[30%]">Person</TableHead>
+            <TableHead className="w-[26%]">Where they are</TableHead>
+            <TableHead className="w-[22%] text-right">
+              {variant === "attended" ? "Status" : "Follow-up window"}
+            </TableHead>
+            <TableHead className="w-[22%] text-right">
+              <span className="sr-only">Actions</span>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -65,7 +69,7 @@ export function FollowUpSection({
           {people.map((person) => (
             <TableRow
               key={person.id}
-              className="cursor-pointer"
+              className="cursor-pointer hover:bg-accent/50"
               onClick={() => onSelect(person.id)}
             >
               <TableCell>
@@ -74,12 +78,7 @@ export function FollowUpSection({
                     <AvatarFallback>{getInitials(person.name)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <button
-                      type="button"
-                      className="rounded-sm text-left font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      {person.name}
-                    </button>
+                    <p className="font-medium text-foreground">{person.name}</p>
                     <p className="text-muted-foreground text-xs">
                       {getRequestedLabel(person)}
                     </p>
@@ -89,16 +88,9 @@ export function FollowUpSection({
               <TableCell>{getProgressLabel(person)}</TableCell>
               <TableCell className="text-right">
                 {variant === "attended" ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onAddToGroup(person.id);
-                    }}
-                  >
-                    Add to group
-                  </Button>
+                  <Badge variant="success" size="lg">
+                    Ready to add
+                  </Badge>
                 ) : (
                   <div className="flex flex-wrap items-center justify-end gap-2">
                     {person.fromEmail ? (
@@ -117,6 +109,30 @@ export function FollowUpSection({
                     )}
                   </div>
                 )}
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-2">
+                  {variant === "attended" ? (
+                    <Button
+                      size="sm"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onAddToGroup(person.id);
+                      }}
+                    >
+                      Add to group
+                    </Button>
+                  ) : null}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    aria-label={`Review ${person.name}`}
+                    aria-haspopup="dialog"
+                  >
+                    Review
+                    <ChevronRightIcon />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

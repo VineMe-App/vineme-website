@@ -112,6 +112,9 @@ export default function FollowUpsPage() {
             <p className="mt-2 text-muted-foreground">
               Beta Connect · Tower Bridge
             </p>
+            <p className="mt-1 text-muted-foreground text-sm">
+              Select a person, or press Review, to update their follow-up.
+            </p>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {stats.map((stat) => (
