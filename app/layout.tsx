@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Nunito } from "next/font/google";
-import localFont from "next/font/local";
 import EntryModal from "@/components/shared/EntryModal";
 import Navbar from "@/components/shared/Navbar";
 import "./globals.css";
@@ -16,14 +15,6 @@ const nunitoHeading = Nunito({
   variable: "--font-nunito-heading",
   subsets: ["latin"],
   weight: "900",
-});
-
-// Cal Sans v2 variable (SIL OFL 1.1), from the official `cal-sans` npm package.
-const calSans = localFont({
-  src: "./fonts/cal-sans/CalSansVF.woff2",
-  variable: "--font-cal-sans",
-  weight: "400 700",
-  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -44,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${nunito.variable} ${nunitoHeading.variable} ${calSans.variable} h-full antialiased`}
+      className={`${nunito.variable} ${nunitoHeading.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-brand-dark">
         <Navbar />
