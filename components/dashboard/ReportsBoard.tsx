@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
-import { FOLLOW_UP_WINDOW_DAYS } from "@/lib/dashboard/queries";
+import { FOLLOW_UP_SLA } from "@/lib/dashboard/queries";
 import type {
   ReportGroup,
   ReportPerson,
@@ -524,8 +524,18 @@ function teamSlice(people: ReportPerson[], now: number): Slice[] {
       counts.attended += 1;
       continue;
     }
-    const days = Math.floor((now - new Date(person.pendingSince).getTime()) / 864e5);
-    if (days > FOLLOW_UP_WINDOW_DAYS) counts.attention += 1;
+    const requested = new Date(person.pendingSince).getTime();
+    const window =
+      person.pendingStage === "not-reached"
+        ? FOLLOW_UP_SLA.reachOut
+        : person.pendingStage === "reached-out"
+          ? FOLLOW_UP_SLA.afterReachOut
+          : FOLLOW_UP_SLA.afterSpokenTo;
+    const due = Math.min(
+      requested + window * 864e5,
+      requested + FOLLOW_UP_SLA.attendGroup * 864e5,
+    );
+    if (now > due) counts.attention += 1;
     else counts.track += 1;
   }
   return [
@@ -542,9 +552,8 @@ function TeamReport({ people }: { people: ReportPerson[] }) {
     <div className="mt-6">
       <h2 className="font-heading text-2xl font-bold">How are we doing as a team?</h2>
       <p className="mt-2 max-w-2xl text-muted-foreground text-sm">
-        Open follow-ups, split the same way as the Follow-ups page. A request
-        needs attention once it has waited more than {FOLLOW_UP_WINDOW_DAYS}{" "}
-        days without moving on.
+        Open follow-ups. A request needs attention once it passes the follow-up
+        window, counted from the day they asked.
       </p>
       <div className="mt-6">
         <ChartCard title="Open follow-ups">
