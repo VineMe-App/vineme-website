@@ -23,9 +23,20 @@ export interface FollowUp {
   outcome: "active" | "added" | "archived";
 }
 
+export interface GroupPerson {
+  name: string;
+  role: string;
+  status: string;
+}
+
 export interface Group {
   id: string;
   name: string;
+  description: string;
+  imageUrl: string | null;
+  whatsappLink: string | null;
+  address: string;
+  people: GroupPerson[];
   area: string;
   meets: string;
   leader: string;

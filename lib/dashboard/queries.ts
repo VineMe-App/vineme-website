@@ -138,6 +138,9 @@ export async function fetchOverview({
 type GroupRow = {
   id: string;
   title: string;
+  description: string | null;
+  image_url: string | null;
+  whatsapp_link: string | null;
   meeting_day: string | null;
   meeting_time: string | null;
   at_capacity: boolean;
@@ -156,7 +159,7 @@ export async function fetchGroups({
   const result = await supabase
     .from("groups")
     .select(
-      "id, title, meeting_day, meeting_time, at_capacity, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name))",
+      "id, title, description, image_url, whatsapp_link, meeting_day, meeting_time, at_capacity, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name))",
     )
     .eq("church_id", churchId)
     .eq("status", "approved")
@@ -174,6 +177,23 @@ export async function fetchGroups({
       return {
         id: group.id,
         name: group.title,
+        description: group.description?.trim() ?? "",
+        imageUrl: group.image_url || null,
+        whatsappLink: group.whatsapp_link || null,
+        address: group.location?.address ?? "",
+        people: memberships
+          .filter((m) => m.status === "active" || m.status === "pending")
+          .map((m) => ({
+            name: one(m.member)?.name || "Unnamed",
+            role: m.role,
+            status: m.status,
+          }))
+          .sort(
+            (a, b) =>
+              Number(b.role === "leader") - Number(a.role === "leader") ||
+              Number(a.status === "pending") - Number(b.status === "pending") ||
+              a.name.localeCompare(b.name),
+          ),
         area: group.location?.name ?? group.location?.address ?? "No location",
         meets:
           [group.meeting_day ? `${group.meeting_day}s` : null, time]
