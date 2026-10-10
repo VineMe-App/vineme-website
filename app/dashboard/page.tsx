@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   createBrowserSupabaseClient,
   isSupabaseConfigured,
@@ -141,9 +144,7 @@ export default function DashboardPage() {
                 view.
               </p>
             </div>
-            <button className="rounded-xl bg-brand-pink px-6 py-4 font-black text-white shadow-lg shadow-brand-pink/20 transition-colors hover:bg-white hover:text-brand-pink">
-              Invite user
-            </button>
+            <Button size="xl">Invite user</Button>
           </div>
         </div>
 
@@ -227,44 +228,27 @@ export default function DashboardPage() {
             </p>
 
             <form className="mt-6 space-y-5">
-              <div>
-                <label
-                  htmlFor="churchsuite-api-key"
-                  className="text-sm font-black text-brand-dark"
-                >
-                  ChurchSuite API key
-                </label>
-                <input
-                  id="churchsuite-api-key"
+              <Field>
+                <FieldLabel>ChurchSuite API key</FieldLabel>
+                <Input
                   name="churchsuite-api-key"
                   type="password"
                   placeholder="Paste API key"
-                  className="mt-2 w-full rounded-xl border border-brand-dark/15 bg-white px-4 py-3 text-brand-dark outline-none transition-colors placeholder:text-brand-dark/35 focus:border-brand-pink"
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label
-                  htmlFor="churchsuite-site"
-                  className="text-sm font-black text-brand-dark"
-                >
-                  ChurchSuite site URL
-                </label>
-                <input
-                  id="churchsuite-site"
+              <Field>
+                <FieldLabel>ChurchSuite site URL</FieldLabel>
+                <Input
                   name="churchsuite-site"
                   type="url"
                   placeholder="https://yourchurch.churchsuite.com"
-                  className="mt-2 w-full rounded-xl border border-brand-dark/15 bg-white px-4 py-3 text-brand-dark outline-none transition-colors placeholder:text-brand-dark/35 focus:border-brand-pink"
                 />
-              </div>
+              </Field>
 
-              <button
-                type="button"
-                className="w-full rounded-xl bg-brand-pink px-6 py-4 font-black text-white shadow-lg shadow-brand-pink/20 transition-colors hover:bg-brand-dark"
-              >
+              <Button type="button" size="xl" className="w-full">
                 Link to ChurchSuite
-              </button>
+              </Button>
             </form>
 
             <p className="mt-5 text-sm leading-6 text-brand-dark/55">
