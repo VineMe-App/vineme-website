@@ -134,6 +134,40 @@ function LegendList({ items }: { items: Slice[] }) {
   );
 }
 
+function renderSliceLabel({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}: {
+  cx?: number;
+  cy?: number;
+  midAngle?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  percent?: number;
+}) {
+  if (!percent || percent < 0.05 || cx == null || cy == null || midAngle == null) {
+    return null;
+  }
+  const radius = (Number(innerRadius) + Number(outerRadius)) / 2;
+  const radians = (-midAngle * Math.PI) / 180;
+  return (
+    <text
+      x={cx + radius * Math.cos(radians)}
+      y={cy + radius * Math.sin(radians)}
+      textAnchor="middle"
+      dominantBaseline="central"
+      fill="white"
+      fontSize={12}
+    >
+      {`${Math.round(percent * 100)}%`}
+    </text>
+  );
+}
+
 function Donut({
   slices,
   centreLabel,
@@ -147,7 +181,7 @@ function Donut({
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+    <div className="mt-2 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
       <LegendList items={slices} />
       <div className="relative h-64 w-full max-w-72">
         <ResponsiveContainer width="100%" height="100%">
@@ -156,16 +190,12 @@ function Donut({
               data={slices}
               dataKey="value"
               nameKey="label"
-              innerRadius="62%"
-              outerRadius="84%"
+              innerRadius="58%"
+              outerRadius="78%"
               paddingAngle={2}
               stroke="none"
               labelLine={false}
-              label={({ percent }) =>
-                percent && percent >= 0.05
-                  ? `${Math.round(percent * 100)}%`
-                  : ""
-              }
+              label={renderSliceLabel}
             >
               {slices.map((slice) => (
                 <Cell key={slice.key} fill={slice.color} />
