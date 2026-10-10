@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   createBrowserSupabaseClient,
   isSupabaseConfigured,
@@ -155,12 +158,9 @@ export default function AdminLoginForm() {
   if (step === "code") {
     return (
       <form className="space-y-5" onSubmit={handleVerifyCode}>
-        <div>
-          <label htmlFor="code" className="text-sm font-black text-brand-dark">
-            Verification code
-          </label>
-          <input
-            id="code"
+        <Field>
+          <FieldLabel>Verification code</FieldLabel>
+          <Input
             name="code"
             type="text"
             inputMode="numeric"
@@ -168,30 +168,26 @@ export default function AdminLoginForm() {
             placeholder="Enter 6-digit code"
             value={code}
             onChange={(event) => setCode(event.target.value)}
-            className="mt-2 w-full rounded-xl border border-brand-dark/15 px-4 py-3 text-brand-dark outline-none transition-colors placeholder:text-brand-dark/35 focus:border-brand-pink"
           />
-        </div>
+        </Field>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="block w-full rounded-xl bg-brand-pink px-6 py-4 text-center font-black text-white shadow-lg shadow-brand-pink/20 transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-        >
+        <Button type="submit" size="xl" disabled={isSubmitting} className="w-full">
           {isSubmitting ? "Checking access..." : "Verify and sign in"}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="link"
           onClick={() => {
             setStep("identifier");
             setCode("");
             setError("");
             setMessage("");
           }}
-          className="w-full text-sm font-black text-brand-pink hover:text-brand-dark"
+          className="w-full text-brand-pink hover:text-brand-dark"
         >
           Use a different email or phone
-        </button>
+        </Button>
 
         {message ? (
           <p className="text-sm leading-6 text-brand-dark/65">{message}</p>
@@ -205,35 +201,24 @@ export default function AdminLoginForm() {
 
   return (
     <form className="space-y-5" onSubmit={handleSendCode}>
-      <div>
-        <label
-          htmlFor="identifier"
-          className="text-sm font-black text-brand-dark"
-        >
-          Church admin email or phone
-        </label>
-        <input
-          id="identifier"
+      <Field>
+        <FieldLabel>Church admin email or phone</FieldLabel>
+        <Input
           name="identifier"
           type="text"
           autoComplete="username"
           placeholder="you@church.org or +447..."
           value={identifier}
           onChange={(event) => setIdentifier(event.target.value)}
-          className="mt-2 w-full rounded-xl border border-brand-dark/15 px-4 py-3 text-brand-dark outline-none transition-colors placeholder:text-brand-dark/35 focus:border-brand-pink"
         />
-        <p className="mt-2 text-xs leading-5 text-brand-dark/55">
+        <FieldDescription>
           Use international format for phone numbers, e.g. +447...
-        </p>
-      </div>
+        </FieldDescription>
+      </Field>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="block w-full rounded-xl bg-brand-pink px-6 py-4 text-center font-black text-white shadow-lg shadow-brand-pink/20 transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-      >
+      <Button type="submit" size="xl" disabled={isSubmitting} className="w-full">
         {isSubmitting ? "Sending code..." : "Send sign-in code"}
-      </button>
+      </Button>
 
       {message ? (
         <p className="text-sm leading-6 text-brand-dark/65">{message}</p>
