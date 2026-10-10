@@ -2,6 +2,7 @@
 
 import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import {
+  ChartColumn,
   ClipboardCheck,
   House,
   IdCard,
@@ -47,6 +48,12 @@ const navItems: NavItem[] = [
     label: "Members",
     exact: false,
     icon: IdCard,
+  },
+  {
+    href: "/dashboard/reports",
+    label: "Reports",
+    exact: false,
+    icon: ChartColumn,
   },
   {
     href: "/dashboard/settings",

@@ -4,6 +4,11 @@ import type {
   Group,
   Member,
   OverviewData,
+  ReportGroup,
+  ReportPerson,
+  ReportStage,
+  ReportsData,
+  SignupOutcome,
 } from "@/lib/dashboard/types";
 
 /**
@@ -433,4 +438,130 @@ export async function fetchContactPhone(
   });
   if (error) throw error;
   return (data as { phone?: string | null } | null)?.phone ?? "";
+}
+
+const stageRank: Record<ReportStage, number> = {
+  "not-reached": 0,
+  "reached-out": 1,
+  invited: 2,
+  attended: 3,
+};
+
+function stageFromJourney(status: number | null): ReportStage {
+  if (status === 3) return "attended";
+  if (status === 2) return "invited";
+  if (status === 1) return "reached-out";
+  return "not-reached";
+}
+
+type ReportUserRow = {
+  id: string;
+  created_at: string;
+  newcomer: boolean | null;
+  cannot_find_group: boolean | null;
+};
+
+type ReportMembershipRow = {
+  user_id: string;
+  status: string;
+  journey_status: number | null;
+  created_at: string;
+};
+
+type ReportGroupRow = {
+  id: string;
+  title: string;
+  at_capacity: boolean;
+  group_memberships: { status: string }[] | null;
+};
+
+/** People, follow-ups and groups behind the Reports charts. No names. */
+export async function fetchReports({
+  supabase,
+  churchId,
+}: AdminContextValue): Promise<ReportsData> {
+  const [usersResult, membershipsResult, groupsResult] = await Promise.all([
+    supabase
+      .from("users")
+      .select("id, created_at, newcomer, cannot_find_group")
+      .eq("church_id", churchId)
+      .limit(2000),
+    supabase
+      .from("group_memberships")
+      .select(
+        "user_id, status, journey_status, created_at, groups!inner(church_id)",
+      )
+      .eq("groups.church_id", churchId)
+      .limit(2000),
+    supabase
+      .from("groups")
+      .select("id, title, at_capacity, group_memberships(status)")
+      .eq("church_id", churchId)
+      .eq("status", "approved")
+      .order("title", { ascending: true }),
+  ]);
+  check(usersResult, membershipsResult, groupsResult);
+
+  const memberships = (membershipsResult.data ?? []) as unknown as ReportMembershipRow[];
+  const byUser = new Map<string, ReportMembershipRow[]>();
+  for (const membership of memberships) {
+    const list = byUser.get(membership.user_id) ?? [];
+    list.push(membership);
+    byUser.set(membership.user_id, list);
+  }
+
+  const people = ((usersResult.data ?? []) as unknown as ReportUserRow[]).map(
+    (user): ReportPerson => {
+      const rows = byUser.get(user.id) ?? [];
+      const live = rows.filter(
+        (row) => row.status === "active" || row.status === "pending",
+      );
+      const pending = rows.filter((row) => row.status === "pending");
+      const attended = live.some(
+        (row) => row.status === "active" || row.journey_status === 3,
+      );
+      const outcome: SignupOutcome = attended
+        ? "attended"
+        : pending.length > 0
+          ? "requested"
+          : "downloaded";
+
+      const furthest = pending.reduce<ReportStage | null>((best, row) => {
+        const stage = stageFromJourney(row.journey_status);
+        if (!best || stageRank[stage] > stageRank[best]) return stage;
+        return best;
+      }, null);
+
+      return {
+        createdAt: user.created_at,
+        isNewcomer: Boolean(user.newcomer),
+        askedForHelp: user.cannot_find_group === true,
+        outcome,
+        pendingStage: furthest,
+        pendingSince: pending.reduce<string | null>(
+          (earliest, row) =>
+            !earliest || row.created_at < earliest ? row.created_at : earliest,
+          null,
+        ),
+      };
+    },
+  );
+
+  const groups = ((groupsResult.data ?? []) as unknown as ReportGroupRow[])
+    .map(
+      (group): ReportGroup => ({
+        id: group.id,
+        name: group.title,
+        members: (group.group_memberships ?? []).filter(
+          (row) => row.status === "active",
+        ).length,
+        pending: (group.group_memberships ?? []).filter(
+          (row) => row.status === "pending",
+        ).length,
+        atCapacity: group.at_capacity,
+      }),
+    )
+    .sort((a, b) => b.members - a.members || a.name.localeCompare(b.name));
+
+  return { people, groups };
 }

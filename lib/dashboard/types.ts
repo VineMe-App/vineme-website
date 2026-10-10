@@ -82,3 +82,32 @@ export interface OverviewData {
   groupsAtCapacity: number;
   members: Member[];
 }
+
+/** Where a signed-up person sits. There is no separate download event. */
+export type SignupOutcome = "attended" | "requested" | "downloaded";
+
+export type ReportStage = "not-reached" | "reached-out" | "invited" | "attended";
+
+export interface ReportPerson {
+  createdAt: string;
+  isNewcomer: boolean;
+  /** They said they cannot find a group. */
+  askedForHelp: boolean;
+  outcome: SignupOutcome;
+  /** Furthest stage of an open (pending) follow-up, if they have one. */
+  pendingStage: ReportStage | null;
+  pendingSince: string | null;
+}
+
+export interface ReportGroup {
+  id: string;
+  name: string;
+  members: number;
+  pending: number;
+  atCapacity: boolean;
+}
+
+export interface ReportsData {
+  people: ReportPerson[];
+  groups: ReportGroup[];
+}
