@@ -1,6 +1,13 @@
 "use client";
 
-import { House, Settings, type LucideIcon } from "lucide-react";
+import {
+  ClipboardCheck,
+  House,
+  IdCard,
+  Settings,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,15 +19,42 @@ interface NavItem {
   href: string;
   label: string;
   exact: boolean;
-  icon?: LucideIcon;
+  icon: LucideIcon;
+  iconOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Overview", exact: true, icon: House },
-  { href: "/dashboard/follow-ups", label: "Follow-ups", exact: false },
-  { href: "/dashboard/groups", label: "Groups", exact: false },
-  { href: "/dashboard/members", label: "Members", exact: false },
-  { href: "/dashboard/settings", label: "Settings", exact: false, icon: Settings },
+  {
+    href: "/dashboard",
+    label: "Overview",
+    exact: true,
+    icon: House,
+    iconOnly: true,
+  },
+  {
+    href: "/dashboard/follow-ups",
+    label: "Follow-ups",
+    exact: false,
+    icon: ClipboardCheck,
+  },
+  {
+    href: "/dashboard/groups",
+    label: "Groups",
+    exact: false,
+    icon: UsersRound,
+  },
+  {
+    href: "/dashboard/members",
+    label: "Members",
+    exact: false,
+    icon: IdCard,
+  },
+  {
+    href: "/dashboard/settings",
+    label: "Settings",
+    exact: false,
+    icon: Settings,
+  },
 ];
 
 export function DashboardNav() {
@@ -69,22 +103,18 @@ export function DashboardNav() {
                 <Link
                   href={item.href}
                   aria-current={isActive ? "page" : undefined}
-                  title={Icon ? item.label : undefined}
+                  title={item.iconOnly ? item.label : undefined}
                   className={cn(
-                    "flex items-center whitespace-nowrap border-b-2 px-3 py-4 font-medium text-sm transition-colors",
+                    "flex items-center gap-2 whitespace-nowrap border-b-2 px-3 py-4 font-medium text-sm transition-colors",
                     isActive
                       ? "border-foreground text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {Icon ? (
-                    <>
-                      <Icon aria-hidden="true" className="size-[18px]" />
-                      <span className="sr-only">{item.label}</span>
-                    </>
-                  ) : (
-                    item.label
-                  )}
+                  <Icon aria-hidden="true" className="size-[18px] shrink-0" />
+                  <span className={item.iconOnly ? "sr-only" : undefined}>
+                    {item.label}
+                  </span>
                 </Link>
               </li>
             );
