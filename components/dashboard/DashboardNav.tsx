@@ -12,6 +12,7 @@ const navItems = [
   { href: "/dashboard/follow-ups", label: "Follow-ups", exact: false },
   { href: "/dashboard/groups", label: "My groups", exact: false },
   { href: "/dashboard/members", label: "Members", exact: false },
+  { href: "/dashboard/settings", label: "Settings", exact: false },
 ];
 
 export function DashboardNav() {

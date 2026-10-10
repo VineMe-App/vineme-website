@@ -1,21 +1,15 @@
+import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardDescription,
-  CardFooter,
   CardFrame,
   CardFrameDescription,
   CardFrameHeader,
   CardFrameTitle,
-  CardHeader,
   CardPanel,
-  CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -48,8 +42,15 @@ export default function DashboardPage() {
               </h1>
               <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">
                 Manage your VineMe user database, track people still waiting,
-                and connect ChurchSuite so your pastoral team has one shared
-                view.
+                and keep your pastoral team on one shared view. Connect
+                ChurchSuite from{" "}
+                <Link
+                  href="/dashboard/settings"
+                  className="underline underline-offset-4 hover:text-white"
+                >
+                  Settings
+                </Link>
+                .
               </p>
             </div>
             <Button size="xl">Invite user</Button>
@@ -71,7 +72,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.35fr_0.65fr]">
+        <div className="mt-8">
           <CardFrame>
             <CardFrameHeader>
               <CardFrameTitle>User database</CardFrameTitle>
@@ -127,44 +128,6 @@ export default function DashboardPage() {
               </TableBody>
             </Table>
           </CardFrame>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Link to ChurchSuite</CardTitle>
-              <CardDescription>
-                Add your ChurchSuite API details so VineMe can sync people,
-                groups, and follow-up status.
-              </CardDescription>
-            </CardHeader>
-            <CardPanel>
-              <Form className="space-y-5">
-                <Field>
-                  <FieldLabel>ChurchSuite API key</FieldLabel>
-                  <Input
-                    name="churchsuite-api-key"
-                    type="password"
-                    placeholder="Paste API key"
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel>ChurchSuite site URL</FieldLabel>
-                  <Input
-                    name="churchsuite-site"
-                    type="url"
-                    placeholder="https://yourchurch.churchsuite.com"
-                  />
-                </Field>
-
-                <Button type="button" size="xl" className="w-full">
-                  Link to ChurchSuite
-                </Button>
-              </Form>
-            </CardPanel>
-            <CardFooter className="text-muted-foreground text-sm">
-              API credentials are not submitted in this preview.
-            </CardFooter>
-          </Card>
         </div>
       </div>
     </section>

@@ -24,17 +24,18 @@ brand styling and must not use anything described here.
 
 | Route | Purpose |
 |---|---|
-| `/dashboard` | Overview (home): header, stats, user preview, ChurchSuite link |
+| `/dashboard` | Overview (home): header, stats, user preview |
 | `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs your attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Each row ends with a "Review" button (chevron) and the whole row is clickable; both open a Sheet editor |
 | `/dashboard/groups` | Group cards with capacity `Progress` and badges |
 | `/dashboard/members` | Searchable members table |
+| `/dashboard/settings` | Integrations, starting with the ChurchSuite link form |
 
 Sample data lives in `lib/dashboard/sample-data.ts`; shared components in
 `components/dashboard/`.
 
 ## Navigation
 
-- Sticky top bar: logo, tabs (Overview, Follow-ups, My groups, Members),
+- Sticky top bar: logo, tabs (Overview, Follow-ups, My groups, Members, Settings),
   avatar on the right. Active tab has a `border-b-2` underline and
   `aria-current="page"`. Tabs scroll horizontally on small screens.
 - Page background is `bg-muted` (light grey) so white coss cards stand out.
