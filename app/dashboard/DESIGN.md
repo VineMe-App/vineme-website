@@ -211,7 +211,9 @@ and subtract that padding (plus the 1px border) from the card radius.
   whatever the stage). Stage dates come from `journey_status_change` notes; if a
   stage was never logged the count falls back to the request date.
 - Groups have an `at_capacity` flag but no capacity number, so the groups page
-  shows member counts, not "n of N places".
+  shows member counts, not "n of N places". Pet friendly and allergy free are
+  dashed placeholder badges on the card and in the sheet. The `groups` table
+  has no columns for them yet, so they are not a yes or no.
 - Email addresses, referral notes and "From your email" are not available to the
   app (the `referrals` table has no read policy), so they are not shown.
 - The ChurchSuite form does not submit.

@@ -4,6 +4,7 @@ import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { CalendarIcon, MapPinIcon } from "lucide-react";
 import Link from "next/link";
 import { GroupImage } from "@/components/dashboard/GroupImage";
+import { GroupTraits } from "@/components/dashboard/GroupTraits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,6 +77,7 @@ function GroupDetails({ group }: { group: Group }) {
                 {group.pendingFollowUps} to follow up
               </Badge>
             ) : null}
+            <GroupTraits />
           </div>
 
           <section aria-labelledby="group-about">

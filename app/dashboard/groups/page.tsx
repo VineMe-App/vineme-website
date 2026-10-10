@@ -4,6 +4,7 @@ import { ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
 import { GroupImage } from "@/components/dashboard/GroupImage";
 import { GroupSheet } from "@/components/dashboard/GroupSheet";
+import { GroupTraits } from "@/components/dashboard/GroupTraits";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -94,6 +95,7 @@ export default function GroupsPage() {
                       {group.pendingFollowUps} to follow up
                     </Badge>
                   ) : null}
+                  <GroupTraits />
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-muted-foreground text-sm">
