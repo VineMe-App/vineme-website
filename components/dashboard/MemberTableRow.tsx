@@ -1,21 +1,24 @@
 import { ChevronRightIcon } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import type { Member } from "@/lib/dashboard/types";
-import { getInitials, memberStatusVariants } from "@/lib/dashboard/utils";
+import { memberStatusVariants } from "@/lib/dashboard/utils";
 
 interface MemberTableRowProps {
   member: Member;
   onSelect: (id: string) => void;
   showJoined?: boolean;
+  /** Joined recently: shows a soft "New" tag beside the name. */
+  isNew?: boolean;
 }
 
 export function MemberTableRow({
   member,
   onSelect,
   showJoined = false,
+  isNew = false,
 }: MemberTableRowProps) {
   return (
     <TableRow
@@ -24,10 +27,15 @@ export function MemberTableRow({
     >
       <TableCell>
         <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
-          </Avatar>
-          <p className="font-medium text-foreground">{member.name}</p>
+          <PersonAvatar name={member.name} src={member.avatarUrl} />
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-foreground">{member.name}</p>
+            {isNew ? (
+              <Badge className="border-transparent bg-primary/10 text-[color-mix(in_srgb,var(--primary)_70%,black)]">
+                New
+              </Badge>
+            ) : null}
+          </div>
         </div>
       </TableCell>
       <TableCell>

@@ -4,11 +4,18 @@ export interface FollowUp {
   id: string;
   userId: string;
   name: string;
+  avatarUrl?: string | null;
   group: string;
+  /** Active leader(s) of the group, or "No leader yet". */
+  leader: string;
   requestedOn: string;
+  /** ISO timestamp the request was made. */
+  requestedAt: string;
   requestedDaysAgo: number;
   overdueDays?: number;
   dueInDays?: number;
+  /** Which SLA rule the due date comes from, e.g. "Reach out within 6 days". */
+  dueReason?: string;
   fromEmail?: boolean;
   /** Empty until looked up with get_user_contact_admin. */
   phone: string;
@@ -25,6 +32,7 @@ export interface FollowUp {
 
 export interface GroupPerson {
   name: string;
+  avatarUrl: string | null;
   role: string;
   status: string;
 }
@@ -54,6 +62,7 @@ export interface MemberGroup {
 export interface Member {
   id: string;
   name: string;
+  avatarUrl: string | null;
   role: string;
   status: string;
   group: string;
@@ -63,6 +72,8 @@ export interface Member {
   isNewcomer: boolean;
   /** Every group membership (active or pending), newest first. */
   memberships: MemberGroup[];
+  /** ISO timestamp, for sorting and "new this month". */
+  joinedAt: string;
 }
 
 export interface OverviewData {

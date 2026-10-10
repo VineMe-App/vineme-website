@@ -1,20 +1,20 @@
 "use client";
 
+import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { PencilIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAdmin } from "@/lib/dashboard/admin-context";
-import { getInitials } from "@/lib/dashboard/utils";
 
 const BIO_MAX_LENGTH = 500;
 
 type ProfileRow = { bio: string | null; created_at: string };
 
 export default function ProfilePage() {
-  const { supabase, userId, fullName, churchName, serviceName } = useAdmin();
+  const { supabase, userId, fullName, avatarUrl, churchName, serviceName } =
+    useAdmin();
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -98,11 +98,12 @@ export default function ProfilePage() {
         <h1 className="font-heading text-3xl font-bold sm:text-4xl">Profile</h1>
 
         <div className="mt-8 flex flex-col items-center text-center">
-          <Avatar className="size-28">
-            <AvatarFallback className="bg-brand-beige font-heading text-4xl font-bold text-primary">
-              {getInitials(fullName)}
-            </AvatarFallback>
-          </Avatar>
+          <PersonAvatar
+            name={fullName}
+            src={avatarUrl}
+            className="size-28"
+            fallbackClassName="bg-brand-beige font-heading text-4xl font-bold text-primary"
+          />
           <h2 className="mt-5 font-heading text-2xl font-bold sm:text-3xl">
             {fullName}
           </h2>

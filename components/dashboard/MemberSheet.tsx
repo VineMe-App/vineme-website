@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,7 @@ import {
 import { useAdmin } from "@/lib/dashboard/admin-context";
 import { fetchContactPhone } from "@/lib/dashboard/queries";
 import type { Member } from "@/lib/dashboard/types";
-import { getInitials, memberStatusVariants } from "@/lib/dashboard/utils";
+import { memberStatusVariants } from "@/lib/dashboard/utils";
 
 interface MemberSheetProps {
   member: Member | null;
@@ -65,11 +65,12 @@ function MemberDetails({ member }: { member: Member }) {
     <>
       <SheetHeader>
         <div className="flex items-center gap-3">
-          <Avatar className="size-12">
-            <AvatarFallback className="text-sm">
-              {getInitials(member.name)}
-            </AvatarFallback>
-          </Avatar>
+          <PersonAvatar
+            name={member.name}
+            src={member.avatarUrl}
+            className="size-12"
+            fallbackClassName="text-sm"
+          />
           <div>
             <SheetTitle>{member.name}</SheetTitle>
             <SheetDescription>Joined {member.joinedOn}</SheetDescription>

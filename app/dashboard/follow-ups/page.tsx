@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FollowUpSection } from "@/components/dashboard/FollowUpSection";
+import { Accordion } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import {
+  FollowUpLeaderSection,
+  FollowUpSection,
+  type StageMeta,
+} from "@/components/dashboard/FollowUpSection";
 import { FollowUpSheet } from "@/components/dashboard/FollowUpSheet";
 import { Card, CardPanel } from "@/components/ui/card";
 import {
@@ -16,33 +22,28 @@ import { fetchContactPhone, fetchFollowUps } from "@/lib/dashboard/queries";
 import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 
-const stages: {
-  id: FollowUpStage;
-  title: string;
-  note: string;
-  variant: "followUp" | "attended";
-}[] = [
+const stages: (StageMeta & { note: string })[] = [
   {
     id: "not-reached",
-    title: "Not reached out yet",
+    title: "Not contacted",
     note: "Nobody has contacted them",
     variant: "followUp",
   },
   {
     id: "reached-out",
-    title: "Reached out",
+    title: "Reached out to",
     note: "Next: invite them to the group",
     variant: "followUp",
   },
   {
     id: "invited",
-    title: "Invited",
+    title: "Spoken to",
     note: "Waiting for them to attend",
     variant: "followUp",
   },
   {
     id: "attended",
-    title: "Attended, not yet added",
+    title: "Attended",
     note: "One step left",
     variant: "attended",
   },
@@ -82,6 +83,7 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
   const [people, setPeople] = useState<FollowUp[]>(initialPeople);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [groupBy, setGroupBy] = useState<"stage" | "leader">("stage");
 
   // Phone numbers are private, so look one up only when its sheet opens.
   useEffect(() => {
@@ -159,6 +161,26 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
     { label: "Attended, not yet added", count: bySection("attended").length },
   ];
   const needsAttentionCount = stats[0].count;
+
+  // Leaders with the most overdue people first; unled groups last.
+  const byLeader = Object.values(
+    activePeople.reduce<Record<string, FollowUp[]>>((acc, person) => {
+      (acc[person.leader] ??= []).push(person);
+      return acc;
+    }, {}),
+  )
+    .map((leaderPeople) => ({
+      leader: leaderPeople[0].leader,
+      people: leaderPeople,
+      overdue: leaderPeople.filter((person) => person.overdueDays).length,
+    }))
+    .sort(
+      (a, b) =>
+        Number(a.leader === "No leader yet") -
+          Number(b.leader === "No leader yet") ||
+        b.overdue - a.overdue ||
+        a.leader.localeCompare(b.leader),
+    );
   const selectedPerson =
     people.find((person) => person.id === selectedId) ?? null;
 
@@ -196,19 +218,74 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
           </div>
         </div>
 
-        <div className="mt-8 space-y-8">
-          {stages.map((section) => (
-            <FollowUpSection
-              key={section.id}
-              title={section.title}
-              note={section.note}
-              variant={section.variant}
-              people={byStage(section.id)}
-              onSelect={handleSelect}
-              onAddToGroup={handleAddToGroup}
-            />
-          ))}
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <span className="text-muted-foreground text-sm">Group by</span>
+          <div
+            role="group"
+            aria-label="Group follow-ups by"
+            className="flex gap-1 rounded-xl bg-muted p-1"
+          >
+            {(
+              [
+                ["stage", "Status"],
+                ["leader", "Group leader"],
+              ] as const
+            ).map(([mode, label]) => (
+              <Button
+                key={mode}
+                size="sm"
+                variant={groupBy === mode ? "default" : "ghost"}
+                aria-pressed={groupBy === mode}
+                onClick={() => setGroupBy(mode)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
         </div>
+
+        {groupBy === "stage" ? (
+          <Accordion
+            key="stage"
+            className="mt-4 space-y-3"
+            multiple
+            defaultValue={[
+              stages.find((stage) => byStage(stage.id).length > 0)?.id ??
+                stages[0].id,
+            ]}
+          >
+            {stages.map((section) => (
+              <FollowUpSection
+                key={section.id}
+                value={section.id}
+                title={section.title}
+                variant={section.variant}
+                people={byStage(section.id)}
+                onSelect={handleSelect}
+                onAddToGroup={handleAddToGroup}
+              />
+            ))}
+          </Accordion>
+        ) : (
+          <Accordion
+            key="leader"
+            className="mt-4 space-y-3"
+            multiple
+            defaultValue={byLeader.length > 0 ? [byLeader[0].leader] : []}
+          >
+            {byLeader.map((entry) => (
+              <FollowUpLeaderSection
+                key={entry.leader}
+                value={entry.leader}
+                leader={entry.leader}
+                people={entry.people}
+                stages={stages}
+                onSelect={handleSelect}
+                onAddToGroup={handleAddToGroup}
+              />
+            ))}
+          </Accordion>
+        )}
 
         <p className="mt-10 text-center text-muted-foreground text-sm">
           That&apos;s everything for now. Your next digest arrives Monday.

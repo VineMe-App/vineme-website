@@ -1,9 +1,9 @@
 "use client";
 
+import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { CalendarIcon, MapPinIcon } from "lucide-react";
 import Link from "next/link";
 import { GroupImage } from "@/components/dashboard/GroupImage";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +16,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { Group } from "@/lib/dashboard/types";
-import { getInitials } from "@/lib/dashboard/utils";
 
 interface GroupSheetProps {
   group: Group | null;
@@ -192,11 +191,12 @@ function PeopleSection({
               key={`${person.name}-${index}`}
               className="flex items-center gap-3 text-sm"
             >
-              <Avatar className="size-8">
-                <AvatarFallback className="text-xs">
-                  {getInitials(person.name)}
-                </AvatarFallback>
-              </Avatar>
+              <PersonAvatar
+                name={person.name}
+                src={person.avatarUrl}
+                className="size-8"
+                fallbackClassName="text-xs"
+              />
               <span className="flex-1 font-medium">{person.name}</span>
               {person.role === "leader" ? (
                 <Badge variant="secondary">Leader</Badge>

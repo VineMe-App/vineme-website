@@ -17,6 +17,7 @@ export interface AdminContextValue {
   serviceName: string | null;
   firstName: string;
   fullName: string;
+  avatarUrl: string | null;
   /** Every church this admin may switch to, current one included. */
   churches: ChurchOption[];
   switchChurch: (churchId: string) => void;

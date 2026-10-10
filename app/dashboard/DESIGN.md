@@ -203,7 +203,11 @@ and subtract that padding (plus the 1px border) from the card radius.
 - Follow-up steps map to `group_memberships.journey_status`: 1 reached out,
   2 spoken to (shown as Invited), 3 attended group. Step dates come from
   `journey_status_change` notes; the overdue window is
-  `FOLLOW_UP_WINDOW_DAYS` (7) in `lib/dashboard/queries.ts`, an assumption.
+  `FOLLOW_UP_SLA` in `lib/dashboard/queries.ts`: reach out within 6 days of the
+  request; follow up a reach out within 10 days; follow up a "spoken to" within
+  14 days; attend a group within 30 days of the request (the final deadline
+  whatever the stage). Stage dates come from `journey_status_change` notes; if a
+  stage was never logged the count falls back to the request date.
 - Groups have an `at_capacity` flag but no capacity number, so the groups page
   shows member counts, not "n of N places".
 - Email addresses, referral notes and "From your email" are not available to the

@@ -6,8 +6,21 @@ import type {
   OverviewData,
 } from "@/lib/dashboard/types";
 
-/** Days after the last follow-up step before someone counts as overdue. */
-export const FOLLOW_UP_WINDOW_DAYS = 7;
+/**
+ * The team's follow-up expectations (SLA), in days. Someone is overdue
+ * ("Attention") once they pass the window for their current stage, or 30 days
+ * after asking to join without having attended a group.
+ */
+export const FOLLOW_UP_SLA = {
+  /** Reach out within 6 days of the request. */
+  reachOut: 6,
+  /** Follow up on a reach out within 10 days. */
+  afterReachOut: 10,
+  /** Follow up on a "spoken to" within 14 days. */
+  afterSpokenTo: 14,
+  /** Attend a group within 30 days of the request. */
+  attendGroup: 30,
+} as const;
 
 const DAY_MS = 864e5;
 
@@ -49,6 +62,7 @@ type MembershipRow = {
 type MemberRow = {
   id: string;
   name: string | null;
+  avatar_url: string | null;
   roles: string[] | null;
   bio: string | null;
   newcomer: boolean | null;
@@ -77,10 +91,12 @@ function toMember(user: MemberRow): Member {
   return {
     id: user.id,
     name: user.name || "Unnamed",
+    avatarUrl: user.avatar_url || null,
     role,
     status,
     group: one(current?.groups)?.title ?? "Unassigned",
     joined: formatMonthYear(user.created_at),
+    joinedAt: user.created_at,
     joinedOn: new Date(user.created_at).toLocaleDateString("en-GB", {
       day: "numeric",
       month: "long",
@@ -100,7 +116,7 @@ function toMember(user: MemberRow): Member {
 }
 
 const memberColumns =
-  "id, name, roles, bio, newcomer, created_at, group_memberships(role, status, created_at, groups(title))";
+  "id, name, avatar_url, roles, bio, newcomer, created_at, group_memberships(role, status, created_at, groups(title))";
 
 export async function fetchMembers({
   supabase,
@@ -166,7 +182,7 @@ type GroupRow = {
   group_memberships: {
     role: string;
     status: string;
-    member: Maybe<{ name: string | null }>;
+    member: Maybe<{ name: string | null; avatar_url: string | null }>;
   }[];
 };
 
@@ -177,7 +193,7 @@ export async function fetchGroups({
   const result = await supabase
     .from("groups")
     .select(
-      "id, title, description, image_url, whatsapp_link, meeting_day, meeting_time, at_capacity, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name))",
+      "id, title, description, image_url, whatsapp_link, meeting_day, meeting_time, at_capacity, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name, avatar_url))",
     )
     .eq("church_id", churchId)
     .eq("status", "approved")
@@ -203,6 +219,7 @@ export async function fetchGroups({
           .filter((m) => m.status === "active" || m.status === "pending")
           .map((m) => ({
             name: one(m.member)?.name || "Unnamed",
+            avatarUrl: one(m.member)?.avatar_url || null,
             role: m.role,
             status: m.status,
           }))
@@ -230,9 +247,10 @@ export async function fetchGroups({
 type FollowUpRow = {
   id: string;
   user_id: string;
+  group_id: string;
   created_at: string;
   journey_status: number | null;
-  member: Maybe<{ name: string | null }>;
+  member: Maybe<{ name: string | null; avatar_url: string | null }>;
   groups: Maybe<{ title: string }>;
 };
 
@@ -248,11 +266,11 @@ export async function fetchFollowUps({
   supabase,
   churchId,
 }: AdminContextValue): Promise<FollowUp[]> {
-  const [requests, notes] = await Promise.all([
+  const [requests, notes, leaders] = await Promise.all([
     supabase
       .from("group_memberships")
       .select(
-        "id, user_id, created_at, journey_status, member:users!group_memberships_user_id_fkey(name), groups!inner(title, church_id)",
+        "id, user_id, group_id, created_at, journey_status, member:users!group_memberships_user_id_fkey(name, avatar_url), groups!inner(title, church_id)",
       )
       .eq("groups.church_id", churchId)
       .eq("status", "pending")
@@ -267,8 +285,29 @@ export async function fetchFollowUps({
       .in("note_type", ["manual", "journey_status_change"])
       .order("created_at", { ascending: true })
       .limit(2000),
+    supabase
+      .from("group_memberships")
+      .select(
+        "group_id, member:users!group_memberships_user_id_fkey(name), groups!inner(church_id)",
+      )
+      .eq("groups.church_id", churchId)
+      .eq("role", "leader")
+      .eq("status", "active"),
   ]);
-  check(requests, notes);
+  check(requests, notes, leaders);
+
+  const leadersByGroup = new Map<string, string[]>();
+  for (const row of (leaders.data ?? []) as unknown as {
+    group_id: string;
+    member: Maybe<{ name: string | null }>;
+  }[]) {
+    const name = one(row.member)?.name;
+    if (!name) continue;
+    leadersByGroup.set(row.group_id, [
+      ...(leadersByGroup.get(row.group_id) ?? []),
+      name,
+    ]);
+  }
 
   const notesByMembership = new Map<string, NoteRow[]>();
   for (const note of (notes.data ?? []) as unknown as NoteRow[]) {
@@ -295,20 +334,59 @@ export async function fetchFollowUps({
       .filter((note) => note.note_type === "journey_status_change")
       .at(-1);
     const lastActivity = lastJourneyNote?.created_at;
-    const dueAt =
-      new Date(lastActivity ?? row.created_at).getTime() +
-      FOLLOW_UP_WINDOW_DAYS * DAY_MS;
-    const daysLate = Math.floor((now - dueAt) / DAY_MS);
+
+    // When the person reached their current stage. If that was never logged
+    // we can only count from the request, so the window may look longer gone.
+    const enteredStageAt = (status: number) =>
+      history.filter((note) => note.new_journey_status === status).at(-1)
+        ?.created_at ?? lastActivity ?? row.created_at;
+
+    const requestedMs = new Date(row.created_at).getTime();
+    const attendDeadline = requestedMs + FOLLOW_UP_SLA.attendGroup * DAY_MS;
+    let dueAt: number | null = null;
+    let dueReason = "";
+
+    if (journey <= 0) {
+      dueAt = requestedMs + FOLLOW_UP_SLA.reachOut * DAY_MS;
+      dueReason = `Reach out within ${FOLLOW_UP_SLA.reachOut} days of the request`;
+    } else if (journey === 1) {
+      dueAt =
+        new Date(enteredStageAt(1)).getTime() +
+        FOLLOW_UP_SLA.afterReachOut * DAY_MS;
+      dueReason = `Follow up within ${FOLLOW_UP_SLA.afterReachOut} days of reaching out`;
+    } else if (journey === 2) {
+      dueAt =
+        new Date(enteredStageAt(2)).getTime() +
+        FOLLOW_UP_SLA.afterSpokenTo * DAY_MS;
+      dueReason = `Follow up within ${FOLLOW_UP_SLA.afterSpokenTo} days of speaking to them`;
+    }
+
+    // Whatever the stage, 30 days after the request is the final deadline.
+    if (dueAt !== null && attendDeadline < dueAt) {
+      dueAt = attendDeadline;
+      dueReason = `Attend a group within ${FOLLOW_UP_SLA.attendGroup} days of the request`;
+    }
+    const isOverdue = dueAt !== null && now > dueAt;
 
     return {
       id: row.id,
       userId: row.user_id,
       name: one(row.member)?.name || "Unnamed",
+      avatarUrl: one(row.member)?.avatar_url || null,
       group: one(row.groups)?.title ?? "Group",
+      leader: leadersByGroup.get(row.group_id)?.sort().join(" & ") || "No leader yet",
       requestedOn: formatDay(row.created_at),
+      requestedAt: row.created_at,
       requestedDaysAgo: daysSince(row.created_at, now),
-      overdueDays: now > dueAt ? Math.max(1, daysLate) : undefined,
-      dueInDays: now > dueAt ? undefined : Math.ceil((dueAt - now) / DAY_MS),
+      overdueDays:
+        isOverdue && dueAt !== null
+          ? Math.max(1, Math.floor((now - dueAt) / DAY_MS))
+          : undefined,
+      dueInDays:
+        !isOverdue && dueAt !== null
+          ? Math.max(0, Math.ceil((dueAt - now) / DAY_MS))
+          : undefined,
+      dueReason: dueAt !== null ? dueReason : undefined,
       phone: "",
       progress: {
         reachedOut: journey >= 1 ? stepDate(1) : null,

@@ -1,7 +1,7 @@
 "use client";
 
+import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,7 +28,6 @@ import {
   getRequestedLabel,
 } from "@/lib/dashboard/follow-up-utils";
 import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
-import { getInitials } from "@/lib/dashboard/utils";
 import { cn } from "@/lib/utils";
 
 const steps: { id: FollowUpStep; label: string; historyLabel: string }[] = [
@@ -98,11 +97,12 @@ function FollowUpEditor({
     <>
       <SheetHeader>
         <div className="flex items-center gap-3">
-          <Avatar className="size-12">
-            <AvatarFallback className="text-sm">
-              {getInitials(person.name)}
-            </AvatarFallback>
-          </Avatar>
+          <PersonAvatar
+            name={person.name}
+            src={person.avatarUrl}
+            className="size-12"
+            fallbackClassName="text-sm"
+          />
           <div>
             <SheetTitle>{person.name}</SheetTitle>
             <SheetDescription>{getRequestedLabel(person)}</SheetDescription>

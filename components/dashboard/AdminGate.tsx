@@ -30,6 +30,7 @@ interface AdminBase {
   userId: string;
   firstName: string;
   fullName: string;
+  avatarUrl: string | null;
   homeChurchId: string;
   homeServiceName: string | null;
   churches: ChurchOption[];
@@ -78,6 +79,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
         church.id === base.homeChurchId ? base.homeServiceName : null,
       firstName: base.firstName,
       fullName: base.fullName,
+      avatarUrl: base.avatarUrl,
       churches: base.churches,
       switchChurch,
     };
@@ -104,7 +106,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
 
       const { data: profile } = await supabase
         .from("users")
-        .select("roles, church_id, service_id, first_name, name")
+        .select("roles, church_id, service_id, first_name, name, avatar_url")
         .eq("id", session.user.id)
         .single();
 
@@ -145,6 +147,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
           firstName:
             profile.first_name || profile.name?.split(" ")[0] || "there",
           fullName: profile.name || profile.first_name || "VineMe admin",
+          avatarUrl: profile.avatar_url || null,
           homeChurchId: home.id,
           homeServiceName: service.data?.name ?? null,
           churches,
