@@ -718,10 +718,10 @@ function ConnectionReport({ people }: { people: ReportPerson[] }) {
 }
 
 const tabs = [
-  { value: "downloads", label: "How many new downloads?" },
-  { value: "pipeline", label: "How is the pipeline looking?" },
-  { value: "groups", label: "How are my groups doing?" },
-  { value: "team", label: "How are we doing as a team?" },
+  { value: "downloads", label: "Downloads" },
+  { value: "pipeline", label: "Pipeline" },
+  { value: "groups", label: "Groups" },
+  { value: "team", label: "Team" },
   { value: "newcomers", label: "Newcomers" },
   { value: "connection", label: "Connection" },
 ];
