@@ -108,6 +108,7 @@ Rules:
 - `.admin-theme *` sets the default border colour to `--border` (coss expects
   this; Tailwind's default is `currentColor`). Keep it in `@layer base`.
 - Dark mode is not supported. The `dark:` variants in coss files are inert.
+- Charts use the brand palette only: `--brand-pink` for the main series (never green), `--brand-dark` for the comparison series, and `--chart-stage-1` to `--chart-stage-4` for ordered stages (darkest pink = most urgent). Status badges still use emerald, amber and blue.
 
 ## Typography
 

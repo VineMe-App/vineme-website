@@ -38,9 +38,9 @@ import type {
 } from "@/lib/dashboard/types";
 
 const outcomes: { key: SignupOutcome; label: string; color: string }[] = [
-  { key: "attended", label: "Attended", color: "var(--color-emerald-500)" },
-  { key: "requested", label: "Requested", color: "var(--color-amber-500)" },
-  { key: "downloaded", label: "Downloaded", color: "var(--color-neutral-400)" },
+  { key: "attended", label: "Attended", color: "var(--brand-pink)" },
+  { key: "requested", label: "Requested", color: "var(--chart-stage-1)" },
+  { key: "downloaded", label: "Downloaded", color: "var(--brand-dark)" },
 ];
 
 const stages: { key: ReportPerson["pendingStage"] & string; label: string; color: string }[] = [
@@ -447,7 +447,7 @@ function GroupsReport({ groups }: { groups: ReportGroup[] }) {
     <div className="mt-6">
       <h2 className="font-heading text-2xl font-bold">How are my groups doing?</h2>
       <p className="mt-2 max-w-2xl text-muted-foreground text-sm">
-        Active members in each approved group. Red bars are at capacity.
+        Active members in each approved group. Darker bars are at capacity.
       </p>
       <div className="mt-6">
         <ChartCard title="Members by group">
@@ -500,8 +500,8 @@ function GroupsReport({ groups }: { groups: ReportGroup[] }) {
                         key={group.id}
                         fill={
                           group.atCapacity
-                            ? "var(--color-rose-500)"
-                            : "var(--color-emerald-500)"
+                            ? "var(--chart-stage-1)"
+                            : "var(--brand-pink)"
                         }
                       />
                     ))}
@@ -539,9 +539,9 @@ function teamSlice(people: ReportPerson[], now: number): Slice[] {
     else counts.track += 1;
   }
   return [
-    { key: "attention", label: "Needs your attention", value: counts.attention, color: "var(--color-rose-500)" },
-    { key: "track", label: "On track", value: counts.track, color: "var(--color-amber-500)" },
-    { key: "attended", label: "Attended, not yet added", value: counts.attended, color: "var(--color-emerald-500)" },
+    { key: "attention", label: "Needs your attention", value: counts.attention, color: "var(--chart-stage-1)" },
+    { key: "track", label: "On track", value: counts.track, color: "var(--chart-stage-2)" },
+    { key: "attended", label: "Attended, not yet added", value: counts.attended, color: "var(--brand-pink)" },
   ];
 }
 
@@ -575,7 +575,7 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
     {
       key: "returning",
       label: "Not a newcomer",
-      color: "var(--color-neutral-400)",
+      color: "var(--brand-dark)",
       value: people.filter((person) => !person.isNewcomer).length,
     },
   ];
@@ -621,7 +621,7 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
                     );
                   }}
                 />
-                <Bar dataKey="returning" name="Not a newcomer" stackId="joined" fill="var(--color-neutral-400)" maxBarSize={40} />
+                <Bar dataKey="returning" name="Not a newcomer" stackId="joined" fill="var(--brand-dark)" maxBarSize={40} />
                 <Bar dataKey="newcomer" name="Newcomer" stackId="joined" fill="var(--brand-pink)" maxBarSize={40} radius={[4, 4, 0, 0]}>
                   <LabelList dataKey="total" content={TotalLabel} />
                 </Bar>
@@ -642,9 +642,9 @@ function connectionSlices(people: ReportPerson[]): Slice[] {
     else counts.looking += 1;
   }
   return [
-    { key: "in-group", label: "In a group", value: counts.inGroup, color: "var(--color-emerald-500)" },
-    { key: "asked", label: "Asked for help", value: counts.asked, color: "var(--color-amber-500)" },
-    { key: "looking", label: "Not connected", value: counts.looking, color: "var(--color-neutral-400)" },
+    { key: "in-group", label: "In a group", value: counts.inGroup, color: "var(--brand-pink)" },
+    { key: "asked", label: "Asked for help", value: counts.asked, color: "var(--chart-stage-1)" },
+    { key: "looking", label: "Not connected", value: counts.looking, color: "var(--brand-dark)" },
   ];
 }
 
