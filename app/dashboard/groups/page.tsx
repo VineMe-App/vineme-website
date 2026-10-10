@@ -63,8 +63,11 @@ export default function GroupsPage() {
               }
               className="cursor-pointer text-left transition-colors hover:border-foreground/25 hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40"
             >
-              <div className="px-6 pt-6">
-                <GroupImage src={group.imageUrl} alt={group.name} />
+              <div className="p-2 pb-0">
+                <GroupImage
+                  src={group.imageUrl}
+                  alt={group.name}
+                />
               </div>
               <CardHeader>
                 <CardTitle className="text-xl">{group.name}</CardTitle>

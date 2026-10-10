@@ -142,6 +142,20 @@ Rules:
 - Tables: coss `Table variant="card"` inside `CardFrame`. Set a `min-w` on
   wide tables; the frame scrolls horizontally on small screens.
 
+### Nested radii (concentric corners)
+
+Outer radius = inner radius + padding. When an image or panel sits inside a
+rounded card, never reuse the card's radius on it. Inset it by a fixed padding
+and subtract that padding (plus the 1px border) from the card radius.
+
+- Card is `rounded-2xl` (16px), image inset is `p-2` (8px), so the image
+  radius is 16 - 8 - 1 = 7px.
+- `GroupImage` applies it as `rounded-[calc(var(--outer-radius,var(--radius-2xl))-var(--inset,0.5rem)-1px)]`, so it reads `--outer-radius` (default `--radius-2xl`) and `--inset` (default `0.5rem`). Override them with `[--inset:...]` / `[--outer-radius:...]` if the parent differs.
+- If the inset is as large as the card radius (for example `p-6` on a 16px
+  card), the inner corner is square or free to choose; do not copy the outer
+  radius.
+- Applied on the group cards (`/dashboard/groups`).
+
 ## Content tone
 
 - Plain, warm, pastoral. Short sentences. No jargon ("Link to ChurchSuite",

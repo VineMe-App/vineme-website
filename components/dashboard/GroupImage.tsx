@@ -10,10 +10,12 @@ interface GroupImageProps {
 }
 
 export function GroupImage({ src, alt, className, sizes }: GroupImageProps) {
+  const radius = "rounded-[calc(var(--outer-radius,var(--radius-2xl))-var(--inset,0.5rem)-1px)]";
   return (
     <div
       className={cn(
-        "relative aspect-video w-full overflow-hidden rounded-xl bg-muted",
+        "relative aspect-video w-full overflow-hidden bg-muted",
+        radius,
         className,
       )}
     >
