@@ -42,6 +42,7 @@ function check(...results: { error: unknown }[]) {
 type MembershipRow = {
   role: string;
   status: string;
+  created_at: string;
   groups: Maybe<{ title: string }>;
 };
 
@@ -49,6 +50,8 @@ type MemberRow = {
   id: string;
   name: string | null;
   roles: string[] | null;
+  bio: string | null;
+  newcomer: boolean | null;
   created_at: string;
   group_memberships: MembershipRow[];
 };
@@ -78,11 +81,26 @@ function toMember(user: MemberRow): Member {
     status,
     group: one(current?.groups)?.title ?? "Unassigned",
     joined: formatMonthYear(user.created_at),
+    joinedOn: new Date(user.created_at).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }),
+    bio: user.bio?.trim() ?? "",
+    isNewcomer: Boolean(user.newcomer),
+    memberships: [...memberships]
+      .filter((m) => m.status === "active" || m.status === "pending")
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .map((m) => ({
+        group: one(m.groups)?.title ?? "Unknown group",
+        role: m.role,
+        status: m.status,
+      })),
   };
 }
 
 const memberColumns =
-  "id, name, roles, created_at, group_memberships(role, status, groups(title))";
+  "id, name, roles, bio, newcomer, created_at, group_memberships(role, status, created_at, groups(title))";
 
 export async function fetchMembers({
   supabase,

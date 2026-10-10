@@ -2,8 +2,8 @@
 
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { MemberSheet } from "@/components/dashboard/MemberSheet";
+import { MemberTableRow } from "@/components/dashboard/MemberTableRow";
 import {
   CardFrame,
   CardFrameDescription,
@@ -21,13 +21,20 @@ import {
 } from "@/components/ui/table";
 import { fetchMembers } from "@/lib/dashboard/queries";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
-import { getInitials, memberStatusVariants } from "@/lib/dashboard/utils";
 
 export default function MembersPage() {
   const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const result = useDashboardQuery(fetchMembers);
   const members = result.data ?? [];
   const normalisedQuery = query.trim().toLowerCase();
+  const selectedMember =
+    members.find((member) => member.id === selectedId) ?? null;
+  const handleSelect = (id: string) => {
+    setSelectedId(id);
+    setIsSheetOpen(true);
+  };
   const visibleMembers = members.filter((member) =>
     [member.name, member.group, member.role, member.status].some((value) =>
       value.toLowerCase().includes(normalisedQuery),
@@ -75,14 +82,17 @@ export default function MembersPage() {
                 <TableHead>Role</TableHead>
                 <TableHead>Group</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Joined</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead>
+                  <span className="sr-only">Actions</span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {visibleMembers.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="py-8 text-center text-muted-foreground"
                   >
                     {result.status === "ready" && members.length === 0
@@ -94,47 +104,24 @@ export default function MembersPage() {
                 </TableRow>
               ) : (
                 visibleMembers.map((member) => (
-                  <TableRow key={member.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback>
-                            {getInitials(member.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <p className="font-medium text-foreground">
-                          {member.name}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" size="lg">
-                        {member.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{member.group}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          memberStatusVariants[
-                            member.status as keyof typeof memberStatusVariants
-                          ] ?? "outline"
-                        }
-                        size="lg"
-                      >
-                        {member.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {member.joined}
-                    </TableCell>
-                  </TableRow>
+                  <MemberTableRow
+                    key={member.id}
+                    member={member}
+                    onSelect={handleSelect}
+                    showJoined
+                  />
                 ))
               )}
             </TableBody>
           </Table>
         </CardFrame>
       </div>
+
+      <MemberSheet
+        member={selectedMember}
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+      />
     </section>
   );
 }

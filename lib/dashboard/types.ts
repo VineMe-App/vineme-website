@@ -45,6 +45,12 @@ export interface Group {
   pendingFollowUps: number;
 }
 
+export interface MemberGroup {
+  group: string;
+  role: string;
+  status: string;
+}
+
 export interface Member {
   id: string;
   name: string;
@@ -52,6 +58,11 @@ export interface Member {
   status: string;
   group: string;
   joined: string;
+  joinedOn: string;
+  bio: string;
+  isNewcomer: boolean;
+  /** Every group membership (active or pending), newest first. */
+  memberships: MemberGroup[];
 }
 
 export interface OverviewData {

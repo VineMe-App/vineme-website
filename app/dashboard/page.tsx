@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { MemberSheet } from "@/components/dashboard/MemberSheet";
+import { MemberTableRow } from "@/components/dashboard/MemberTableRow";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +16,6 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -24,12 +24,19 @@ import { PendingRequestsChart } from "@/components/dashboard/PendingRequestsChar
 import { useAdmin } from "@/lib/dashboard/admin-context";
 import { fetchFollowUps, fetchOverview } from "@/lib/dashboard/queries";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
-import { getInitials, memberStatusVariants } from "@/lib/dashboard/utils";
 
 export default function DashboardPage() {
   const { churchName } = useAdmin();
   const query = useDashboardQuery(fetchOverview);
   const overview = query.data;
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const selectedMember =
+    overview?.members.find((member) => member.id === selectedId) ?? null;
+  const handleSelectMember = (id: string) => {
+    setSelectedId(id);
+    setIsSheetOpen(true);
+  };
   const followUps = useDashboardQuery(fetchFollowUps);
   const stats = [
     ["Total users", overview?.totalPeople],
@@ -105,44 +112,30 @@ export default function DashboardPage() {
                   <TableHead>Role</TableHead>
                   <TableHead>Group</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(overview?.members ?? []).map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback>
-                            {getInitials(user.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <p className="font-medium text-foreground">
-                          {user.name}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" size="lg">
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{user.group}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={memberStatusVariants[user.status as keyof typeof memberStatusVariants] ?? "outline"}
-                        size="lg"
-                      >
-                        {user.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
+                  <MemberTableRow
+                    key={user.id}
+                    member={user}
+                    onSelect={handleSelectMember}
+                  />
                 ))}
               </TableBody>
             </Table>
           </CardFrame>
         </div>
       </div>
+
+      <MemberSheet
+        member={selectedMember}
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+      />
     </section>
   );
 }

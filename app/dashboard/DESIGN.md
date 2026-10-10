@@ -27,7 +27,7 @@ brand styling and must not use anything described here.
 | `/dashboard` | Overview (home): header, stats, user preview |
 | `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs your attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Each row ends with a "Review" button (chevron) and the whole row is clickable; both open a Sheet editor |
 | `/dashboard/groups` | Group cards (photo, badges, "View details"). Each card is a button that opens a read-only `GroupSheet` with the photo, description, meeting details, members, pending follow-ups and WhatsApp link. Groups have a single `image_url` |
-| `/dashboard/members` | Searchable members table |
+| `/dashboard/members` | Searchable members table. Rows (and the Overview "User database" rows) open a `MemberSheet` with badges, phone (looked up on open) with Call and WhatsApp, bio, group memberships, and links to the follow-ups and groups pages |
 | `/dashboard/settings` | Integrations, starting with the ChurchSuite link form |
 
 Live data comes from `lib/dashboard/queries.ts` (one fetch function per page, run through `useDashboardQuery`); shared components in
