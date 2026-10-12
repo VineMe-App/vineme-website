@@ -33,7 +33,7 @@ const GroupsMap = dynamic(
   },
 );
 
-type GroupView = "cards" | "compact" | "map";
+type GroupView = "cards" | "map";
 
 export default function GroupsPage() {
   const query = useDashboardQuery(fetchGroups);
@@ -42,7 +42,7 @@ export default function GroupsPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [view, setView] = useState<GroupView>("cards");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const isCompact = view === "compact";
+  const showMap = view === "map";
   const mappedGroups = useMemo(
     () =>
       groups.flatMap((group) =>
@@ -81,17 +81,12 @@ export default function GroupsPage() {
           <Tabs
             value={view}
             onValueChange={(value) => {
-              if (value === "cards" || value === "compact" || value === "map") {
-                setView(value);
-              }
+              if (value === "cards" || value === "map") setView(value);
             }}
           >
             <TabsList size="sm" aria-label="Group view">
               <TabsTab value="cards">Cards</TabsTab>
-              <TabsTab value="compact">Compact</TabsTab>
-              <TabsTab value="map" className="lg:hidden">
-                Map
-              </TabsTab>
+              <TabsTab value="map">Map</TabsTab>
             </TabsList>
           </Tabs>
         </div>
@@ -109,14 +104,20 @@ export default function GroupsPage() {
         ) : null}
 
         {query.status === "ready" && groups.length > 0 ? (
-          <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] lg:items-start lg:gap-6">
-            <div className={cn(view === "map" && "max-lg:hidden")}>
+          <div
+            className={cn(
+              "mt-8 flex flex-col gap-6",
+              showMap &&
+                "lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] lg:items-start",
+            )}
+          >
+            <div className={cn(showMap && "order-2 lg:order-1")}>
               <div
                 className={cn(
-                  "grid",
-                  isCompact
-                    ? "grid-cols-2 gap-3"
-                    : "gap-5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2",
+                  "grid grid-cols-2 gap-3",
+                  showMap
+                    ? "lg:grid-cols-1 xl:grid-cols-2"
+                    : "lg:grid-cols-3 xl:grid-cols-4",
                 )}
               >
                 {groups.map((group) => (
@@ -138,66 +139,47 @@ export default function GroupsPage() {
                         "border-foreground/40",
                     )}
                   >
-                    <div className={cn("pb-0", isCompact ? "p-1.5" : "p-2")}>
+                    <div className="p-1.5 pb-0">
                       <GroupImage
                         src={group.imageUrl}
                         alt={group.name}
-                        className={isCompact ? "aspect-[2/1]" : undefined}
+                        className="aspect-[2/1]"
                         sizes={
-                          isCompact
+                          showMap
                             ? "(min-width: 1280px) 25vw, 50vw"
-                            : undefined
+                            : "(min-width: 1280px) 20vw, (min-width: 1024px) 30vw, 50vw"
                         }
                       />
                     </div>
-                    <CardHeader
-                      className={isCompact ? "gap-1 px-3 py-3" : undefined}
-                    >
-                      <CardTitle className={isCompact ? "text-base" : "text-xl"}>
-                        {group.name}
-                      </CardTitle>
-                      <CardDescription
-                        className={isCompact ? "line-clamp-1" : undefined}
-                      >
+                    <CardHeader className="gap-1 px-3 py-3">
+                      <CardTitle className="text-base">{group.name}</CardTitle>
+                      <CardDescription className="line-clamp-1">
                         {group.area} · {group.meets}
                       </CardDescription>
                     </CardHeader>
-                    <CardPanel
-                      className={cn(
-                        isCompact ? "space-y-2 px-3 pb-3" : "space-y-4",
-                      )}
-                    >
+                    <CardPanel className="space-y-2 px-3 pb-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge
-                          variant="secondary"
-                          size={isCompact ? "sm" : "lg"}
-                        >
+                        <Badge variant="secondary" size="sm">
                           Led by {group.leader}
                         </Badge>
                         {group.atCapacity ? (
-                          <Badge variant="error" size={isCompact ? "sm" : "lg"}>
+                          <Badge variant="error" size="sm">
                             At capacity
                           </Badge>
                         ) : (
-                          <Badge
-                            variant="success"
-                            size={isCompact ? "sm" : "lg"}
-                          >
+                          <Badge variant="success" size="sm">
                             Taking new members
                           </Badge>
                         )}
                         {group.pendingFollowUps > 0 ? (
-                          <Badge
-                            variant="warning"
-                            size={isCompact ? "sm" : "lg"}
-                          >
+                          <Badge variant="warning" size="sm">
                             {group.pendingFollowUps} to follow up
                           </Badge>
                         ) : null}
                         <GroupTraits
                           groupId={group.id}
                           groupName={group.name}
-                          size={isCompact ? "sm" : "lg"}
+                          size="sm"
                         />
                       </div>
                       <div className="flex items-center justify-between gap-3">
@@ -206,11 +188,7 @@ export default function GroupsPage() {
                           {group.members === 1 ? "member" : "members"}
                         </p>
                         <span className="inline-flex items-center gap-1 font-medium text-sm">
-                          {isCompact ? (
-                            <span className="sr-only">View details</span>
-                          ) : (
-                            "View details"
-                          )}
+                          <span className="sr-only">View details</span>
                           <ChevronRightIcon
                             aria-hidden="true"
                             className="size-4"
@@ -222,25 +200,22 @@ export default function GroupsPage() {
                 ))}
               </div>
             </div>
-            <div
-              className={cn(
-                "h-[70dvh] lg:sticky lg:top-20 lg:block lg:h-[calc(100dvh-6.5rem)]",
-                view === "map" ? "block" : "hidden",
-              )}
-            >
-              {mappedGroups.length === 0 ? (
-                <div className="flex size-full items-center justify-center rounded-2xl border bg-muted px-6 text-center text-muted-foreground text-sm">
-                  No group locations to show yet.
-                </div>
-              ) : (
-                <GroupsMap
-                  groups={mappedGroups}
-                  activeId={hoveredId ?? selectedId}
-                  onSelect={handleOpenGroup}
-                  onHover={setHoveredId}
-                />
-              )}
-            </div>
+            {showMap ? (
+              <div className="order-1 h-[40dvh] lg:sticky lg:top-20 lg:order-2 lg:h-[calc(100dvh-6.5rem)]">
+                {mappedGroups.length === 0 ? (
+                  <div className="flex size-full items-center justify-center rounded-2xl border bg-muted px-6 text-center text-muted-foreground text-sm">
+                    No group locations to show yet.
+                  </div>
+                ) : (
+                  <GroupsMap
+                    groups={mappedGroups}
+                    activeId={hoveredId ?? selectedId}
+                    onSelect={handleOpenGroup}
+                    onHover={setHoveredId}
+                  />
+                )}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>
