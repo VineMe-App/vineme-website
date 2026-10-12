@@ -1,4 +1,4 @@
-import { Accessibility, Dog, type LucideIcon } from "lucide-react";
+import { Accessibility, Dog, NutOff, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface GroupTraitsProps {
@@ -28,7 +28,7 @@ function traitsFor(groupId: string, groupName: string): Trait[] {
     traits.push({ label: "Pet friendly", icon: Dog });
   }
   if (hasPlaceholderTrait(groupId, "allergy")) {
-    traits.push({ label: "Allergy free" });
+    traits.push({ label: "Allergy free", icon: NutOff });
   }
   if (groupName.trim().toLowerCase() === "south kensington connect") {
     traits.push({ label: "Accessible", icon: Accessibility });

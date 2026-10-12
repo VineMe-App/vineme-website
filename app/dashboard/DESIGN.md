@@ -214,7 +214,7 @@ and subtract that padding (plus the 1px border) from the card radius.
   shows member counts, not "n of N places". Pet friendly and allergy free are
   not stored on `groups`. About half the groups show each badge, chosen from
   the group id so it stays put. South Kensington Connect also shows Accessible.
-  Pet friendly uses a dog icon and Accessible uses a wheelchair icon.
+  Pet friendly uses a dog icon, Allergy free uses a nut with a line through it, and Accessible uses a wheelchair icon.
 - Email addresses, referral notes and "From your email" are not available to the
   app (the `referrals` table has no read policy), so they are not shown.
 - The ChurchSuite form does not submit.
