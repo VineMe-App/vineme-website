@@ -131,7 +131,11 @@ export default function GroupsPage() {
                       {group.pendingFollowUps} to follow up
                     </Badge>
                   ) : null}
-                  <GroupTraits size={isCompact ? "sm" : "lg"} />
+                  <GroupTraits
+                    groupId={group.id}
+                    groupName={group.name}
+                    size={isCompact ? "sm" : "lg"}
+                  />
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-muted-foreground text-sm">

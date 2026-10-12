@@ -1,23 +1,60 @@
+import { Accessibility, Dog, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-const traits = ["Pet friendly", "Allergy free"];
+interface GroupTraitsProps {
+  groupId: string;
+  groupName: string;
+  size?: "sm" | "lg";
+}
 
-/** Shown until groups store these flags. Not a real yes or no. */
-export function GroupTraits({ size = "lg" }: { size?: "sm" | "lg" }) {
+interface Trait {
+  label: string;
+  icon?: LucideIcon;
+}
+
+/** Stable stand-in until `groups` has columns for these flags. */
+function hasPlaceholderTrait(groupId: string, salt: string) {
+  let hash = 0;
+  const value = `${salt}:${groupId}`;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+  return hash % 2 === 0;
+}
+
+function traitsFor(groupId: string, groupName: string): Trait[] {
+  const traits: Trait[] = [];
+  if (hasPlaceholderTrait(groupId, "pet")) {
+    traits.push({ label: "Pet friendly", icon: Dog });
+  }
+  if (hasPlaceholderTrait(groupId, "allergy")) {
+    traits.push({ label: "Allergy free" });
+  }
+  if (groupName.trim().toLowerCase() === "south kensington connect") {
+    traits.push({ label: "Accessible", icon: Accessibility });
+  }
+  return traits;
+}
+
+export function GroupTraits({
+  groupId,
+  groupName,
+  size = "lg",
+}: GroupTraitsProps) {
+  const traits = traitsFor(groupId, groupName);
+  if (traits.length === 0) return null;
+
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="sr-only">Not recorded yet.</span>
-      {traits.map((trait) => (
-        <Badge
-          key={trait}
-          variant="outline"
-          size={size}
-          title="Not recorded yet"
-          className="border-dashed text-muted-foreground"
-        >
-          {trait}
-        </Badge>
-      ))}
-    </div>
+    <>
+      {traits.map((trait) => {
+        const Icon = trait.icon;
+        return (
+          <Badge key={trait.label} variant="outline" size={size}>
+            {Icon ? <Icon aria-hidden="true" /> : null}
+            {trait.label}
+          </Badge>
+        );
+      })}
+    </>
   );
 }

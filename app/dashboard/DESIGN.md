@@ -212,8 +212,9 @@ and subtract that padding (plus the 1px border) from the card radius.
   stage was never logged the count falls back to the request date.
 - Groups have an `at_capacity` flag but no capacity number, so the groups page
   shows member counts, not "n of N places". Pet friendly and allergy free are
-  dashed placeholder badges on the card and in the sheet. The `groups` table
-  has no columns for them yet, so they are not a yes or no.
+  not stored on `groups`. About half the groups show each badge, chosen from
+  the group id so it stays put. South Kensington Connect also shows Accessible.
+  Pet friendly uses a dog icon and Accessible uses a wheelchair icon.
 - Email addresses, referral notes and "From your email" are not available to the
   app (the `referrals` table has no read policy), so they are not shown.
 - The ChurchSuite form does not submit.

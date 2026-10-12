@@ -77,7 +77,7 @@ function GroupDetails({ group }: { group: Group }) {
                 {group.pendingFollowUps} to follow up
               </Badge>
             ) : null}
-            <GroupTraits />
+            <GroupTraits groupId={group.id} groupName={group.name} />
           </div>
 
           <section aria-labelledby="group-about">
