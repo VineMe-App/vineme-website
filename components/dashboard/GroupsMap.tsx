@@ -6,6 +6,7 @@ import {
   Map as MapLibreMap,
   Marker,
   NavigationControl,
+  setWorkerUrl,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -81,6 +82,7 @@ export function GroupsMap({
     const markers = markersRef.current;
     if (!container || mapRef.current) return;
 
+    setWorkerUrl("/maplibre-worker");
     const map = new MapLibreMap({
       container,
       style: MAP_STYLE,
