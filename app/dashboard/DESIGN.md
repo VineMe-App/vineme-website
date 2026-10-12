@@ -26,7 +26,7 @@ brand styling and must not use anything described here.
 |---|---|
 | `/dashboard` | Overview (home): header, stats, user preview |
 | `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs your attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Each row ends with a "Review" button (chevron) and the whole row is clickable; both open a Sheet editor |
-| `/dashboard/groups` | Group cards (photo, badges, "View details"). A Cards / Compact toggle (coss `Tabs`) shrinks them into a denser grid. Each card opens a read-only `GroupSheet`. Groups have a single `image_url` |
+| `/dashboard/groups` | Group cards beside a sticky MapLibre map (OpenFreeMap tiles). Cards / Compact changes card size. On a small screen, Map replaces the list. A pin opens the same `GroupSheet`. Pins use `location.coordinates` |
 | `/dashboard/members` | Searchable members table. Rows (and the Overview "User database" rows) open a `MemberSheet` with badges, phone (looked up on open) with Call and WhatsApp, bio, group memberships, and links to the follow-ups and groups pages |
 | `/dashboard/reports` | Short underline tabs (Downloads, Pipeline, Groups, Team, Newcomers, Connection). The full question stays as the heading inside the panel. Charts are Recharts, church-scoped, and only where the table has the data. "Downloaded" is a signup with no live group, not a store download event |
 | `/dashboard/settings` | Integrations, starting with the ChurchSuite link form |

@@ -52,6 +52,12 @@ function daysSince(timestamp: string, now: number) {
   return Math.max(0, Math.floor((now - new Date(timestamp).getTime()) / DAY_MS));
 }
 
+function mapCoordinate(value: number | string | null | undefined) {
+  if (value == null || value === "") return null;
+  const number = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
 function check(...results: { error: unknown }[]) {
   const failed = results.find((result) => result.error);
   if (failed) throw failed.error;
@@ -183,7 +189,14 @@ type GroupRow = {
   meeting_day: string | null;
   meeting_time: string | null;
   at_capacity: boolean;
-  location: { name?: string; address?: string } | null;
+  location: {
+    name?: string;
+    address?: string;
+    coordinates?: {
+      latitude?: number | string | null;
+      longitude?: number | string | null;
+    };
+  } | null;
   group_memberships: {
     role: string;
     status: string;
@@ -244,6 +257,8 @@ export async function fetchGroups({
         atCapacity: group.at_capacity,
         pendingFollowUps: memberships.filter((m) => m.status === "pending")
           .length,
+        latitude: mapCoordinate(group.location?.coordinates?.latitude),
+        longitude: mapCoordinate(group.location?.coordinates?.longitude),
       };
     })
     .sort((a, b) => b.pendingFollowUps - a.pendingFollowUps);

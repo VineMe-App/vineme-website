@@ -52,6 +52,8 @@ export interface Group {
   members: number;
   atCapacity: boolean;
   pendingFollowUps: number;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface MemberGroup {
