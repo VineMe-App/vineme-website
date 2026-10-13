@@ -156,10 +156,11 @@ export default function GroupsPage() {
                         "border-foreground/40",
                     )}
                   >
-                    <div className="p-1.5 pb-0">
+                    <div className="relative">
                       <GroupImage
                         src={group.imageUrl}
                         alt={group.name}
+                        flush
                         className="aspect-[2/1]"
                         sizes={
                           showMap
@@ -167,6 +168,15 @@ export default function GroupsPage() {
                             : "(min-width: 1280px) 20vw, (min-width: 1024px) 30vw, 50vw"
                         }
                       />
+                      {group.pendingFollowUps > 0 ? (
+                        <Badge
+                          variant="warning"
+                          size="sm"
+                          className="absolute top-2.5 left-2.5 bg-background shadow-sm"
+                        >
+                          {group.pendingFollowUps} to follow up
+                        </Badge>
+                      ) : null}
                     </div>
                     <CardHeader className="gap-1 px-3 py-3">
                       <CardTitle className="text-base">{group.name}</CardTitle>
@@ -188,11 +198,6 @@ export default function GroupsPage() {
                             Taking new members
                           </Badge>
                         )}
-                        {group.pendingFollowUps > 0 ? (
-                          <Badge variant="warning" size="sm">
-                            {group.pendingFollowUps} to follow up
-                          </Badge>
-                        ) : null}
                         <GroupTraits
                           groupId={group.id}
                           groupName={group.name}

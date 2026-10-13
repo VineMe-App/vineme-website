@@ -7,10 +7,20 @@ interface GroupImageProps {
   alt: string;
   className?: string;
   sizes?: string;
+  /** Photo runs to the card edges. Top corners follow the card radius. */
+  flush?: boolean;
 }
 
-export function GroupImage({ src, alt, className, sizes }: GroupImageProps) {
-  const radius = "rounded-[calc(var(--outer-radius,var(--radius-2xl))-var(--inset,0.5rem)-1px)]";
+export function GroupImage({
+  src,
+  alt,
+  className,
+  sizes,
+  flush = false,
+}: GroupImageProps) {
+  const radius = flush
+    ? "rounded-t-[calc(var(--radius-2xl)-1px)]"
+    : "rounded-[calc(var(--outer-radius,var(--radius-2xl))-var(--inset,0.5rem)-1px)]";
   return (
     <div
       className={cn(

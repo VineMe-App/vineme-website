@@ -156,7 +156,7 @@ and subtract that padding (plus the 1px border) from the card radius.
 - If the inset is as large as the card radius (for example `p-6` on a 16px
   card), the inner corner is square or free to choose; do not copy the outer
   radius.
-- Applied on the group cards (`/dashboard/groups`).
+- The group sheet still insets its photo this way. On the group cards the photo meets the card edges, with only the top corners rounded to the card. The follow-up badge sits on that photo, top left.
 
 ## Content tone
 
