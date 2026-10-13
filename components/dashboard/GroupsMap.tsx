@@ -27,8 +27,11 @@ interface GroupsMapProps {
 }
 
 function paintPin(button: HTMLButtonElement, active: boolean) {
+  // Scale the inner button only. MapLibre positions the outer pin with
+  // its own transform, and replacing that transform sends every pin to 0,0.
   button.style.transform = active ? "scale(1.35)" : "scale(1)";
-  button.style.zIndex = active ? "2" : "1";
+  const pin = button.parentElement;
+  if (pin instanceof HTMLElement) pin.style.zIndex = active ? "2" : "1";
 }
 
 function frameGroups(map: MapLibreMap, groups: MapGroup[]) {
@@ -122,20 +125,25 @@ export function GroupsMap({
       markersRef.current.clear();
 
       for (const group of groups) {
+        const pin = document.createElement("div");
+        pin.style.width = "22px";
+        pin.style.height = "22px";
         const button = document.createElement("button");
         button.type = "button";
         button.title = group.name;
         button.setAttribute("aria-label", `View ${group.name}`);
         Object.assign(button.style, {
-          width: "22px",
-          height: "22px",
+          width: "100%",
+          height: "100%",
           padding: "0",
           borderRadius: "999px",
           border: "2px solid white",
           background: "var(--brand-pink, #ff0083)",
           boxShadow: "0 1px 4px rgb(0 0 0 / 35%)",
           cursor: "pointer",
+          transformOrigin: "center",
         });
+        pin.appendChild(button);
         paintPin(button, group.id === activeIdRef.current);
         button.addEventListener("click", (event) => {
           event.stopPropagation();
@@ -155,7 +163,7 @@ export function GroupsMap({
           onHoverRef.current(null);
         });
 
-        const marker = new Marker({ element: button, anchor: "center" })
+        const marker = new Marker({ element: pin, anchor: "center" })
           .setLngLat([group.longitude, group.latitude])
           .addTo(map);
         markersRef.current.set(group.id, { marker, button });

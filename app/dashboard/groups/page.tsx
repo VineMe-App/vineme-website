@@ -115,9 +115,7 @@ export default function GroupsPage() {
               <div
                 className={cn(
                   "grid grid-cols-2 gap-3",
-                  showMap
-                    ? "lg:grid-cols-1 xl:grid-cols-2"
-                    : "lg:grid-cols-3 xl:grid-cols-4",
+                  showMap ? "lg:grid-cols-2" : "lg:grid-cols-3 xl:grid-cols-4",
                 )}
               >
                 {groups.map((group) => (
