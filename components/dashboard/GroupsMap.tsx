@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import {
+  AttributionControl,
   LngLatBounds,
   Map as MapLibreMap,
   Marker,
@@ -91,7 +92,15 @@ export function GroupsMap({
       style: MAP_STYLE,
       center: [-0.12, 51.5],
       zoom: 10,
+      attributionControl: false,
     });
+    map.addControl(new AttributionControl({ compact: true }));
+    const attribution = map
+      .getContainer()
+      .querySelector(".maplibregl-ctrl-attrib");
+    attribution?.classList.add("maplibregl-compact");
+    attribution?.classList.remove("maplibregl-compact-show");
+    attribution?.removeAttribute("open");
     map.addControl(
       new NavigationControl({ showCompass: false }),
       "top-right",
