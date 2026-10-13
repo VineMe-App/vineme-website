@@ -1,5 +1,7 @@
-import { Accessibility, Dog, NutOff, type LucideIcon } from "lucide-react";
+import { Accessibility, Dog, PawPrint, Slash, type LucideIcon } from "lucide-react";
+import type { ComponentProps } from "react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface GroupTraitsProps {
   groupId: string;
@@ -7,9 +9,21 @@ interface GroupTraitsProps {
   size?: "sm" | "lg";
 }
 
+function PetFreeIcon({ className, ...props }: ComponentProps<"span">) {
+  return (
+    <span
+      {...props}
+      className={cn("relative inline-flex size-3.5 sm:size-3", className)}
+    >
+      <PawPrint aria-hidden="true" className="size-full" />
+      <Slash aria-hidden="true" className="absolute inset-0 size-full" />
+    </span>
+  );
+}
+
 interface Trait {
   label: string;
-  icon?: LucideIcon;
+  icon?: LucideIcon | typeof PetFreeIcon;
 }
 
 /** Stable stand-in until `groups` has columns for these flags. */
@@ -24,11 +38,11 @@ function hasPlaceholderTrait(groupId: string, salt: string) {
 
 function traitsFor(groupId: string, groupName: string): Trait[] {
   const traits: Trait[] = [];
-  if (hasPlaceholderTrait(groupId, "pet")) {
+  const petFriendly = hasPlaceholderTrait(groupId, "pet");
+  if (petFriendly) {
     traits.push({ label: "Pet friendly", icon: Dog });
-  }
-  if (hasPlaceholderTrait(groupId, "allergy")) {
-    traits.push({ label: "Allergy free", icon: NutOff });
+  } else if (hasPlaceholderTrait(groupId, "allergy")) {
+    traits.push({ label: "Pet free", icon: PetFreeIcon });
   }
   if (groupName.trim().toLowerCase() === "south kensington connect") {
     traits.push({ label: "Accessible", icon: Accessibility });
