@@ -40,7 +40,7 @@ export default function GroupsPage() {
   const groups = useMemo(() => query.data ?? [], [query.data]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [view, setView] = useState<GroupView>("cards");
+  const [view, setView] = useState<GroupView>("map");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const showMap = view === "map";
   const mappedGroups = useMemo(
@@ -67,9 +67,27 @@ export default function GroupsPage() {
   };
 
   return (
-    <section className="px-5 py-10 sm:px-6 lg:py-14">
-      <div className="mx-auto w-full max-w-[90rem]">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <section
+      className={cn(
+        "px-5 sm:px-6",
+        showMap
+          ? "py-4 lg:h-[calc(100dvh-var(--dashboard-nav-height,3.75rem))] lg:overflow-hidden lg:py-5"
+          : "py-10 lg:py-14",
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-[90rem] flex-col",
+          showMap &&
+            "lg:grid lg:h-full lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-5",
+        )}
+      >
+        <div
+          className={cn(
+            "flex shrink-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
+            showMap && "lg:col-start-1 lg:row-start-1",
+          )}
+        >
           <div>
             <h1 className="font-heading text-3xl font-bold sm:text-4xl">
               Groups
@@ -104,18 +122,19 @@ export default function GroupsPage() {
         ) : null}
 
         {query.status === "ready" && groups.length > 0 ? (
-          <div
-            className={cn(
-              "mt-8 flex flex-col gap-6",
-              showMap &&
-                "lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] lg:items-start",
-            )}
-          >
-            <div className={cn(showMap && "order-2 lg:order-1")}>
+          <div className={showMap ? "contents" : "mt-8"}>
+            <div
+              className={cn(
+                showMap &&
+                  "order-2 mt-4 lg:col-start-1 lg:row-start-2 lg:mt-0 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:pr-1",
+              )}
+            >
               <div
                 className={cn(
                   "grid grid-cols-2 gap-3",
-                  showMap ? "lg:grid-cols-2" : "lg:grid-cols-3 xl:grid-cols-4",
+                  showMap
+                    ? "pb-4 lg:grid-cols-2"
+                    : "lg:grid-cols-3 xl:grid-cols-4",
                 )}
               >
                 {groups.map((group) => (
@@ -199,7 +218,8 @@ export default function GroupsPage() {
               </div>
             </div>
             {showMap ? (
-              <div className="order-1 h-[40dvh] lg:sticky lg:top-20 lg:order-2 lg:h-[calc(100dvh-6.5rem)]">
+              <div className="relative order-1 mt-4 h-[calc(100dvh-var(--dashboard-nav-height,3.75rem)-8rem)] shrink-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:h-full lg:min-h-0">
+                <div className="h-full lg:absolute lg:inset-0">
                 {mappedGroups.length === 0 ? (
                   <div className="flex size-full items-center justify-center rounded-2xl border bg-muted px-6 text-center text-muted-foreground text-sm">
                     No group locations to show yet.
@@ -212,6 +232,7 @@ export default function GroupsPage() {
                     onHover={setHoveredId}
                   />
                 )}
+                </div>
               </div>
             ) : null}
           </div>

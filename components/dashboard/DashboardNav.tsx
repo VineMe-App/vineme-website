@@ -13,6 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { ChurchSwitcher } from "@/components/dashboard/ChurchSwitcher";
 import { useAdmin } from "@/lib/dashboard/admin-context";
 import { cn } from "@/lib/utils";
@@ -66,9 +67,30 @@ const navItems: NavItem[] = [
 export function DashboardNav() {
   const pathname = usePathname();
   const { fullName, avatarUrl } = useAdmin();
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const applyHeight = () => {
+      document.documentElement.style.setProperty(
+        "--dashboard-nav-height",
+        `${header.offsetHeight}px`,
+      );
+    };
+
+    applyHeight();
+    const observer = new ResizeObserver(applyHeight);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur"
+    >
       <nav
         aria-label="Dashboard"
         className="mx-auto flex w-full max-w-6xl items-center gap-4 px-5 sm:gap-8 sm:px-6"
