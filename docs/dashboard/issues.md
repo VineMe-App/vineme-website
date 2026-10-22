@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-52 issues, in working order. Each `###` entry below becomes one GitHub issue:
+54 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -129,7 +129,9 @@ Number: #4
 - [ ] Invite user. (Hide it for now. Later it becomes "Invite a colleague", DEV-6.)
 - [ ] What the group badge counts and sorts by. (Requests needing attention, not all pending. A group with 7 pending that are all on track isn't a problem.)
 - [ ] How wide search goes. (Search on the Groups page first, and a global search later, POL-2.)
-- [ ] The order of the Members cards. (All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days.)
+- [ ] The order of the Members cards.
+  - OY: (All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days.)
+  - CG: (All members, then Connected, Not yet connected, Archived and No requests, which add up to All members, then Needs help and New in 30 days.)
 - [ ] How the Insights groups tab is framed. ("Where to offer support", not a league table. The leaders are volunteers.)
 
 **Done when**
@@ -351,7 +353,7 @@ The four stages in "Pending requests by group" are close shades of pink and hard
 
 ---
 
-### QW-9 · One name for each stage everywhere
+### QW-9 · Terms dictionary: one place in the code for every label
 
 Labels: dashboard, shared, size:S
 Milestone: 2. Quick wins and bugs
@@ -360,15 +362,17 @@ Number: #14
 **Body**
 
 **Why**
-The follow-up drawer says "Invited" where the rest of the dashboard, and the reference SQL, say "Spoken to".
+`glossary.md` defines every term, but labels are typed into each component, so the same idea gets different names ("Invited" and "Spoken to"; "Connected" meaning two things). One terms file means a term is renamed in one place.
 
 **What to do**
-- Use the stage names agreed in DEC-2 in every page, drawer, chart, legend and filter.
+- Create one terms file (for example `lib/dashboard/terms.ts`) that maps each status, stage and measure to its label and a one-line description, matching `glossary.md` exactly.
+- Replace hard-coded labels on every page, drawer, chart, legend and filter with imports from it.
+- Use the stage names agreed in DEC-2.
 
 **Done when**
-- Searching the code finds one name per stage.
+- No component hard-codes a status label, and the terms file matches `glossary.md`.
 
-**Depends on:** DEC-2
+**Depends on:** DEC-1, DEC-2
 
 ---
 
@@ -410,11 +414,13 @@ Number: #16
 **Body**
 
 **What to do**
-- Build on DATA-1. One row per member: signed-up date, newcomer, role, connected, furthest stage, number of pending requests, whether any request needs attention, needs help (open), and whether all their requests were archived.
+- OY: Build on DATA-1. One row per member: signed-up date, newcomer, role, connected, furthest stage, number of pending requests, whether any request needs attention, needs help (open), and whether all their requests were archived.
+- CG: Build on DATA-1. One row per member: signed-up date, newcomer, role, connected, plugged in, in a group now, furthest stage, number of pending requests, whether any request needs attention, needs help (open), and whether all their requests were archived.
 - Use the same row-level security approach as DATA-1.
 
 **Done when**
-- Connected + Pending + Not in a group yet = All members.
+- OY: Connected + Pending + Not in a group yet = All members.
+- CG: Connected + Not yet connected + Archived + No requests = All members, and the counts match `reference/people.sql`.
 - The totals match the definitions in `glossary.md`.
 
 **Depends on:** DATA-1, DEC-1
@@ -479,6 +485,7 @@ Number: #19
 - Exclude leaders' own memberships.
 - Add a "Not contacted" segment to the User-Requests bar.
 - Fix the "Total Requests by Group" legend: its light grey is labelled "joined", but the same grey means "left" in the Total Requests donut.
+- CG: Rename the Total Users donut's "Connected" column (any active membership) to "In a group now", so Connected only means reached Attended.
 - Show year-on-year in points: "58% (73% last year)".
 - Apply the test-account exclusion agreed in DEC-1.
 - Once DATA-1 and DATA-2 exist, point the questions at the views.
@@ -605,14 +612,19 @@ Number: #25
 **Body**
 
 **What to do**
-- Order: All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days.
-- Rename "Looking for a group" to "Not in a group yet". "Needs help" is only for people who've asked.
-- The three middle cards add up to All members. Set Needs help and New in 30 days apart, since they overlap with the others.
-- Give Pending both units: "30 people · 46 requests".
+- OY: Order: All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days.
+- CG: Order: All members, then Connected, Not yet connected, Archived and No requests, then Needs help and New in 30 days.
+- OY: Rename "Looking for a group" to "Not in a group yet". "Needs help" is only for people who've asked.
+- CG: Replace "Looking for a group" with these outcomes. "Needs help" is only for people who've asked.
+- OY: The three middle cards add up to All members. Set Needs help and New in 30 days apart, since they overlap with the others.
+- CG: The four outcome cards add up to All members. Set Needs help and New in 30 days apart, since they overlap with the others.
+- OY: Give Pending both units: "30 people · 46 requests".
+- CG: There's no Pending card, because pending describes requests. Give Not yet connected both units: people, and their pending requests.
 - Each card filters the list, and the filter goes in the URL (for example `?filter=needs-help`) so Overview can link to it.
 
 **Done when**
-- The middle three cards add up to the total, and every card can be linked to.
+- OY: The middle three cards add up to the total, and every card can be linked to.
+- CG: The four outcome cards add up to All members, and every card can be linked to.
 
 **Depends on:** DEC-1, DEC-4, DATA-2
 
@@ -630,7 +642,8 @@ Number: #26
 - Put "Signed up" first, with the full date.
 - Role: Admin, Leader, Newcomer or Existing member, with role filters to match.
 - Groups: the count, then the names, cut off if long: "2 · Outreach Connect, Central…"
-- Status, in small pieces with one job each: the furthest stage; "+3 others pending" if they have more open requests; a Needs help tag; a red marker if any request needs attention.
+- OY: Status, in small pieces with one job each: the furthest stage; "+3 others pending" if they have more open requests; a Needs help tag; a red marker if any request needs attention.
+- CG: Status, in small pieces with one job each: the furthest stage; "+3 more requests pending" if they have more open requests; a Needs help tag; a red marker if any request needs attention.
 - Add a sort: "Most open requests".
 - Use one meaning of "New" (DEC-1).
 
@@ -863,8 +876,11 @@ Number: #38
 **Body**
 
 **What to do**
-- Two headline numbers, each with a one-line explanation: "Got to a group" and "Stuck", as defined in the glossary.
-- A chart of requests per month, with the share that ended up connected. Mark recent months as in progress.
+- OY: Two headline numbers, each with a one-line explanation: "Got to a group" and "Stuck", as defined in the glossary.
+- CG: Two headline numbers, each with a one-line explanation: the Connected rate and the Plugged-in rate, as defined in the glossary.
+- OY: A chart of requests per month, with the share that ended up connected. Mark recent months as in progress.
+- CG: A chart of requests per month, with the share that reached Attended. Mark recent months as in progress.
+- CG: The connection bar: Connected, Not yet connected (split into its stages) and Archived, adding up to everyone who has requested.
 - Why requests were closed: the archive reasons, plus how long people had waited before "No longer interested" (days waiting is in the reference SQL). If long waits dominate, that's the leakage story in one chart.
 - Note beside the reasons that "Not suitable for group" and "Group at capacity" are re-referral cases (DEV-4).
 
@@ -1159,3 +1175,51 @@ The charts use four close shades of pink, so the stages can't be told apart at a
 
 **Done when**
 - The palette exists as tokens, is documented in the glossary, and passes the contrast and colour-blindness checks.
+
+---
+
+### MEM-4 · Needs help: contact and resolve people who can't find a group
+
+Labels: dashboard, members, size:M
+Milestone: 4. Pages
+Number: #53
+
+**Body**
+
+**Why**
+People who press "I can't find a group" in the app have asked for help outright, and only clergy see them. The app lets you mark them contacted and resolved, but the dashboard has nothing yet.
+
+**What to do**
+- First, check in the app code how the flag works: when `cannot_find_group` is set, whether resolving sets it back to false, and what happens if someone asks again. To let Claude Code read the app, clone its repo next to this one and run `/add-dir` with its path. Record the answer in `glossary.md`.
+- Agree with the devs where it lives: a filter on Members with actions, or its own list. The Overview "Needs help" card links to it.
+- Show who needs help, when they asked and whether they've been contacted, oldest first.
+- Let clergy mark someone contacted or resolved, writing the same `cannot_find_group_contacted_at` and `cannot_find_group_resolved_at` fields the app uses, so the app and dashboard stay in step.
+- Decide whether needs help gets its own time limit, like the follow-up limits.
+- Later, resolving can mean referring them to a group (DEV-4).
+
+**Done when**
+- A clergy member can see everyone who needs help and mark them contacted or resolved, and the app shows the same state.
+
+**Depends on:** DEC-1, DATA-2
+
+**Plan mode:** yes
+
+---
+
+### DEV-11 · A proper test-account flag
+
+Labels: dashboard, needs-dev, data
+Milestone: 6. Dev backlog
+Number: #54
+
+**Body**
+
+**Why**
+Test accounts are excluded by matching "test" in the first name, last name or email. That can catch a real person (a surname like Testa) and miss test accounts with other names.
+
+**What to do**
+- Add an `is_test` flag to users, and set it for existing test accounts.
+- Switch the views, the dashboard and Metabase to the flag, and update `glossary.md`.
+
+**Done when**
+- Test accounts are excluded by the flag everywhere.

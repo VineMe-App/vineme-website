@@ -1,7 +1,6 @@
 -- Reference: the Metabase follow-up detail query (6:30pm Evening Service), as of 22 October 2026.
 -- Used by AUD-1 (the audit) and DATA-1 (the request view). Kept as written; known issues:
 --   * the inner join to active leaders drops requests to groups with no active leader
---   * leaders' own memberships of their groups are not filtered out
 --   * test accounts are excluded by name match (LIKE is case-sensitive)
 -- The time limits and clock rules in docs/dashboard/glossary.md take precedence.
 

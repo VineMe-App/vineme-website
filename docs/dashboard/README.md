@@ -7,7 +7,8 @@ Start here. This folder holds the plan for reworking the clergy dashboard (Overv
 | `README.md` | This plan: the problem, the order of work, and the decisions still open. |
 | `glossary.md` | The definitions and rules every page, query and label follows. Read it before any dashboard task. |
 | `issues.md` | The source of the 52 GitHub issues, with the issue number for each key. |
-| `reference/follow-ups.sql` | The Metabase follow-up query, the reference for the audit and the database views. |
+| `reference/` | Reference queries. `people.sql` applies the agreed definitions, and `follow-ups.sql` is the follow-up query. |
+| `decisions/` | One file per settled decision: what was decided and why. |
 | `audit.md` | Written by AUD-1: where every number comes from, and what's wrong with it. |
 
 ## The short version
@@ -15,7 +16,7 @@ Start here. This folder holds the plan for reworking the clergy dashboard (Overv
 The dashboard's shape is right. Most of what feels wrong is the same word counting different things on different pages. Connected is 117 on Members, 155 on Reports and 182 in Metabase. There are also a few real bugs, and some data that was invented to fill the design, such as the pet tags.
 
 - **The fix:** agree the definitions once, calculate the numbers once in the database, then work through the pages.
-- **The work:** 52 GitHub issues in order, each sized for one Claude Code session and one commit. 42 are dashboard work, and 10 need app or backend work (labelled `needs-dev`).
+- **The work:** 54 GitHub issues in order, each sized for one Claude Code session and one commit. 43 are dashboard work, and 11 need app or backend work (labelled `needs-dev`).
 - **Picking up work:** every issue stands on its own and says what it depends on. Take the next open issue in the current milestone.
 - **If time is short:** the critical path is DEC-1, DEC-2, AUD-1, QW-1 and DATA-1 to DATA-3, then FU-1 and FU-2. That gets the numbers right and the page clergy act on into shape.
 
@@ -40,7 +41,7 @@ These also sit at the top of `glossary.md`, so Claude Code reads them before eve
 4. **Pages.** Follow-ups first, because it's where clergy act. Then Members, Groups, Overview (after the pages it links to) and Insights.
 5. **Polish.**
 
-The dev backlog runs alongside all of it. The GitHub milestones match these steps, and the issue numbers follow the list below (#1 is DEC-1, #52 is DEV-10). `issues.md` has the exact number for each key.
+The dev backlog runs alongside all of it. The GitHub milestones match these steps. Issues #1 to #52 follow the list below, and later additions take the next numbers. `issues.md` has the exact number for each key.
 
 Sizes: **S** is under an hour, **M** is a session of 2 to 3 hours, **L** is more than one session.
 
@@ -62,7 +63,7 @@ Sizes: **S** is under an hour, **M** is a session of 2 to 3 hours, **L** is more
 - QW-6 Shared contact block with formatted phone numbers · S
 - QW-7 Follow-ups: collapse group leader view by default · S
 - QW-8 Overview chart: readable stage colours, after DEV-10 · S
-- QW-9 One name for each stage everywhere, after DEC-2 · S
+- QW-9 Terms dictionary: one place in the code for every label, after DEC-2 · S
 
 **3. Data foundations**
 
@@ -82,6 +83,7 @@ Sizes: **S** is under an hour, **M** is a session of 2 to 3 hours, **L** is more
 - MEM-1 Members: top cards · M
 - MEM-2 Members: table columns and status · M
 - MEM-3 Members: person drawer · M
+- MEM-4 Needs help: contact and resolve people who can't find a group · M
 - GRP-1 Groups: count, filters and search · M
 - GRP-2 Groups: badge and sort · S
 - GRP-3 Groups: Active / Closed switch · S
@@ -101,7 +103,7 @@ Sizes: **S** is under an hour, **M** is a session of 2 to 3 hours, **L** is more
 - POL-1 Tap a profile picture to enlarge it · M
 - POL-2 Search across the dashboard · M
 
-**Dev backlog** (alongside everything): DEV-1 to DEV-10, described under For the devs.
+**Dev backlog** (alongside everything): DEV-1 to DEV-11, described under For the devs.
 
 ## How to work through it
 
@@ -127,15 +129,10 @@ Read docs/dashboard/glossary.md. Then run gh issue view <N> and do that issue on
 
 ## Decisions to make
 
-Twenty choices, grouped into four issues, each with a recommendation drafted with Claude. DEC-1 and DEC-2 block the data work, so they come first.
+DEC-1 is decided: see `decisions/dec-1-definitions.md`, with the definitions in `glossary.md`. The remaining choices are below, each with a recommendation drafted with Claude. DEC-2 blocks the data work, so it comes next.
 
 | Decision | Recommendation | Issue |
 | --- | --- | --- |
-| What counts as a member | Match the dashboard's scope (one service for now, the only one using VineMe). Include leaders and admins. Exclude test accounts with a flag on users, not a name match. Church-wide and per-service views come later, with DEV-9. | DEC-1 |
-| What counts as connected | An active member of at least one group right now. Attended but not added stays pending. | DEC-1 |
-| Where people whose requests were all archived sit | Under "Not in a group yet", with a filter chip for "requests closed". | DEC-1 |
-| What "new" means | "New" means signed up in the last 30 days. "Newcomer" means new to church. | DEC-1 |
-| When a Needs help flag clears | When clergy mark it handled, or the person becomes connected. | DEC-1 |
 | The time limits | Keep 6 days to first contact, then 10 and 14 days, then 30 days from attending to being added. | DEC-2 |
 | What resets the clock | Stage moves, status changes and leader notes. Not admin notes, or a clergy note makes an untouched request look on track. | DEC-2 |
 | Attended but not added | Keep its own count, and flag anyone past 30 days. Today the dashboard never flags them. | DEC-2 |
@@ -149,10 +146,10 @@ Twenty choices, grouped into four issues, each with a recommendation drafted wit
 | Invite user | Hide it now. Later it becomes "Invite a colleague" (DEV-6). | DEC-4 |
 | Group badge and sort | Count requests needing attention, not all pending. | DEC-4 |
 | Search | Groups page first, global search later (POL-2). | DEC-4 |
-| Members cards | All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days. | DEC-4 |
+| Members cards | Built on the DEC-1 definitions: All members, Connected (with how many are plugged in), Not yet connected, Archived, then Needs help and New in 30 days. | DEC-4 |
 | Insights groups tab | Framed as "Where to offer support", not a league table. | DEC-4 |
 
-The audit (AUD-1) answers six data questions these depend on: whether church_admin access shows the whole church or one service, where needs-help requests are stored, how group status is stored, whether notes record who made a change, where archive reasons are defined, and whether unconfirmed emails can be read on the server.
+The audit (AUD-1) answers five data questions the work depends on: whether church_admin access shows the whole church or one service, how group status is stored, whether notes record who made a change, where archive reasons are defined, and whether unconfirmed emails can be read on the server.
 
 ## What's changing, page by page
 
@@ -184,7 +181,8 @@ The audit (AUD-1) answers six data questions these depend on: whether church_adm
 **Members**
 
 - Fix the bug: the list stops at 500 and search misses people.
-- Cards in journey order: All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days.
+- Cards built on the agreed definitions: connected (and plugged in), not yet connected, archived, needs help, and new in the last 30 days.
+- Needs help: see who's asked, and mark them contacted or resolved, as the app does (MEM-4).
 - Table: Signed up first, Newcomer or Existing member, a group count, and a status showing the furthest stage, other open requests, needs help and anything needing attention.
 - Drawer: each group's stage and timing, opening its follow-up, plus past requests and no dead buttons.
 
@@ -192,7 +190,7 @@ The audit (AUD-1) answers six data questions these depend on: whether church_adm
 
 - Four tabs: Activity, Results, Groups and Team. Newcomers becomes a filter across all of them.
 - Activity: sign-ups and requests over time, by week, month or quarter.
-- Results: got to a group, stuck, and why requests were closed, including how long people waited before losing interest.
+- Results: the connected and plugged-in rates, and why requests were closed, including how long people waited before losing interest.
 - Team: follow-up speed over time, counted fairly.
 - Groups: a scorecard for spotting where to offer support.
 
@@ -208,7 +206,7 @@ The audit (AUD-1) answers six data questions these depend on: whether church_adm
 
 ## For the devs
 
-Ten issues need work in the app or backend, beyond the dashboard. They're labelled `needs-dev` and sit in the Dev backlog milestone.
+Eleven issues need work in the app or backend, beyond the dashboard. They're labelled `needs-dev` and sit in the Dev backlog milestone.
 
 | Issue | What | Why it matters |
 | --- | --- | --- |
@@ -222,6 +220,7 @@ Ten issues need work in the app or backend, beyond the dashboard. They're labell
 | DEV-8 | Group details as real fields, like pet friendly | Lets the dashboard show them honestly |
 | DEV-9 | Rethink role-level access, with Aonghas | Service pastors see their own service; church pastors see the whole church and can drill into each service |
 | DEV-10 | Chart colour palette, built from the brand colours | Four shades of pink can't be told apart. Worth doing early: QW-8 and the Insights charts use it |
+| DEV-11 | A proper test-account flag | Matching "test" in names and emails can catch real people and miss real test accounts |
 
 **Where to start.** Everything you need is in the issues, `glossary.md` and `audit.md` (once AUD-1 is done). Pick up the next open issue in the current milestone. Each issue says what it depends on.
 
