@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-54 issues, in working order. Each `###` entry below becomes one GitHub issue:
+55 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -127,11 +127,9 @@ Number: #4
 
 **Decide** (recommendation in brackets)
 - [ ] Invite user. (Hide it for now. Later it becomes "Invite a colleague", DEV-6.)
-- [ ] What the group badge counts and sorts by. (Requests needing attention, not all pending. A group with 7 pending that are all on track isn't a problem.)
+- [ ] What the group badge counts and sorts by. (Requests needing attention, not all pending. A group with 7 pending, none of them needing attention, isn't a problem.)
 - [ ] How wide search goes. (Search on the Groups page first, and a global search later, POL-2.)
-- [ ] The order of the Members cards.
-  - OY: (All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days.)
-  - CG: (All members, then Connected, Not yet connected, Archived and No requests, which add up to All members, then Needs help and New in 30 days.)
+- [ ] The order of the Members cards. (All members, then Connected, Not yet connected, Archived and No requests, which add up to All members, then Needs help and New in 30 days.)
 - [ ] How the Insights groups tab is framed. ("Where to offer support", not a league table. The leaders are volunteers.)
 
 **Done when**
@@ -164,6 +162,8 @@ Several numbers disagree between pages and with Metabase, and some data on scree
    - Does `group_membership_notes` record who made each change, and whether they acted as the leader or as an admin?
    - Where are archive reasons defined?
    - Can the confirmed email and `auth.users.email_change` be read on the server?
+   - When clergy tick a stage in the dashboard, is a `group_membership_notes` row written the same way the app does it? The follow-up clock and the history both depend on it.
+   - Does the drawer's "Add a note" save anything today, and with what `note_type`? If it saves as `manual`, clergy notes are already resetting the clock.
 6. Check every table, column, status value and time limit named in `docs/dashboard/glossary.md` against the code and database, and list any that are wrong.
 
 **Reference figures** (Metabase, 22 October 2026, 6:30pm Evening Service)
@@ -388,12 +388,10 @@ Number: #15
 Each page calculates its own numbers, so they disagree. One view, read by both the dashboard and Metabase, fixes that at the source.
 
 **What to do**
-- Create a Postgres view with one row per request: person, group, the group's leaders, status, stage, request date, the dates first reached out, spoken to and attended, added date, archive reason, last action date, days since the last action, current limit, needs attention or on track, and days until due.
-- Base it on `docs/dashboard/reference/follow-ups.sql`, keeping its one-hour undo guard, with these fixes:
+- Create a Postgres view with one row per request (every `group_memberships` row, as DEC-1 agreed): person, group, the group's leaders, status, stage, request date, stage dates, added date, archive reason, last action date, days since the last action, current limit, follow-up state (needs first contact, on track or needs attention) and days until due.
+- Base it on `docs/dashboard/reference/follow-ups.sql`, which holds the agreed follow-up rules, with these fixes:
   - a left join to leaders (the inner join drops requests to groups with no active leader)
-  - exclude leaders' own memberships of their groups
-  - apply the clock rules agreed in DEC-2, including the 30-day Attended rule
-  - exclude test accounts the way DEC-1 agrees
+  - exclude test accounts as the glossary says
 - Respect row-level security (`security_invoker = true`), so one church can never see another's data.
 
 **Done when**
@@ -414,13 +412,11 @@ Number: #16
 **Body**
 
 **What to do**
-- OY: Build on DATA-1. One row per member: signed-up date, newcomer, role, connected, furthest stage, number of pending requests, whether any request needs attention, needs help (open), and whether all their requests were archived.
-- CG: Build on DATA-1. One row per member: signed-up date, newcomer, role, connected, plugged in, in a group now, furthest stage, number of pending requests, whether any request needs attention, needs help (open), and whether all their requests were archived.
+- Build on DATA-1. One row per member: signed-up date, newcomer, role, connected, plugged in, in a group now, furthest stage, number of pending requests, whether any request needs attention, needs help (open), and whether all their requests were archived.
 - Use the same row-level security approach as DATA-1.
 
 **Done when**
-- OY: Connected + Pending + Not in a group yet = All members.
-- CG: Connected + Not yet connected + Archived + No requests = All members, and the counts match `reference/people.sql`.
+- Connected + Not yet connected + Archived + No requests = All members, and the counts match `reference/people.sql`.
 - The totals match the definitions in `glossary.md`.
 
 **Depends on:** DATA-1, DEC-1
@@ -481,13 +477,14 @@ Number: #19
 **Body**
 
 **What to do** (in Metabase, not Claude Code)
-- Change the inner join on leaders to a left join.
-- Exclude leaders' own memberships.
+- Change the inner join on leaders to a left join. That's why the User-Requests bar shows 181 connected rather than 182.
 - Add a "Not contacted" segment to the User-Requests bar.
 - Fix the "Total Requests by Group" legend: its light grey is labelled "joined", but the same grey means "left" in the Total Requests donut.
-- CG: Rename the Total Users donut's "Connected" column (any active membership) to "In a group now", so Connected only means reached Attended.
+- Rename the Total Users donut's "Connected" column (any active membership) to "In a group now", so Connected only means reached Attended.
+- Fix the spoken-to measure in the per-person query: `spoken_within_sla` counts a request as a miss once it's 14 days old, but the limit is 16.
+- Use the follow-up states from the glossary: Needs first contact, On track, Needs attention.
 - Show year-on-year in points: "58% (73% last year)".
-- Apply the test-account exclusion agreed in DEC-1.
+- Apply the test-account exclusion from the glossary.
 - Once DATA-1 and DATA-2 exist, point the questions at the views.
 
 **Done when**
@@ -497,7 +494,7 @@ Number: #19
 
 ---
 
-### FU-1 · Follow-ups: explanation and totals at the top
+### FU-1 · Follow-ups: explanation, time limits and totals at the top
 
 Labels: dashboard, follow-ups, size:S
 Milestone: 4. Pages
@@ -507,13 +504,14 @@ Number: #20
 
 **What to do**
 - Replace the intro text. It mentions a "Review" button that doesn't exist and says changes aren't saved.
-- Add a short explanation: what a pending request is (asked to join, not yet added or archived, so Attended still counts), what on track and needs attention mean, and the time limits. One line, plus a "How this works" expander.
-- Show the total so it ties back to Overview, for example "46 pending requests: 31 need attention, 8 on track, 7 attended but not yet added".
+- Add a short explanation of the three follow-up states: needs first contact, on track and needs attention. Say what a pending request is (asked to join, not yet added or archived, so Attended still counts) and what resets the clock. One line, plus a "How this works" expander.
+- Show each stage's time limit on the page, for example as a one-line key: Not contacted 6 days, Reached out 10, Spoken to 14, Attended 30. The cards don't show due dates, so this is where clergy see them.
+- Show the total and how it splits into the three states, so it ties back to Overview. Show attended but not yet added as its own count beside it.
 
 **Done when**
 - A new clergy member can understand the page without asking, and the total matches Overview.
 
-**Depends on:** DEC-2, DATA-3
+**Depends on:** DATA-3
 
 ---
 
@@ -526,17 +524,20 @@ Number: #21
 **Body**
 
 **What to do**
-- Replace "Overdue X days" and "Due in X days" with plain wording:
-  - Not contacted: "Waiting 122 days, no contact yet"
-  - Other stages: "Spoken to 40 days ago", or "Spoken to 3 days ago, follow up within 11 days"
-- Count days since the request (for Not contacted) or since the last action, not days past the limit.
-- Red when it needs attention, green when on track. The wording must still work without the colour.
+- Replace "Overdue X days" and "Due in X days" with wording for each stage, as in the glossary:
+  - Not contacted: "No contact in 5 days", counted from the request, and "Requested today" on the first day
+  - Reached out: "Reached out today", "Reached out yesterday", "Reached out 3 days ago"
+  - Spoken to and Attended: the same pattern
+- The time comes from the stage date. If a later note or contact reset the clock, add it: "Reached out 12 days ago, updated 3 days ago".
+- Colour the pill by follow-up state: green for on track, red for needs attention, neutral for needs first contact. The wording must still make sense without the colour.
+- Don't show when the next contact is due. FU-1 shows the limits at the top of the page.
+- Work out "today" and "yesterday" in UK time.
 - Make the stage headings inside each group stand out more.
 
 **Done when**
-- Every card reads as a plain sentence, and its colour matches its status.
+- Every card reads as a plain phrase, and its colour matches its follow-up state.
 
-**Depends on:** DEC-2, DATA-3
+**Depends on:** DATA-3
 
 ---
 
@@ -570,13 +571,15 @@ Number: #23
 
 **What to do**
 - When an admin ticks a stage or archives a request, show a confirmation: "You're updating this on behalf of [leader name]", with an optional note.
+- Save the change to `group_membership_notes` the same way the app does, so it resets the follow-up clock and shows in the history. AUD-1 says whether the dashboard does this today.
 - Record in the history that an admin made the change.
+- Save the optional note as a clergy note (FU-6).
 - Notifying the leader is DEV-2, not this issue.
 
 **Done when**
-- No admin change happens without the confirmation, and the history shows who made it.
+- No admin change happens without the confirmation, every stage change resets the clock, and the history shows who made it.
 
-**Depends on:** DEC-2, and DEV-7 if AUD-1 finds changes don't record who made them
+**Depends on:** AUD-1, FU-6 (for the note), and DEV-7 if AUD-1 finds changes don't record who made them
 
 **Plan mode:** yes
 
@@ -587,6 +590,7 @@ Number: #23
 Labels: dashboard, follow-ups, size:S
 Milestone: 4. Pages
 Number: #24
+Parked: closed as not planned by DEC-2. Reopen if very old requests become a problem.
 
 **Body**
 
@@ -612,19 +616,14 @@ Number: #25
 **Body**
 
 **What to do**
-- OY: Order: All members, Not in a group yet, Pending, Connected, then Needs help and New in 30 days.
-- CG: Order: All members, then Connected, Not yet connected, Archived and No requests, then Needs help and New in 30 days.
-- OY: Rename "Looking for a group" to "Not in a group yet". "Needs help" is only for people who've asked.
-- CG: Replace "Looking for a group" with these outcomes. "Needs help" is only for people who've asked.
-- OY: The three middle cards add up to All members. Set Needs help and New in 30 days apart, since they overlap with the others.
-- CG: The four outcome cards add up to All members. Set Needs help and New in 30 days apart, since they overlap with the others.
-- OY: Give Pending both units: "30 people · 46 requests".
-- CG: There's no Pending card, because pending describes requests. Give Not yet connected both units: people, and their pending requests.
+- Order: All members, then Connected, Not yet connected, Archived and No requests, then Needs help and New in 30 days.
+- Replace "Looking for a group" with these outcomes. "Needs help" is only for people who've asked.
+- The four outcome cards add up to All members. Set Needs help and New in 30 days apart, since they overlap with the others.
+- There's no Pending card, because pending describes requests. Give Not yet connected both units: people, and their pending requests.
 - Each card filters the list, and the filter goes in the URL (for example `?filter=needs-help`) so Overview can link to it.
 
 **Done when**
-- OY: The middle three cards add up to the total, and every card can be linked to.
-- CG: The four outcome cards add up to All members, and every card can be linked to.
+- The four outcome cards add up to All members, and every card can be linked to.
 
 **Depends on:** DEC-1, DEC-4, DATA-2
 
@@ -642,8 +641,7 @@ Number: #26
 - Put "Signed up" first, with the full date.
 - Role: Admin, Leader, Newcomer or Existing member, with role filters to match.
 - Groups: the count, then the names, cut off if long: "2 · Outreach Connect, Central…"
-- OY: Status, in small pieces with one job each: the furthest stage; "+3 others pending" if they have more open requests; a Needs help tag; a red marker if any request needs attention.
-- CG: Status, in small pieces with one job each: the furthest stage; "+3 more requests pending" if they have more open requests; a Needs help tag; a red marker if any request needs attention.
+- Status, in small pieces with one job each: the furthest stage; "+3 more requests pending" if they have more open requests; a Needs help tag; a red marker if any request needs attention.
 - Add a sort: "Most open requests".
 - Use one meaning of "New" (DEC-1).
 
@@ -704,7 +702,7 @@ Number: #29
 
 **What to do**
 - The badge shows the count agreed in DEC-4 (recommended: requests needing attention), in glossary wording, replacing "X to follow up".
-- Sort by it, and change "busiest first" to match, for example "Most people waiting first".
+- Sort by it, and change "busiest first" to match, for example "Most needing attention first".
 
 **Done when**
 - The badge and sort use the same number as Follow-ups.
@@ -777,7 +775,7 @@ Number: #33
 **Body**
 
 **What to do**
-- Add a toggle to "Pending requests by group": by stage, or by needs attention and on track.
+- Add a toggle to "Pending requests by group": by stage, or by follow-up state (needs first contact, on track and needs attention).
 - In the needs-attention view, sort groups by how many need attention.
 - Keep "View as table".
 
@@ -876,11 +874,9 @@ Number: #38
 **Body**
 
 **What to do**
-- OY: Two headline numbers, each with a one-line explanation: "Got to a group" and "Stuck", as defined in the glossary.
-- CG: Two headline numbers, each with a one-line explanation: the Connected rate and the Plugged-in rate, as defined in the glossary.
-- OY: A chart of requests per month, with the share that ended up connected. Mark recent months as in progress.
-- CG: A chart of requests per month, with the share that reached Attended. Mark recent months as in progress.
-- CG: The connection bar: Connected, Not yet connected (split into its stages) and Archived, adding up to everyone who has requested.
+- Two headline numbers, each with a one-line explanation: the Connected rate and the Plugged-in rate, as defined in the glossary.
+- A chart of requests per month, with the share that reached Attended. Mark recent months as in progress.
+- The connection bar: Connected, Not yet connected (split into its stages) and Archived, adding up to everyone who has requested.
 - Why requests were closed: the archive reasons, plus how long people had waited before "No longer interested" (days waiting is in the reference SQL). If long waits dominate, that's the leakage story in one chart.
 - Note beside the reasons that "Not suitable for group" and "Group at capacity" are re-referral cases (DEV-4).
 
@@ -1168,7 +1164,7 @@ The charts use four close shades of pink, so the stages can't be told apart at a
 - Start from the colour scheme already in the repo, and extend it rather than adding a second set.
 - Define:
   - four stage colours (Not contacted, Reached out, Spoken to, Attended) that read as an order and are clearly distinct, none of them red or green
-  - status colours for needs attention (red) and on track (green), used for nothing else
+  - status colours for needs attention (red) and on track (green), used for nothing else, and a neutral colour for needs first contact
   - a small set of colours for other charts, such as sign-ups against requests
 - Check contrast and colour blindness, in light and dark mode.
 - Store them as tokens in the codebase, and note them in the Colours section of `docs/dashboard/glossary.md`.
@@ -1223,3 +1219,31 @@ Test accounts are excluded by matching "test" in the first name, last name or em
 
 **Done when**
 - Test accounts are excluded by the flag everywhere.
+
+---
+
+### FU-6 · Follow-ups drawer: clergy notes, with an "I've spoken to them" tick
+
+Labels: dashboard, follow-ups, size:M
+Milestone: 4. Pages
+Number: #55
+
+**Body**
+
+**Why**
+Clergy can add notes from the follow-up drawer. A note on its own shouldn't reset the follow-up clock, or a request nobody has acted on could look on track. But when clergy have actually spoken to the person, it should, because they've had contact (DEC-2).
+
+**What to do**
+- Save clergy notes with their own note type, never `manual` (the leaders' type), so they can't reset the clock by accident.
+- Add a tick box to the note form: "I've spoken to [name]". A ticked note resets the clock for requests at Reached out, Spoken to or Attended. It never changes the stage; clergy change the stage separately if they want to. A request that's still Not contacted stays on its first-contact clock until the leader makes contact.
+- Store the tick so the clock rule can read it, for example as a second note type or a flag on the note. Agree which with the devs, since the app reads the same table, and check the app shows the new note type(s) in its history without breaking.
+- Count ticked clergy notes as a last action in `docs/dashboard/reference/follow-ups.sql` and in the request view (DATA-1).
+- Show clergy notes in the history, marked as from clergy, with a ticked note shown as "Spoke to [name]".
+- Notifying the leader is DEV-1, not this issue.
+
+**Done when**
+- Clergy can add a note with or without the tick, only ticked notes reset the clock, and both show in the dashboard and the app.
+
+**Depends on:** AUD-1, DATA-1
+
+**Plan mode:** yes

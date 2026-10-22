@@ -16,7 +16,7 @@ Start here. This folder holds the plan for reworking the clergy dashboard (Overv
 The dashboard's shape is right. Most of what feels wrong is the same word counting different things on different pages. Connected is 117 on Members, 155 on Reports and 182 in Metabase. There are also a few real bugs, and some data that was invented to fill the design, such as the pet tags.
 
 - **The fix:** agree the definitions once, calculate the numbers once in the database, then work through the pages.
-- **The work:** 54 GitHub issues in order, each sized for one Claude Code session and one commit. 43 are dashboard work, and 11 need app or backend work (labelled `needs-dev`).
+- **The work:** 55 GitHub issues in order, each sized for one Claude Code session and one commit. 44 are dashboard work, and 11 need app or backend work (labelled `needs-dev`). One (FU-5) is parked.
 - **Picking up work:** every issue stands on its own and says what it depends on. Take the next open issue in the current milestone.
 - **If time is short:** the critical path is DEC-1, DEC-2, AUD-1, QW-1 and DATA-1 to DATA-3, then FU-1 and FU-2. That gets the numbers right and the page clergy act on into shape.
 
@@ -79,7 +79,8 @@ Sizes: **S** is under an hour, **M** is a session of 2 to 3 hours, **L** is more
 - FU-2 Follow-ups: plain-language cards and colours · M
 - FU-3 Follow-ups drawer: full history, leader contact, real archive reasons · M
 - FU-4 Follow-ups: confirm before acting on a leader's behalf · M
-- FU-5 Follow-ups: nudge on very old requests · S
+- FU-5 Follow-ups: nudge on very old requests (parked) · S
+- FU-6 Follow-ups drawer: clergy notes, with an "I've spoken to them" tick · M
 - MEM-1 Members: top cards · M
 - MEM-2 Members: table columns and status · M
 - MEM-3 Members: person drawer · M
@@ -129,16 +130,10 @@ Read docs/dashboard/glossary.md. Then run gh issue view <N> and do that issue on
 
 ## Decisions to make
 
-DEC-1 is decided: see `decisions/dec-1-definitions.md`, with the definitions in `glossary.md`. The remaining choices are below, each with a recommendation drafted with Claude. DEC-2 blocks the data work, so it comes next.
+DEC-1 and DEC-2 are decided: see `decisions/`, with the definitions in `glossary.md`. The remaining choices are below, each with a recommendation drafted with Claude.
 
 | Decision | Recommendation | Issue |
 | --- | --- | --- |
-| The time limits | Keep 6 days to first contact, then 10 and 14 days, then 30 days from attending to being added. | DEC-2 |
-| What resets the clock | Stage moves, status changes and leader notes. Not admin notes, or a clergy note makes an untouched request look on track. | DEC-2 |
-| Attended but not added | Keep its own count, and flag anyone past 30 days. Today the dashboard never flags them. | DEC-2 |
-| Stage 2's name | Whatever leaders see in the app, "Spoken to" or "Invited", used everywhere. | DEC-2 |
-| The name for requests past their limit | "Needs attention" everywhere. Drop "overdue", "to follow up" and "waiting". | DEC-2 |
-| Very old requests | A nudge after 90 days: "Add or archive?" | DEC-2 |
 | Name for the Reports page | "Insights" or "Stats". Not "Performance", which sounds like appraising volunteers. | DEC-3 |
 | Results headline | Count people: 182 of 259 who asked have attended a group (70%). Counted by requests, it's about 50%. | DEC-3 |
 | Team measures | Count every request old enough to judge, not just those that reached the stage. | DEC-3 |
@@ -163,12 +158,12 @@ The audit (AUD-1) answers five data questions the work depends on: whether churc
 
 **Follow-ups**
 
-- A short explanation of pending, on track and needs attention, with the time limits, and a total that ties back to Overview.
-- Cards in plain words: "Waiting 122 days, no contact yet" in red, "Spoken to 3 days ago, follow up within 11 days" in green.
+- A short explanation of the three follow-up states (needs first contact, on track, needs attention), each stage's time limit shown on the page, and a total that ties back to Overview.
+- Cards in plain words for each stage: "No contact in 8 days" in red, "Reached out 2 days ago" in green.
 - Group leader view collapsed by default, with clearer stage headings.
 - Drawer: formatted phone, email, contact for the leader, a full history of notes and stage changes, and the real archive reasons.
+- Clergy can add notes, with an "I've spoken to them" tick that resets the clock.
 - Admins can act on a leader's behalf after a confirmation, with an optional note.
-- A nudge on requests older than 90 days.
 
 **Groups**
 

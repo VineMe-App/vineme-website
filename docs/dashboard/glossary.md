@@ -8,7 +8,7 @@ Lines marked **Decision needed** are recommendations waiting for sign-off. The m
 
 ## Rules for anyone working on the dashboard
 
-1. **Use these words exactly, with no synonyms as labels.** "Overdue", "To follow up", "Waiting", "Joined" and "Looking for a group" are currently used as labels for ideas defined below; replace them. Plain sentences on cards, like "Waiting 122 days, no contact yet", are fine.
+1. **Use these words exactly, with no synonyms as labels.** "Overdue", "Due in", "To follow up", "Waiting", "Invited", "Joined" and "Looking for a group" are currently used as labels for ideas defined below; replace them. Plain phrases on cards, like "No contact in 5 days" or "Reached out 2 days ago", are fine.
 2. **Every number says what it counts.** People or requests: "30 people, 46 requests", never just "46".
 3. **Calculate once.** Once the request and person views exist (DATA-1 and DATA-2), numbers come from them, not from new calculations in components. Until then, don't add number calculations beyond what an issue asks for.
 4. **Now pages and an over-time page.** Overview, Follow-ups, Groups and Members show the current state. Insights shows change over time. Each number has one home, and other pages link to it.
@@ -42,14 +42,16 @@ Lines marked **Decision needed** are recommendations waiting for sign-off. The m
 | Term | Meaning |
 | --- | --- |
 | Request | One person's membership of one group (a `group_memberships` row). Everyone starts by asking to join, so it's called a request. A person can have several. |
-| Stage | Where a pending request has got to: Not contacted (`journey_status` empty), Reached out (1), Spoken to (2), Attended (3). **Decision needed (DEC-2):** the follow-up drawer calls stage 2 "Invited". Use whatever leaders see in the app, everywhere. |
+| Stage | Where a pending request has got to: Not contacted (`journey_status` empty), Reached out (1), Spoken to (2), Attended (3). Stage 2 is always "Spoken to"; the follow-up drawer's "Invited" goes. |
+| Stage date | When a request first reached its current stage, from `group_membership_notes`. Taps undone within an hour are ignored, as in `reference/follow-ups.sql`. |
 | Pending | Not yet resolved (`status = 'pending'`). Attended is still pending. |
 | Added | The leader added them to the group (status `active`). |
 | Left | Was added and has since left (status `inactive`). |
 | Archived | Closed with a reason (status `archived`). |
 | Resolved | Added or Archived. |
 | Archive reasons | No longer interested, Not contactable, Not suitable for group, Group at capacity, and any others where the app defines them. Read the list from that definition; never keep a second copy. |
-| Last action | The latest of: a stage moving forward, a status change, or a note. Stage taps undone within an hour are ignored, as in `reference/follow-ups.sql`. **Decision needed (DEC-2):** whether admin notes count (recommended: no, only notes from the group's leaders). |
+| Last action | The latest of: a stage moving forward (by a leader or clergy), a status change, a leader's note (`note_type` `manual`), or a clergy note marked "spoken to them". Other clergy notes don't count, so a note alone can't make an untouched request look on track. Counted in calendar days. |
+| Clergy note | A note added by clergy in the dashboard (FU-6), stored with its own note type so it never counts as a leader's note. It can be marked "spoken to them", which resets the clock without changing the stage. |
 
 ## Outcomes: who got connected
 
@@ -91,9 +93,9 @@ Every request goes through the journey: the app only lets a leader add someone o
 
 **Check (MEM-4):** in the app code, whether resolving sets `cannot_find_group` back to false, and what happens if someone asks again. Until then, a request made after the last resolution counts as open again.
 
-## Time limits and needs attention
+## Follow-up states and time limits
 
-Every pending request has a limit for its current stage.
+Every pending request has a limit for its current stage. Once more than that many days have passed, it needs attention.
 
 | Stage | Limit | Counted from |
 | --- | --- | --- |
@@ -102,15 +104,27 @@ Every pending request has a limit for its current stage.
 | Spoken to | 14 days | the last action |
 | Attended, not yet added | 30 days | the last action |
 
-**Decision needed (DEC-2):** confirm these limits (they come from `reference/follow-ups.sql`), and that Attended past 30 days counts as needing attention. The dashboard doesn't apply that rule today.
+Not contacted always counts from the request. Only first contact (moving to Reached out or beyond) stops that clock, so notes don't reset it.
 
-| Term | Meaning |
-| --- | --- |
-| Needs attention | A pending request past its limit. Shown in red. |
-| On track | A pending request within its limit. Shown in green. |
-| Very old | A pending request with no action for 90 days. Gets an "Add or archive?" nudge. **Decision needed (DEC-2):** confirm the threshold. |
+Every pending request is in one of three follow-up states, which add up to all pending requests:
 
-Card wording says how long it's been since the request (for Not contacted) or since the last action, never days past the limit. For example: "Waiting 122 days, no contact yet", "Spoken to 3 days ago, follow up within 11 days".
+| Follow-up state | Meaning | Colour |
+| --- | --- | --- |
+| Needs first contact | Not contacted, and 6 days or fewer since the request. | Neutral |
+| On track | Contacted, and within its stage's limit. | Green |
+| Needs attention | Past its stage's limit, at any stage. | Red |
+
+**Attended, not yet added** is also shown as its own count, because the job is different: the leader adding them. Those past 30 days are already in Needs attention.
+
+`reference/follow-ups.sql` holds the agreed logic, in its `follow_up` column.
+
+**Card wording.** Cards say what happened and when, in plain words, and never count days past a limit:
+
+- Not contacted: "No contact in 5 days", counted from the request ("Requested today" on the first day)
+- Reached out: "Reached out today", "Reached out yesterday", "Reached out 3 days ago"
+- Spoken to and Attended: the same pattern
+
+The time comes from the stage date. If a later note or contact has reset the clock, the card adds it: "Reached out 12 days ago, updated 3 days ago". Cards don't say when the next contact is due; the page shows each stage's limit instead.
 
 ## Measures on Insights
 
@@ -145,6 +159,7 @@ This answers a different question from needs attention. Needs attention asks "is
 | --- | --- |
 | Needs attention | Red |
 | On track | Green |
+| Needs first contact | Neutral, neither red nor green |
 | Stages: Not contacted, Reached out, Spoken to, Attended | Four clearly distinct colours, none of them red or green |
 
 Exact values come from the chart palette (DEV-10), stored as tokens alongside the brand colours. Never hard-code a chart colour.

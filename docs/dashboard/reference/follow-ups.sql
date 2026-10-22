@@ -1,8 +1,11 @@
 -- Reference: the Metabase follow-up detail query (6:30pm Evening Service), as of 22 October 2026.
--- Used by AUD-1 (the audit) and DATA-1 (the request view). Kept as written; known issues:
+-- Used by AUD-1 (the audit) and DATA-1 (the request view).
+-- The follow_up column holds the follow-up rules agreed in DEC-2, with the glossary's labels
+-- (Metabase calls them Attention, Actioned and Needs Reach Out).
+-- Known issues in the rest, kept as written:
 --   * the inner join to active leaders drops requests to groups with no active leader
 --   * test accounts are excluded by name match (LIKE is case-sensitive)
--- The time limits and clock rules in docs/dashboard/glossary.md take precedence.
+-- docs/dashboard/glossary.md takes precedence.
 
 with latest_note as (
 	select membership_id
@@ -37,7 +40,7 @@ with latest_note as (
 	, created_at
 	, min(case when new_status = 'active' then created_at end) over (partition by membership_id) as first_activated_at
 	from group_membership_notes
-	where note_type = 'manual'
+	where note_type = 'manual' -- leaders' notes. Clergy notes marked "spoken to them" join this list once FU-6 adds them; plain clergy notes never do
 	   or new_journey_status > coalesce(previous_journey_status, 0)
 	   or new_status is distinct from previous_status
 )
@@ -64,18 +67,15 @@ select users.first_name
 	END as pending
 , CASE WHEN gm.status = 'archived' THEN a.action_date - gm.created_at ::date
 	WHEN gm.status in ('active','inactive') THEN COALESCE(gm.joined_at, a.first_activated_at) ::date - gm.created_at ::date
-	ELSE CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) END as days_waiting
+	ELSE CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) END as days_waiting -- Not contacted cards count from the request, as follow_up does, not from this
 , a.action_date as last_action_on
-, CASE WHEN gm.status = 'archived' THEN 'Archived'
-	WHEN gm.status = 'inactive' THEN 'Left Group'
-	WHEN gm.status = 'active' THEN 'Added'
-	WHEN gm.journey_status = 3 AND CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) > 30 THEN 'Attention'
-	WHEN gm.journey_status = 3 THEN 'Attended'
-	WHEN gm.journey_status = 2 AND CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) > 14 THEN 'Attention'
-	WHEN gm.journey_status = 1 AND CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) > 10 THEN 'Attention'
-	WHEN gm.journey_status is null AND CURRENT_DATE - gm.created_at ::date > 6 THEN 'Attention'
-	WHEN gm.journey_status is not null THEN 'Actioned'
-	ELSE 'Needs Reach Out' END as follow_up
+, CASE WHEN gm.journey_status = 3 AND CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) > 30 AND gm.status = 'pending' THEN 'Needs attention'
+	WHEN gm.journey_status = 2 AND CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) > 14 AND gm.status = 'pending' THEN 'Needs attention'
+	WHEN gm.journey_status = 1 AND CURRENT_DATE - COALESCE(a.action_date, gm.created_at ::date) > 10 AND gm.status = 'pending' THEN 'Needs attention'
+	WHEN gm.journey_status is null AND CURRENT_DATE - gm.created_at ::date > 6 AND gm.status = 'pending' THEN 'Needs attention'
+	WHEN gm.journey_status is not null AND gm.status = 'pending' THEN 'On track'
+	WHEN gm.status = 'pending' THEN 'Needs first contact'
+	END as follow_up -- empty for requests that are added, left or archived
 , CASE WHEN gm.journey_status = 3 AND jm.first_spoken_at is not null THEN 'Spoken to'
 	WHEN gm.journey_status in (2,3) AND jm.first_reached_at is not null THEN 'Reached out'
 	WHEN gm.journey_status is not null THEN 'Requested'
