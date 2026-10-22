@@ -46,7 +46,7 @@ Definitions live in `docs/dashboard/glossary.md`. The reference query is `docs/d
 
 Labels: dashboard, decision, size:S
 Milestone: 1. Decide and audit
-Number:
+Number: #1
 
 **Body**
 
@@ -71,7 +71,7 @@ The same word counts different things on different pages. Connected is 117 on Me
 
 Labels: dashboard, decision, size:S
 Milestone: 1. Decide and audit
-Number:
+Number: #2
 
 **Body**
 
@@ -97,7 +97,7 @@ The Follow-ups page says 31 requests need attention, but its rules differ from t
 
 Labels: dashboard, decision, size:S
 Milestone: 1. Decide and audit
-Number:
+Number: #3
 
 **Body**
 
@@ -121,7 +121,7 @@ Some Metabase measures only count requests that reached a stage, so they look be
 
 Labels: dashboard, decision, size:S
 Milestone: 1. Decide and audit
-Number:
+Number: #4
 
 **Body**
 
@@ -143,7 +143,7 @@ Number:
 
 Labels: dashboard, data, size:M
 Milestone: 1. Decide and audit
-Number:
+Number: #5
 
 **Body**
 
@@ -192,7 +192,7 @@ Several numbers disagree between pages and with Metabase, and some data on scree
 
 Labels: dashboard, bug, members, size:M
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #6
 
 **Body**
 
@@ -215,7 +215,7 @@ Members shows "500 of 500 people", but there are about 550, and searching for so
 
 Labels: dashboard, settings, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #7
 
 **Body**
 
@@ -234,7 +234,7 @@ The ChurchSuite connection isn't finished (DEV-5).
 
 Labels: dashboard, overview, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #8
 
 **Body**
 
@@ -257,7 +257,7 @@ The dark banner takes a lot of space, and "Invite user" doesn't work.
 
 Labels: dashboard, groups, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #9
 
 **Body**
 
@@ -278,7 +278,7 @@ Number:
 
 Labels: dashboard, shared, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #10
 
 **Body**
 
@@ -295,7 +295,7 @@ Number:
 
 Labels: dashboard, shared, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #11
 
 **Body**
 
@@ -316,7 +316,7 @@ The follow-up and member drawers each show a raw number like 447700900123. They 
 
 Labels: dashboard, follow-ups, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #12
 
 **Body**
 
@@ -333,7 +333,7 @@ Number:
 
 Labels: dashboard, overview, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #13
 
 **Body**
 
@@ -355,7 +355,7 @@ The four stages in "Pending requests by group" are close shades of pink and hard
 
 Labels: dashboard, shared, size:S
 Milestone: 2. Quick wins and bugs
-Number:
+Number: #14
 
 **Body**
 
@@ -376,7 +376,7 @@ The follow-up drawer says "Invited" where the rest of the dashboard, and the ref
 
 Labels: dashboard, data, size:L
 Milestone: 3. Data foundations
-Number:
+Number: #15
 
 **Body**
 
@@ -405,7 +405,7 @@ Each page calculates its own numbers, so they disagree. One view, read by both t
 
 Labels: dashboard, data, size:M
 Milestone: 3. Data foundations
-Number:
+Number: #16
 
 **Body**
 
@@ -427,7 +427,7 @@ Number:
 
 Labels: dashboard, data, size:M
 Milestone: 3. Data foundations
-Number:
+Number: #17
 
 **Body**
 
@@ -448,7 +448,7 @@ Number:
 
 Labels: dashboard, data, shared, size:M
 Milestone: 3. Data foundations
-Number:
+Number: #18
 
 **Body**
 
@@ -470,7 +470,7 @@ Number:
 
 Labels: dashboard, data, size:M
 Milestone: 3. Data foundations
-Number:
+Number: #19
 
 **Body**
 
@@ -494,7 +494,7 @@ Number:
 
 Labels: dashboard, follow-ups, size:S
 Milestone: 4. Pages
-Number:
+Number: #20
 
 **Body**
 
@@ -514,7 +514,7 @@ Number:
 
 Labels: dashboard, follow-ups, size:M
 Milestone: 4. Pages
-Number:
+Number: #21
 
 **Body**
 
@@ -537,7 +537,7 @@ Number:
 
 Labels: dashboard, follow-ups, size:M
 Milestone: 4. Pages
-Number:
+Number: #22
 
 **Body**
 
@@ -557,7 +557,7 @@ Number:
 
 Labels: dashboard, follow-ups, size:M
 Milestone: 4. Pages
-Number:
+Number: #23
 
 **Body**
 
@@ -579,7 +579,7 @@ Number:
 
 Labels: dashboard, follow-ups, size:S
 Milestone: 4. Pages
-Number:
+Number: #24
 
 **Body**
 
@@ -600,7 +600,7 @@ Many requests from 2025 are probably resolved but never updated, such as King's 
 
 Labels: dashboard, members, size:M
 Milestone: 4. Pages
-Number:
+Number: #25
 
 **Body**
 
@@ -622,7 +622,7 @@ Number:
 
 Labels: dashboard, members, size:M
 Milestone: 4. Pages
-Number:
+Number: #26
 
 **Body**
 
@@ -645,7 +645,7 @@ Number:
 
 Labels: dashboard, members, size:M
 Milestone: 4. Pages
-Number:
+Number: #27
 
 **Body**
 
@@ -665,7 +665,7 @@ Number:
 
 Labels: dashboard, groups, size:M
 Milestone: 4. Pages
-Number:
+Number: #28
 
 **Body**
 
@@ -685,7 +685,7 @@ Number:
 
 Labels: dashboard, groups, size:S
 Milestone: 4. Pages
-Number:
+Number: #29
 
 **Body**
 
@@ -704,7 +704,7 @@ Number:
 
 Labels: dashboard, groups, size:S
 Milestone: 4. Pages
-Number:
+Number: #30
 
 **Body**
 
@@ -722,7 +722,7 @@ Number:
 
 Labels: dashboard, groups, size:S
 Milestone: 4. Pages
-Number:
+Number: #31
 
 **Body**
 
@@ -740,7 +740,7 @@ Number:
 
 Labels: dashboard, overview, size:S
 Milestone: 4. Pages
-Number:
+Number: #32
 
 **Body**
 
@@ -759,7 +759,7 @@ Number:
 
 Labels: dashboard, overview, size:M
 Milestone: 4. Pages
-Number:
+Number: #33
 
 **Body**
 
@@ -779,7 +779,7 @@ Number:
 
 Labels: dashboard, overview, size:S
 Milestone: 4. Pages
-Number:
+Number: #34
 
 **Body**
 
@@ -797,7 +797,7 @@ Number:
 
 Labels: dashboard, overview, size:M
 Milestone: 4. Pages
-Number:
+Number: #35
 
 **Body**
 
@@ -817,7 +817,7 @@ Number:
 
 Labels: dashboard, insights, size:M
 Milestone: 4. Pages
-Number:
+Number: #36
 
 **Body**
 
@@ -838,7 +838,7 @@ Number:
 
 Labels: dashboard, insights, size:M
 Milestone: 4. Pages
-Number:
+Number: #37
 
 **Body**
 
@@ -858,7 +858,7 @@ Number:
 
 Labels: dashboard, insights, size:L
 Milestone: 4. Pages
-Number:
+Number: #38
 
 **Body**
 
@@ -879,7 +879,7 @@ Number:
 
 Labels: dashboard, insights, size:M
 Milestone: 4. Pages
-Number:
+Number: #39
 
 **Body**
 
@@ -900,7 +900,7 @@ Number:
 
 Labels: dashboard, insights, size:L
 Milestone: 4. Pages
-Number:
+Number: #40
 
 **Body**
 
@@ -922,7 +922,7 @@ Number:
 
 Labels: dashboard, shared, size:M
 Milestone: 5. Polish
-Number:
+Number: #41
 
 **Body**
 
@@ -939,7 +939,7 @@ Number:
 
 Labels: dashboard, shared, size:M
 Milestone: 5. Polish
-Number:
+Number: #42
 
 **Body**
 
@@ -957,7 +957,7 @@ Number:
 
 Labels: dashboard, needs-dev, follow-ups
 Milestone: 6. Dev backlog
-Number:
+Number: #43
 
 **Body**
 
@@ -976,7 +976,7 @@ Clergy can add notes in the dashboard, but leaders won't see them unless they're
 
 Labels: dashboard, needs-dev, follow-ups
 Milestone: 6. Dev backlog
-Number:
+Number: #44
 
 **Body**
 
@@ -997,7 +997,7 @@ FU-4 lets clergy update a stage or archive a request for a leader. The leader ne
 
 Labels: dashboard, needs-dev, groups
 Milestone: 6. Dev backlog
-Number:
+Number: #45
 
 **Body**
 
@@ -1016,7 +1016,7 @@ Number:
 
 Labels: dashboard, needs-dev, members
 Milestone: 6. Dev backlog
-Number:
+Number: #46
 
 **Body**
 
@@ -1037,7 +1037,7 @@ When a group isn't the right fit, the person should be pointed to another one, n
 
 Labels: dashboard, needs-dev, settings
 Milestone: 6. Dev backlog
-Number:
+Number: #47
 
 **Body**
 
@@ -1057,7 +1057,7 @@ Churches want VineMe groups on their own websites. The plan is to sync VineMe an
 
 Labels: dashboard, needs-dev, shared
 Milestone: 6. Dev backlog
-Number:
+Number: #48
 
 **Body**
 
@@ -1077,7 +1077,7 @@ Number:
 
 Labels: dashboard, needs-dev, data
 Milestone: 6. Dev backlog
-Number:
+Number: #49
 
 **Body**
 
@@ -1098,7 +1098,7 @@ Only needed if AUD-1 finds that `group_membership_notes` doesn't record who made
 
 Labels: dashboard, needs-dev, groups
 Milestone: 6. Dev backlog
-Number:
+Number: #50
 
 **Body**
 
@@ -1118,7 +1118,7 @@ The dashboard showed pet tags with no data behind them. They're a nice idea, but
 
 Labels: dashboard, needs-dev, shared
 Milestone: 6. Dev backlog
-Number:
+Number: #51
 
 **Body**
 
@@ -1141,7 +1141,7 @@ Today the `church_admin` role opens the dashboard, and it isn't clear whether it
 
 Labels: dashboard, needs-dev, design, shared
 Milestone: 6. Dev backlog
-Number:
+Number: #52
 
 **Body**
 
