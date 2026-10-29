@@ -128,19 +128,33 @@ The time comes from the stage date. If a later note or contact has reset the clo
 
 ## Measures on Insights
 
+**Insights** is the page that used to be called Reports. Metabase was the reference while the dashboard was built, but it's being retired, so where these definitions improve on a Metabase measure, the dashboard doesn't have to match it.
+
 **Followed up in time** (the Team tab). Measured from the request date, using the same limits added up:
 
 - Reached out within 6 days
 - Spoken to within 16 days (6 + 10)
 - Attended within 30 days (6 + 10 + 14)
 
-The base is every request made in the period that's old enough to judge (at least 6, 16 or 30 days old). Requests that never reached the stage count as misses. Year-on-year comparisons are shown in points: "58% (73% last year)". **Decision needed (DEC-3):** confirm, and change Metabase to match.
+A request only counts towards a measure once its result is known:
+
+| What's happened to the request | Counts? | Result |
+| --- | --- | --- |
+| Reached the stage within the limit | Yes | Hit |
+| Reached the stage after the limit | Yes | Miss |
+| Archived before reaching the stage, for any reason | Yes | Miss |
+| Past the limit without reaching the stage | Yes | Miss |
+| Still open, within the limit, stage not reached | No | Not known yet |
+
+So someone archived at Reached out is a miss for Spoken to and Attended, and someone still at Reached out isn't judged on Attended until day 30. If a stage is skipped, the later stage counts for the earlier ones: going straight to Attended counts as reached out and spoken to on that date. Each measure shows how many requests it's based on, and the current period is marked in progress. Year-on-year comparisons are shown in points: "58% (73% last year)".
+
+`reference/followed-up-in-time.sql` holds the logic. The Team tab has an info button that shows the table above.
 
 This answers a different question from needs attention. Needs attention asks "is this request slipping right now?" Followed up in time asks "how quickly did we get people through?" Never use one name for both.
 
-**Connected rate** (the Results tab). Of people who requested, the share who are connected. **Decision needed (DEC-3):** count people (recommended) or requests.
+**Connected rate** (the Results tab headline). Of people who requested, the share who are connected, counted in people, not requests. On 22 October 2026 that was 182 of 259 (70%).
 
-**Plugged-in rate** (the Results tab). Of people who requested, the share who are plugged in.
+**Plugged-in rate** (the Results tab). Of people who are connected, the share who were added to a group, including those who've since left.
 
 **Resolved this week** (Overview). Requests that were added or archived this week. Attended doesn't count, because it's still pending.
 

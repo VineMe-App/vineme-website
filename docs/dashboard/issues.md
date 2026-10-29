@@ -385,7 +385,7 @@ Number: #15
 **Body**
 
 **Why**
-Each page calculates its own numbers, so they disagree. One view, read by both the dashboard and Metabase, fixes that at the source.
+Each page calculates its own numbers, so they disagree. One view, read by every page, fixes that at the source.
 
 **What to do**
 - Create a Postgres view with one row per request (every `group_memberships` row, as DEC-1 agreed): person, group, the group's leaders, status, stage, request date, stage dates, added date, archive reason, last action date, days since the last action, current limit, follow-up state (needs first contact, on track or needs attention) and days until due.
@@ -468,29 +468,24 @@ Number: #18
 
 ---
 
-### DATA-5 · Bring Metabase in line (Olly, in Metabase)
+### DATA-5 · Keep Metabase usable until it's retired (Olly, in Metabase)
 
-Labels: dashboard, data, size:M
+Labels: dashboard, data, size:S
 Milestone: 3. Data foundations
 Number: #19
 
 **Body**
 
-**What to do** (in Metabase, not Claude Code)
-- Change the inner join on leaders to a left join. That's why the User-Requests bar shows 181 connected rather than 182.
-- Add a "Not contacted" segment to the User-Requests bar.
+**Why**
+Metabase is being retired once the dashboard replaces it. Until then it's a useful cross-check, but it doesn't have to match where the dashboard's definitions are better (DEC-3).
+
+**What to do** (in Metabase, only what's worth doing before it's retired)
+- Change the inner join on leaders to a left join, so the User-Requests bar shows 182 connected rather than 181.
+- Fix `spoken_within_sla` in the per-person query: it counts a miss once a request is 14 days old, but the limit is 16.
 - Fix the "Total Requests by Group" legend: its light grey is labelled "joined", but the same grey means "left" in the Total Requests donut.
-- Rename the Total Users donut's "Connected" column (any active membership) to "In a group now", so Connected only means reached Attended.
-- Fix the spoken-to measure in the per-person query: `spoken_within_sla` counts a request as a miss once it's 14 days old, but the limit is 16.
-- Use the follow-up states from the glossary: Needs first contact, On track, Needs attention.
-- Show year-on-year in points: "58% (73% last year)".
-- Apply the test-account exclusion from the glossary.
-- Once DATA-1 and DATA-2 exist, point the questions at the views.
 
 **Done when**
-- Metabase and the dashboard show the same numbers.
-
-**Depends on:** DEC-1, DEC-3, DATA-1, DATA-2
+- Metabase is good enough to cross-check against until it's switched off. Close this issue when it is.
 
 ---
 
@@ -833,15 +828,13 @@ Number: #36
 **Body**
 
 **What to do**
-- Rename the page as agreed in DEC-3.
+- Rename the page from Reports to **Insights**, in the navigation and anywhere it's mentioned.
 - Reduce six tabs to four: Activity (was Downloads), Results (was Pipeline and Connection), Groups and Team. Newcomers becomes a filter.
 - Page-wide filters: Everyone or Newcomers (check it actually filters), a date range, and week, month or quarter. Put them in the URL.
 - Headings as plain questions. No "pipeline", "effectiveness" or "performance".
 
 **Done when**
-- Four tabs, filters that apply everywhere, and no corporate words.
-
-**Depends on:** DEC-3
+- The page is called Insights, with four tabs, filters that apply everywhere, and no corporate words.
 
 ---
 
@@ -859,7 +852,7 @@ Number: #37
 - Check May: 13 sign-ups here against 10 in Metabase.
 
 **Done when**
-- Both charts match Metabase for the same period.
+- Both charts match Metabase for the same period, or each difference is explained. Where the dashboard's definitions are better, the dashboard wins.
 
 **Depends on:** INS-1, DATA-2
 
@@ -874,16 +867,17 @@ Number: #38
 **Body**
 
 **What to do**
-- Two headline numbers, each with a one-line explanation: the Connected rate and the Plugged-in rate, as defined in the glossary.
-- A chart of requests per month, with the share that reached Attended. Mark recent months as in progress.
-- The connection bar: Connected, Not yet connected (split into its stages) and Archived, adding up to everyone who has requested.
-- Why requests were closed: the archive reasons, plus how long people had waited before "No longer interested" (days waiting is in the reference SQL). If long waits dominate, that's the leakage story in one chart.
+- Headline: the connected rate, counted in people. Of everyone who has requested, the share who are connected (182 of 259, 70%, on 22 October 2026), with a one-line explanation.
+- The connection bar for everyone who has requested: Connected, then Not yet connected split into Spoken to, Reached out and Not contacted, then Archived.
+- A second measure, the plugged-in rate: of the people who are connected, the share who were added to a group, including those who've since left (status active or inactive). Label it so it doesn't read as "still in a group".
+- Why requests were closed: the archive reasons, plus how long people had waited before "No longer interested".
 - Note beside the reasons that "Not suitable for group" and "Group at capacity" are re-referral cases (DEV-4).
+- Optional, to try if there's time: the connected rate by the month people first requested, with recent months marked in progress.
 
 **Done when**
 - A clergy member can say how well VineMe is working in one sentence, with the number.
 
-**Depends on:** INS-1, DATA-1, DATA-2, DEC-3
+**Depends on:** INS-1, DATA-1, DATA-2
 
 ---
 
@@ -897,14 +891,16 @@ Number: #39
 
 **What to do**
 - Three measures over time, counted from the request date: reached out within 6 days, spoken to within 16, attended within 30.
-- The base is every request in the period old enough to judge, with misses counted.
-- Mark the current period as in progress.
+- Count requests as the glossary says: only once the result is known. The logic is in `docs/dashboard/reference/followed-up-in-time.sql`.
+- Show how many requests each percentage is based on, and mark the current period as in progress.
 - Show year-on-year in points: "58% (73% last year)".
+- Add an info button ("How are these counted?") that opens the counting table from the glossary: reached in time is a hit; reached late, archived first or past the limit is a miss; still open within the limit isn't counted yet. Keep it short and in plain words.
+- Beside each percentage, show the average days to reach that stage, among requests that reached it, as the Metabase Team tab does.
 
 **Done when**
-- The numbers can't flatter themselves: a quarter with 4 attended out of 15 requests can't show 100%.
+- The numbers can't flatter themselves (a quarter with 4 attended out of 15 requests can't show 100%), and a clergy member can find out how they're counted without asking.
 
-**Depends on:** INS-1, DATA-1, DEC-3
+**Depends on:** INS-1, DATA-1
 
 ---
 
@@ -922,6 +918,7 @@ Number: #40
 - Show the count next to every percentage, and grey out groups with fewer than 5 requests in the period.
 - Frame it as "Where to offer support", with a filter for pending.
 - Add a "See stats" button to the group drawer that opens this tab, filtered to that group.
+- The three measures use the same counting rule as the Team tab (INS-4), and show how many requests each one is based on.
 
 **Done when**
 - Clergy can spot which groups need support, without small numbers misleading them.
@@ -1215,7 +1212,7 @@ Test accounts are excluded by matching "test" in the first name, last name or em
 
 **What to do**
 - Add an `is_test` flag to users, and set it for existing test accounts.
-- Switch the views, the dashboard and Metabase to the flag, and update `glossary.md`.
+- Switch the views and the dashboard to the flag, and Metabase if it's still in use, and update `glossary.md`.
 
 **Done when**
 - Test accounts are excluded by the flag everywhere.

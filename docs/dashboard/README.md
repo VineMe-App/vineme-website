@@ -7,7 +7,7 @@ Start here. This folder holds the plan for reworking the clergy dashboard (Overv
 | `README.md` | This plan: the problem, the order of work, and the decisions still open. |
 | `glossary.md` | The definitions and rules every page, query and label follows. Read it before any dashboard task. |
 | `issues.md` | The source of the 52 GitHub issues, with the issue number for each key. |
-| `reference/` | Reference queries. `people.sql` applies the agreed definitions, and `follow-ups.sql` is the follow-up query. |
+| `reference/` | Reference queries. `people.sql` applies the agreed definitions, `follow-ups.sql` is the follow-up query, and `followed-up-in-time.sql` holds the Team measures. |
 | `decisions/` | One file per settled decision: what was decided and why. |
 | `audit.md` | Written by AUD-1: where every number comes from, and what's wrong with it. |
 
@@ -130,14 +130,10 @@ Read docs/dashboard/glossary.md. Then run gh issue view <N> and do that issue on
 
 ## Decisions to make
 
-DEC-1 and DEC-2 are decided: see `decisions/`, with the definitions in `glossary.md`. The remaining choices are below, each with a recommendation drafted with Claude.
+DEC-1, DEC-2 and DEC-3 are decided: see `decisions/`, with the definitions in `glossary.md`. The remaining choices are below, each with a recommendation drafted with Claude.
 
 | Decision | Recommendation | Issue |
 | --- | --- | --- |
-| Name for the Reports page | "Insights" or "Stats". Not "Performance", which sounds like appraising volunteers. | DEC-3 |
-| Results headline | Count people: 182 of 259 who asked have attended a group (70%). Counted by requests, it's about 50%. | DEC-3 |
-| Team measures | Count every request old enough to judge, not just those that reached the stage. | DEC-3 |
-| Metabase | Change it to match, or the two will disagree again. Historical figures will drop. | DEC-3 |
 | Invite user | Hide it now. Later it becomes "Invite a colleague" (DEV-6). | DEC-4 |
 | Group badge and sort | Count requests needing attention, not all pending. | DEC-4 |
 | Search | Groups page first, global search later (POL-2). | DEC-4 |
@@ -186,7 +182,7 @@ The audit (AUD-1) answers five data questions the work depends on: whether churc
 - Four tabs: Activity, Results, Groups and Team. Newcomers becomes a filter across all of them.
 - Activity: sign-ups and requests over time, by week, month or quarter.
 - Results: the connected and plugged-in rates, and why requests were closed, including how long people waited before losing interest.
-- Team: follow-up speed over time, counted fairly.
+- Team: follow-up speed over time, counting each request only once its result is known, with an info button that explains how.
 - Groups: a scorecard for spotting where to offer support.
 
 **Settings**
