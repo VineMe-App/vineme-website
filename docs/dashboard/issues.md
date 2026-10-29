@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-58 issues, in working order. Each `###` entry below becomes one GitHub issue:
+59 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -1319,3 +1319,25 @@ The dashboard can't write to Supabase, so ticking a stage, adding a note, Add to
 
 **Done when**
 - An admin's changes save and appear in the app, and an admin can't change another church's data.
+
+---
+
+### QW-11 · Show when the data was last loaded, with a refresh button
+
+Labels: dashboard, shared, size:S
+Milestone: 2. Quick wins and bugs
+Number: #60
+
+**Body**
+
+**Why**
+The dashboard seems to load its data once per session, so changes made in the app since then don't show. Clergy can't tell how fresh the numbers are.
+
+**What to do**
+- First, find out how and when the dashboard loads its data, and how long it's kept. Record it in the issue.
+- Show "Last updated [time]" in the top bar, in plain words ("Last updated 5 minutes ago").
+- Add a "Refresh" button that reloads the data for every page.
+- Keep the data no older than a sensible limit, for example by reloading when someone comes back to the tab after a while.
+
+**Done when**
+- Clergy can always see how fresh the numbers are, and get the latest with one click.
