@@ -24,6 +24,7 @@ Lines marked **Decision needed** are recommendations waiting for sign-off. The m
 - **People** belong to the dashboard's church and service when `users.church_id` and `users.service_id` match. All their memberships count, in any group, open or closed, so a person's history doesn't vanish when a group closes.
 - **Requests** belong to the service of the group they were made to (`groups.service_id`). Follow-ups and the Team measures use this.
 - Only one service uses VineMe today, so the two rarely differ. Church-wide and per-service views come with DEV-9.
+- A few profiles don't fit. Someone with no church or service can still have requests to a group here (counted in requests, not people), and someone can have this service but another church's `church_id` (counted in neither). AUD-1 found one of each.
 
 ## People
 
@@ -31,8 +32,8 @@ Lines marked **Decision needed** are recommendations waiting for sign-off. The m
 | --- | --- |
 | Member | Everyone in scope, leaders and admins included, test accounts excluded. |
 | Admin | A member whose `users.roles` includes `church_admin`. |
-| Leader | A member with an active leader membership (`group_memberships.role = 'leader'`, status `active`). |
-| Test account | First name, last name or email containing "test", in any case. A proper flag would be safer (DEV-11). |
+| Leader | A member with an active leader membership (`group_memberships.role = 'leader'`, status `active`). The `role` column also allows `admin`, which the code treats like a leader. There are none today. |
+| Test account | First name or last name containing "test", in any case. Email can't be used, because `users` has no email column (email lives in `auth.users`). A proper flag would be safer (DEV-11). |
 | Signed up | When the person created their account (`users.created_at`). Replaces "Joined" and "Downloaded" as labels. |
 | New | Signed up in the last 30 days. Worked out from Signed up; nothing in the database stores it. |
 | Newcomer | Said during onboarding that they're looking for a group (`users.newcomer`). It doesn't mean new to church. It separates people using VineMe to find a group from existing members recording a group they're already in. Everyone else is an Existing member. |
@@ -44,14 +45,14 @@ Lines marked **Decision needed** are recommendations waiting for sign-off. The m
 | --- | --- |
 | Request | One person's membership of one group (a `group_memberships` row). Everyone starts by asking to join, so it's called a request. A person can have several. |
 | Stage | Where a pending request has got to: Not contacted (`journey_status` empty), Reached out (1), Spoken to (2), Attended (3). Stage 2 is always "Spoken to"; the follow-up drawer's "Invited" goes. |
-| Stage date | When a request first reached its current stage, from `group_membership_notes`. Taps undone within an hour are ignored, as in `reference/follow-ups.sql`. |
+| Stage date | When a request first reached its current stage, from `group_membership_notes`. Taps undone within an hour are ignored, as in `reference/follow-ups.sql`. Stage changes have only been recorded since 7 January 2026, so most earlier requests have no stage dates. |
 | Pending | Not yet resolved (`status = 'pending'`). Attended is still pending. |
 | Added | The leader added them to the group (status `active`). |
 | Left | Was added and has since left (status `inactive`). |
 | Archived | Closed with a reason (status `archived`). |
 | Resolved | Added or Archived. |
 | Archive reasons | No longer interested, Not contactable, Not suitable for group, Group at capacity, and any others where the app defines them. Read the list from that definition; never keep a second copy. |
-| Last action | The latest of: a stage moving forward (by a leader or clergy), a status change, a leader's note (`note_type` `manual`), or a clergy note marked "spoken to them". Other clergy notes don't count, so a note alone can't make an untouched request look on track. Counted in calendar days. |
+| Last action | The latest of: a stage moving forward (by a leader or clergy), a status change, a leader's note (`note_type` `manual`; the type doesn't prove who wrote it, since some manual notes come from people who aren't leaders of that group, and DEV-7 records who and in what role), or a clergy note marked "spoken to them". Other clergy notes don't count, so a note alone can't make an untouched request look on track. Counted in calendar days. |
 | Clergy note | A note added by clergy in the dashboard (FU-6), stored with its own note type so it never counts as a leader's note. It can be marked "spoken to them", which resets the clock without changing the stage. |
 
 ## Outcomes: who got connected
@@ -80,7 +81,7 @@ Other person-level terms:
 - **Plugged in:** a connected person who was then added to the group, even if they've since left. It's a measure, not a separate group: every plugged-in person is also connected.
 - **In a group now:** has an active membership today, as a member or a leader. This is a state, not a VineMe outcome. Group member counts use it.
 
-Every request goes through the journey: the app only lets a leader add someone once they've reached Attended. So an added or left request should always be at stage 3. `reference/people.sql` counts anything else as a data error.
+Every request goes through the journey: the app only lets a leader add someone once they've reached Attended. So an added or left request should always be at stage 3. The database enforces this for added requests (the constraint `group_memberships_active_requires_attended`) but not for left ones. `reference/people.sql` counts anything else as a data error.
 
 `reference/people.sql` is the reference query for all of these. It uses each request's current stage.
 
@@ -92,7 +93,7 @@ Every request goes through the journey: the app only lets a leader add someone o
 | Contacted | Someone has marked them contacted (`cannot_find_group_contacted_at`), but it isn't resolved yet. |
 | Resolved | Marked resolved (`cannot_find_group_resolved_at`). They drop off the list. |
 
-**Check (MEM-4):** in the app code, whether resolving sets `cannot_find_group` back to false, and what happens if someone asks again. Until then, a request made after the last resolution counts as open again.
+Resolving sets `cannot_find_group` back to false: in October 2026, all 60 resolved requests had it off and all 11 open ones had it on. **Check (MEM-4):** in the app code, what happens if someone asks again. Until then, a request made after the last resolution counts as open again.
 
 ## Follow-up states and time limits
 
@@ -151,6 +152,8 @@ So someone archived at Reached out is a miss for Spoken to and Attended, and som
 
 `reference/followed-up-in-time.sql` holds the logic. The Team tab has an info button that shows the table above.
 
+Stage dates only exist from 7 January 2026, when the app started recording stage changes, so the Team tab starts from Q1 2026. Most earlier requests have no stage dates, and the measures can't be worked out for them.
+
 This answers a different question from needs attention. Needs attention asks "is this request slipping right now?" Followed up in time asks "how quickly did we get people through?" Never use one name for both.
 
 **Connected rate** (the Results tab headline). Of people who requested, the share who are connected, counted in people, not requests. On 22 October 2026 that was 182 of 259 (70%).
@@ -164,7 +167,8 @@ This answers a different question from needs attention. Needs attention asks "is
 | Term | Meaning |
 | --- | --- |
 | At capacity / Taking new members | From `groups.at_capacity`, set by the leader. |
-| Group status | Active or Closed, with Pending approval to come (DEV-3). How it's stored: answered by AUD-1. |
+| Closed groups | A group is closed when `groups.status = 'closed'`. Left out of every group count and filter, including the total, At capacity and Taking new members. A closed group never counts as at capacity, whatever its `at_capacity` flag says. They only appear in the Closed view (GRP-3). |
+| Group status | Stored in `groups.status`: `approved` (shown as Active), `closed`, `pending` or `denied`. `pending` (awaiting approval) is the default for a new group, so pending approval already exists in the data; DEV-3 builds the approval flow. |
 | Leaders | Every active leader of the group, not just the first. |
 | Badge | On a group card: how many of its requests need attention, in red. If none do but some are pending, the pending count in a neutral colour. Groups are listed with the most needing attention first, on Groups and on Follow-ups. |
 | Members (of a group) | People in the group now: active memberships, leaders included. |

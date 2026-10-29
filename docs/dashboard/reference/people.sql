@@ -1,6 +1,6 @@
 -- People: one row per member, using the definitions agreed in DEC-1 (docs/dashboard/glossary.md).
 -- Connected = at least one group membership at Attended (journey_status 3). This is the 182 in Metabase.
--- If the total differs slightly, it's the wider test-account rule (email too, any case) or someone with
+-- If the total differs slightly, it's the wider test-account rule (any case) or someone with
 -- no first name, whom the old filter dropped.
 -- The reference for the person view (DATA-2). Runs as it is in Metabase.
 
@@ -26,7 +26,6 @@ with params as (
 	and u.service_id::text = p.service_id
 	and coalesce(u.first_name, '') not ilike '%test%'
 	and coalesce(u.last_name, '') not ilike '%test%'
-	-- and coalesce(u.email, '') not ilike '%test%' -- if users has no email column, remove this line
 )
 , by_person as (
 	select gm.user_id

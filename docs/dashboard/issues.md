@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-56 issues, in working order. Each `###` entry below becomes one GitHub issue:
+58 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -166,11 +166,11 @@ Several numbers disagree between pages and with Metabase, and some data on scree
    - Does the drawer's "Add a note" save anything today, and with what `note_type`? If it saves as `manual`, clergy notes are already resetting the clock.
 6. Check every table, column, status value and time limit named in `docs/dashboard/glossary.md` against the code and database, and list any that are wrong.
 
-**Reference figures** (Metabase, 22 October 2026, 6:30pm Evening Service)
-- 550 people: 182 attended a group, 77 requested but haven't attended, 291 never requested
-- 259 people have made a request (the User-Requests bar shows 257)
-- 314 requests: 50% in a group, 15% pending, 28% archived, 7% left
-- Archived requests by reason: No longer interested 51, Not contactable 25, Not suitable for group 7, Group at capacity 5
+**Reference figures** (29 October 2026, 6:30pm Evening Service, from `reference/people.sql` and the glossary's request scope)
+- 560 members: 184 connected, 23 not yet connected, 59 archived, 294 no requests
+- 266 people have made a request (Metabase's Total Users donut also shows 266, of 558 people; its User-Requests bar shows 264)
+- 333 requests: 48% added, 16% pending, 29% archived, 7% left
+- Archived requests by reason: No longer interested 54, Not contactable 26, Not suitable for group 10, Group at capacity 5, none recorded 2
 
 **Known gaps to explain**
 - Total people: Overview 558, Metabase 550, Members 500
@@ -264,7 +264,7 @@ Number: #9
 **Body**
 
 **What to do**
-- List every leader on each card, not just the first: "Led by Sam and Alex", with "+1" beyond two.
+- List every leader on each card, not just the first: "Led by [leader] and [leader]", with "+1" beyond two.
 - Remove the pet tags. There's no pet field in the database. Note in the commit where "Pet friendly" on Outreach Connect was coming from (AUD-1 should already say).
 - Show a short area on cards (like "Chelsea") rather than a full address. Beta Connect Group shows a full street and postcode. If there's no area field, say so rather than inventing one.
 - In the group drawer, remove the location and time from the header, since "When and where" repeats them just below.
@@ -565,6 +565,7 @@ Number: #23
 **Body**
 
 **What to do**
+- Today the dashboard writes nothing. Saving stage changes, Archive and Add to group all have to be built, writing to `group_membership_notes` the same way the app does.
 - When an admin ticks a stage or archives a request, show a confirmation: "You're updating this on behalf of [leader name]", with an optional note.
 - Save the change to `group_membership_notes` the same way the app does, so it resets the follow-up clock and shows in the history. AUD-1 says whether the dashboard does this today.
 - Record in the history that an admin made the change.
@@ -574,7 +575,7 @@ Number: #23
 **Done when**
 - No admin change happens without the confirmation, every stage change resets the clock, and the history shows who made it.
 
-**Depends on:** AUD-1, FU-6 (for the note), and DEV-7 if AUD-1 finds changes don't record who made them
+**Depends on:** DEV-13, AUD-1, FU-6 (for the note), and DEV-7 if AUD-1 finds changes don't record who made them
 
 **Plan mode:** yes
 
@@ -900,6 +901,7 @@ Number: #39
 - Show year-on-year in points: "58% (73% last year)".
 - Add an info button ("How are these counted?") that opens the counting table from the glossary: reached in time is a hit; reached late, archived first or past the limit is a miss; still open within the limit isn't counted yet. Keep it short and in plain words.
 - Beside each percentage, show the average days to reach that stage, among requests that reached it, as the Metabase Team tab does.
+- Stage dates only exist from 7 January 2026, so the Team tab starts from Q1 2026.
 
 **Done when**
 - The numbers can't flatter themselves (a quarter with 4 attended out of 15 requests can't show 100%), and a clergy member can find out how they're counted without asking.
@@ -1200,7 +1202,7 @@ People who press "I can't find a group" in the app have asked for help outright,
 **Done when**
 - A clergy member can see everyone who needs help and mark them contacted or resolved, and the app shows the same state.
 
-**Depends on:** DEC-1, DATA-2
+**Depends on:** DEC-1, DATA-2, DEV-13
 
 **Plan mode:** yes
 
@@ -1248,7 +1250,7 @@ Clergy can add notes from the follow-up drawer. A note on its own shouldn't rese
 **Done when**
 - Clergy can add a note with or without the tick, only ticked notes reset the clock, and both show in the dashboard and the app.
 
-**Depends on:** AUD-1, DATA-1
+**Depends on:** AUD-1, DATA-1, DEV-13
 
 **Plan mode:** yes
 
@@ -1273,3 +1275,47 @@ Clergy sometimes contact someone about finding a group in general, not about one
 
 **Done when**
 - Clergy can add and read notes about a person from the dashboard, and only the right people can see them.
+
+---
+
+### QW-10 · Follow-ups drawer: switch off actions that don't save yet
+
+Labels: dashboard, bug, follow-ups, size:S
+Milestone: 2. Quick wins and bugs
+Number: #58
+Parked: closed as not planned. Not needed: the site won't be published until the dashboard can save changes (DEV-13).
+
+**Body**
+
+**Why**
+The follow-up drawer's stage ticks, note box, "Add to group" and "Archive" look like they work but save nothing, and the drawer says "Ticking a box saves straight away". AUD-1 found the dashboard writes nothing at all.
+
+**What to do**
+- Until FU-4 and FU-6 make them save, disable the stage ticks, the note box, "Add to group" and "Archive", with a short line such as "Coming soon. For now, update this in the app".
+- Do the same for the "Add to group" button on Attended cards, which doesn't save either.
+- Remove the "Ticking a box saves straight away" line.
+
+**Done when**
+- Nothing in the drawer looks like it saves when it doesn't.
+
+---
+
+### DEV-13 · Let the dashboard save changes
+
+Labels: dashboard, needs-dev, data
+Milestone: 6. Dev backlog
+Number: #59
+
+**Body**
+
+**Why**
+The dashboard can't write to Supabase, so ticking a stage, adding a note, Add to group and Archive are all lost on refresh (AUD-1). FU-4, FU-6 and MEM-4 all need saving to work.
+
+**What to do**
+- Save changes on the server, as the signed-in admin. Never expose the Supabase service-role key in the browser.
+- Add row-level security policies so church admins can only change their own church's requests, notes and needs-help records.
+- Write the same rows the app writes (for example `group_membership_notes` for stage changes), so the app and the dashboard agree and the follow-up clock resets.
+- Record who made each change (see DEV-7).
+
+**Done when**
+- An admin's changes save and appear in the app, and an admin can't change another church's data.

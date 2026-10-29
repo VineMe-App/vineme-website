@@ -109,20 +109,25 @@ Sizes: **S** is under an hour, **M** is a session of 2 to 3 hours, **L** is more
 
 ## How to work through it
 
-One issue at a time, in a fresh Claude Code session, with a commit after each.
+One issue at a time, each on its own branch, in a fresh Claude Code session.
 
-- Work on the `dashboard-refresh` branch, created from `staging`. At the end of each milestone, merge it back through a pull request, so the changes can be reviewed in sensible chunks.
-- `CLAUDE.md` in the repo root already holds the dashboard rules, so Claude Code reads them at the start of every session. One of them: if a task depends on anything marked "Decision needed" in the glossary, it stops and asks rather than assuming the recommendation.
+- Each issue gets its own branch from `staging`, linked to the issue, and is assigned to whoever is working on it.
+- `CLAUDE.md` in the repo root holds the dashboard rules, so Claude Code reads them at the start of every session. One of them: if a task depends on anything marked "Decision needed" in the glossary, it stops and asks rather than assuming the recommendation.
 
 **For each issue**
 
-1. Start a fresh session with `/clear`.
-2. Paste the prompt below with the issue number. Start in plan mode if the issue says so.
+1. Start a fresh session with `/clear`. Use plan mode if the issue says so.
+2. Paste the prompt below with the issue number.
 3. Check the change in the browser.
-4. Commit with the message Claude Code suggests. "Closes #N" closes the issue when the branch is merged.
+4. When you're happy, Claude Code commits, pushes and opens a pull request into `staging`.
+5. Merge the pull request (or ask a dev to review it first), then close the issue. GitHub only closes issues automatically for pull requests into `main`, so close it yourself or ask Claude Code to.
 
 ```text
-Read docs/dashboard/glossary.md. Then run gh issue view <N> and do that issue only. When you're done, tell me how to check it in the browser and suggest a commit message ending "Closes #<N>".
+Read docs/dashboard/glossary.md. Then work on issue <N> only:
+1. Assign it to me: gh issue edit <N> --add-assignee @me
+2. Create and check out a branch for it from staging: gh issue develop <N> --base staging --checkout
+3. Do the issue. When you're done, tell me how to check it in the browser.
+4. When I say OK, commit, push, and open a pull request into staging that mentions #<N>.
 ```
 
 **When a decision is made:** update `glossary.md`, tick it in its decision issue, and close the issue once every box is ticked.

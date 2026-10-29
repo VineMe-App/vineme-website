@@ -39,7 +39,6 @@ with journey_taps as (
 	where g.service_id = '52434036-c693-45ff-a79c-2b47220f879f'
 	and coalesce(u.first_name, '') not ilike '%test%'
 	and coalesce(u.last_name, '') not ilike '%test%'
-	and coalesce(u.email, '') not ilike '%test%' -- if users has no email column, remove this line
 )
 select request_id
 , group_
