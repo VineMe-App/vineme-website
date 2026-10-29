@@ -611,16 +611,14 @@ Number: #25
 **Body**
 
 **What to do**
-- Order: All members, then Connected, Not yet connected, Archived and No requests, then Needs help and New in 30 days.
-- Replace "Looking for a group" with these outcomes. "Needs help" is only for people who've asked.
-- The four outcome cards add up to All members. Set Needs help and New in 30 days apart, since they overlap with the others.
-- There's no Pending card, because pending describes requests. Give Not yet connected both units: people, and their pending requests.
+- Cards, in this order: All members; then Connected, Not yet connected, Archived and No requests, which add up to All members; then, set apart because they overlap the others, Needs help and New in 30 days.
+- These replace the current cards (Connected, Pending follow-up, Looking for a group, New in 30 days). "Pending" describes requests, not people, so it isn't a card here.
 - Each card filters the list, and the filter goes in the URL (for example `?filter=needs-help`) so Overview can link to it.
 
 **Done when**
-- The four outcome cards add up to All members, and every card can be linked to.
+- The four middle cards add up to All members, and every card can be linked to.
 
-**Depends on:** DEC-1, DEC-4, DATA-2
+**Depends on:** DATA-2
 
 ---
 
@@ -676,14 +674,12 @@ Number: #28
 **Body**
 
 **What to do**
-- Show a count at the top ("18 groups") that updates with filters.
+- Show a count at the top ("18 groups") that updates with filters and search.
 - Add filters: Taking new members and At capacity. They apply to the map as well as the cards, and go in the URL so Overview's card can link to `?filter=at-capacity`.
-- Add a search box covering group name, leader and member.
+- Add a search box for this page: group name, leader, member, or anyone with a pending request. Searching for a person narrows the cards and the map to the groups they're in or have asked to join. The search covers this page only.
 
 **Done when**
-- Filtering to At capacity shows the right count on both the cards and the map, and searching a leader's name finds their group.
-
-**Depends on:** DEC-4
+- Filtering to At capacity shows the right count on both the cards and the map, and searching for a person shows only their groups, including ones they've asked to join.
 
 ---
 
@@ -696,13 +692,14 @@ Number: #29
 **Body**
 
 **What to do**
-- The badge shows the count agreed in DEC-4 (recommended: requests needing attention), in glossary wording, replacing "X to follow up".
-- Sort by it, and change "busiest first" to match, for example "Most needing attention first".
+- The badge on each group card shows how many of its requests need attention, in red, replacing "X to follow up". If none need attention but some are pending, show the pending count in a neutral colour. No pending requests, no badge.
+- Sort groups by requests needing attention, most first, then by pending requests. Change "busiest first" to match, for example "Groups needing the most attention first".
+- Use the same order for the group leader view on Follow-ups.
 
 **Done when**
-- The badge and sort use the same number as Follow-ups.
+- The badge and sort use the same numbers as Follow-ups, and both pages list groups in the same order.
 
-**Depends on:** DEC-4, DATA-3
+**Depends on:** DATA-3
 
 ---
 
@@ -770,12 +767,12 @@ Number: #33
 **Body**
 
 **What to do**
-- Add a toggle to "Pending requests by group": by stage, or by follow-up state (needs first contact, on track and needs attention).
-- In the needs-attention view, sort groups by how many need attention.
-- Keep "View as table".
+- Add a toggle to "Pending requests by group": By stage, or By follow-up state (needs attention, on track, needs first contact).
+- In the follow-up view, sort groups by how many requests need attention, so the groups needing the most rise to the top. Animate the bars to their new places when the toggle changes, so the reshuffle is easy to follow.
+- Hovering a bar segment shows its count. Keep "View as table".
 
 **Done when**
-- Clergy can see which groups have requests slipping, not just how many are pending.
+- One click shows which groups have requests slipping, with those groups at the top.
 
 **Depends on:** QW-8, DATA-3
 
@@ -832,6 +829,7 @@ Number: #36
 - Reduce six tabs to four: Activity (was Downloads), Results (was Pipeline and Connection), Groups and Team. Newcomers becomes a filter.
 - Page-wide filters: Everyone or Newcomers (check it actually filters), a date range, and week, month or quarter. Put them in the URL.
 - Headings as plain questions. No "pipeline", "effectiveness" or "performance".
+- Give the page a heading question: "How are people getting connected at [church name]?"
 
 **Done when**
 - The page is called Insights, with four tabs, filters that apply everywhere, and no corporate words.
@@ -916,9 +914,10 @@ Number: #40
 - One table, one row per group: requests, members, needs attention now, and the three Team measures.
 - Sortable by any column, with a small rank number in each cell and shading like the Metabase tables.
 - Show the count next to every percentage, and grey out groups with fewer than 5 requests in the period.
-- Frame it as "Where to offer support", with a filter for pending.
 - Add a "See stats" button to the group drawer that opens this tab, filtered to that group.
 - The three measures use the same counting rule as the Team tab (INS-4), and show how many requests each one is based on.
+- Head the tab "How are our groups doing?", framed as where to offer support. It isn't a league table: the leaders are volunteers.
+- Clicking a measure's column heading opens a bar chart of that measure across groups, sorted, with each bar showing its count. Clicking again closes it.
 
 **Done when**
 - Clergy can spot which groups need support, without small numbers misleading them.
@@ -949,6 +948,7 @@ Number: #41
 Labels: dashboard, shared, size:M
 Milestone: 5. Polish
 Number: #42
+Parked: closed as not planned by DEC-4. Each page's search covers that page only. The Groups search (GRP-1) can find people.
 
 **Body**
 
@@ -1062,7 +1062,7 @@ Churches want VineMe groups on their own websites. The plan is to sync VineMe an
 
 ---
 
-### DEV-6 · Invite a colleague to the dashboard
+### DEV-6 · Invite someone to the dashboard
 
 Labels: dashboard, needs-dev, shared
 Milestone: 6. Dev backlog
@@ -1071,12 +1071,12 @@ Number: #48
 **Body**
 
 **What to do**
-- Let an admin invite another clergy or staff member to the dashboard, with a chosen role.
-- Use the roles from DEV-9, so a colleague only sees what their role allows.
-- Bring back the "Invite user" button (hidden in QW-3) once it works.
+- Let an admin invite another person to the dashboard, with one of the roles from DEV-9, so they only see what their role allows.
+- Name the button after the roles, for example "Invite an admin". Avoid "colleague".
+- Bring back the button hidden in QW-3 once it works.
 
 **Done when**
-- An invited colleague can sign in and sees only what their role allows.
+- An invited person can sign in and sees only what their role allows.
 
 **Depends on:** DEV-9
 

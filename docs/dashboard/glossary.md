@@ -17,6 +17,7 @@ Lines marked **Decision needed** are recommendations waiting for sign-off. The m
 7. **Plain, warm words.** Avoid pipeline, performance, effectiveness, workflow, onboarding, optimise and streamline. Headings work best as plain questions, like "How quickly are we following up?"
 8. **Mark the current period as in progress.** This week, month or quarter hasn't finished, so it can't be compared like for like.
 9. **Small numbers get their count.** Every percentage shows the count it's based on. Groups with fewer than 5 requests in a period are greyed out in comparisons (a recommended threshold, open to change).
+10. **Charts invite exploring.** Hovering shows the numbers behind a mark, clicking drills in, and views animate when they change rather than jumping.
 
 ## Scope
 
@@ -165,6 +166,7 @@ This answers a different question from needs attention. Needs attention asks "is
 | At capacity / Taking new members | From `groups.at_capacity`, set by the leader. |
 | Group status | Active or Closed, with Pending approval to come (DEV-3). How it's stored: answered by AUD-1. |
 | Leaders | Every active leader of the group, not just the first. |
+| Badge | On a group card: how many of its requests need attention, in red. If none do but some are pending, the pending count in a neutral colour. Groups are listed with the most needing attention first, on Groups and on Follow-ups. |
 | Members (of a group) | People in the group now: active memberships, leaders included. |
 
 ## Colours
