@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-55 issues, in working order. Each `###` entry below becomes one GitHub issue:
+56 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -645,7 +645,7 @@ Number: #26
 
 ---
 
-### MEM-3 · Members: person drawer
+### MEM-3 · Members: person drawer, with every request and a notes history
 
 Labels: dashboard, members, size:M
 Milestone: 4. Pages
@@ -653,15 +653,21 @@ Number: #27
 
 **Body**
 
+**Why**
+The drawer should be the one place to see everything about a person. Today it leaves out requests that were archived, or whose group has since closed, and it shows no notes. For example, one member asked to join a group, the request was archived, and the drawer doesn't show it.
+
 **What to do**
-- Each group row shows the stage and timing in the same wording and colours as the follow-up cards (FU-2). Clicking a row opens that request's follow-up drawer, reusing the component.
-- Add a collapsed "Past requests" section for archived requests, with their reasons.
+- List every request the person has made, including archived requests and requests to groups that have since closed. Each row shows the stage and timing in the same wording and colours as the follow-up cards (FU-2). Clicking a row opens that request's follow-up drawer, reusing the component.
+- Put archived requests in a collapsed "Past requests" section, with their archive reasons and dates.
+- Show the counts in the heading, for example "Groups · 4 requests, 1 archived".
+- Add a notes history: every note from all of their requests in one list, newest first, each labelled with its group, with stage changes shown distinctly from notes. Once DEV-12 exists, notes about the person join the same list.
+- Once DEV-12 exists, add a note box for notes about the person that aren't tied to a group.
 - Use the shared contact block.
 
 **Done when**
-- From a person, any of their requests is one click away.
+- From the drawer, you can see every request a person has made, including archived ones, and everything noted about them, in one place.
 
-**Depends on:** FU-2, QW-5, QW-6
+**Depends on:** FU-2, QW-5, QW-6, and DEV-12 for notes about the person
 
 ---
 
@@ -1189,6 +1195,7 @@ People who press "I can't find a group" in the app have asked for help outright,
 - Let clergy mark someone contacted or resolved, writing the same `cannot_find_group_contacted_at` and `cannot_find_group_resolved_at` fields the app uses, so the app and dashboard stay in step.
 - Decide whether needs help gets its own time limit, like the follow-up limits.
 - Later, resolving can mean referring them to a group (DEV-4).
+- Once DEV-12 exists, marking someone contacted can include a note about them.
 
 **Done when**
 - A clergy member can see everyone who needs help and mark them contacted or resolved, and the app shows the same state.
@@ -1244,3 +1251,25 @@ Clergy can add notes from the follow-up drawer. A note on its own shouldn't rese
 **Depends on:** AUD-1, DATA-1
 
 **Plan mode:** yes
+
+---
+
+### DEV-12 · Notes about a person, not tied to a group
+
+Labels: dashboard, needs-dev, data, members
+Milestone: 6. Dev backlog
+Number: #56
+
+**Body**
+
+**Why**
+Clergy sometimes contact someone about finding a group in general, not about one request: someone who asked for help, or someone with several requests. Notes only exist on a group membership today (`group_membership_notes`), so there's nowhere to put them.
+
+**What to do**
+- Agree where person notes live. Recommended: a new table, for example `user_notes` with the person, the author, the text, the date and an "I've spoken to them" flag, rather than loosening `group_membership_notes`, which drives the follow-up clock.
+- Decide who can see them. Recommended: clergy and admins only, protected by row-level security so only that church's admins can read them.
+- Decide whether a person note marked "I've spoken to them" resets the clock on their pending requests. Recommended: no. Each request's clock stays with that group's follow-up, so one conversation doesn't mark several groups as on track.
+- Use them for needs-help contacts too (MEM-4), since those people have no group yet.
+
+**Done when**
+- Clergy can add and read notes about a person from the dashboard, and only the right people can see them.

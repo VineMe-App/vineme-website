@@ -16,7 +16,7 @@ Start here. This folder holds the plan for reworking the clergy dashboard (Overv
 The dashboard's shape is right. Most of what feels wrong is the same word counting different things on different pages. Connected is 117 on Members, 155 on Reports and 182 in Metabase. There are also a few real bugs, and some data that was invented to fill the design, such as the pet tags.
 
 - **The fix:** agree the definitions once, calculate the numbers once in the database, then work through the pages.
-- **The work:** 55 GitHub issues in order, each sized for one Claude Code session and one commit. 44 are dashboard work, and 11 need app or backend work (labelled `needs-dev`). Two (FU-5 and POL-2) are parked.
+- **The work:** 56 GitHub issues in order, each sized for one Claude Code session and one commit. 44 are dashboard work, and 12 need app or backend work (labelled `needs-dev`). Two (FU-5 and POL-2) are parked.
 - **Picking up work:** every issue stands on its own and says what it depends on. Take the next open issue in the current milestone.
 - **If time is short:** the critical path is DEC-1, DEC-2, AUD-1, QW-1 and DATA-1 to DATA-3, then FU-1 and FU-2. That gets the numbers right and the page clergy act on into shape.
 
@@ -105,7 +105,7 @@ Sizes: **S** is under an hour, **M** is a session of 2 to 3 hours, **L** is more
 - POL-1 Tap a profile picture to enlarge it · M
 - POL-2 Search across the dashboard (parked) · M
 
-**Dev backlog** (alongside everything): DEV-1 to DEV-11, described under For the devs.
+**Dev backlog** (alongside everything): DEV-1 to DEV-12, described under For the devs.
 
 ## How to work through it
 
@@ -175,7 +175,7 @@ The audit (AUD-1) answers five data questions the work depends on: whether churc
 - Cards: All members, then Connected, Not yet connected, Archived and No requests, which add up to All members. Needs help and New in 30 days sit apart.
 - Needs help: see who's asked, and mark them contacted or resolved, as the app does (MEM-4).
 - Table: Signed up first, Newcomer or Existing member, a group count, and a status showing the furthest stage, other open requests, needs help and anything needing attention.
-- Drawer: each group's stage and timing, opening its follow-up, plus past requests and no dead buttons.
+- Drawer: every request, including archived ones, each opening its follow-up; a notes history across all their requests; and, with DEV-12, notes about the person that aren't tied to a group.
 
 **Insights (was Reports)**
 
@@ -198,7 +198,7 @@ The audit (AUD-1) answers five data questions the work depends on: whether churc
 
 ## For the devs
 
-Eleven issues need work in the app or backend, beyond the dashboard. They're labelled `needs-dev` and sit in the Dev backlog milestone.
+Twelve issues need work in the app or backend, beyond the dashboard. They're labelled `needs-dev` and sit in the Dev backlog milestone.
 
 | Issue | What | Why it matters |
 | --- | --- | --- |
@@ -213,6 +213,7 @@ Eleven issues need work in the app or backend, beyond the dashboard. They're lab
 | DEV-9 | Rethink role-level access, with Aonghas | Service pastors see their own service; church pastors see the whole church and can drill into each service |
 | DEV-10 | Chart colour palette, built from the brand colours | Four shades of pink can't be told apart. Worth doing early: QW-8 and the Insights charts use it |
 | DEV-11 | A proper test-account flag | Matching "test" in names and emails can catch real people and miss real test accounts |
+| DEV-12 | Notes about a person, not tied to a group | Notes only exist on group memberships today, so a general conversation with someone has nowhere to go |
 
 **Where to start.** Everything you need is in the issues, `glossary.md` and `audit.md` (once AUD-1 is done). Pick up the next open issue in the current milestone. Each issue says what it depends on.
 
