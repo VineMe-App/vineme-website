@@ -51,6 +51,8 @@ export interface Group {
   leader: string;
   members: number;
   atCapacity: boolean;
+  /** Pending approval and denied groups are left out. */
+  status: "approved" | "closed";
   pendingFollowUps: number;
   latitude: number | null;
   longitude: number | null;

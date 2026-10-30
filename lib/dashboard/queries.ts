@@ -218,6 +218,7 @@ type GroupRow = {
   meeting_day: string | null;
   meeting_time: string | null;
   at_capacity: boolean;
+  status: "approved" | "closed";
   location: {
     name?: string;
     address?: string;
@@ -240,10 +241,10 @@ export async function fetchGroups({
   const result = await supabase
     .from("groups")
     .select(
-      "id, title, description, image_url, whatsapp_link, meeting_day, meeting_time, at_capacity, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name, avatar_url))",
+      "id, title, description, image_url, whatsapp_link, meeting_day, meeting_time, at_capacity, status, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name, avatar_url))",
     )
     .eq("church_id", churchId)
-    .eq("status", "approved")
+    .in("status", ["approved", "closed"])
     .order("title", { ascending: true });
   check(result);
 
@@ -284,6 +285,7 @@ export async function fetchGroups({
         leader: one(leader?.member)?.name || "No leader yet",
         members: memberships.filter((m) => m.status === "active").length,
         atCapacity: group.at_capacity,
+        status: group.status,
         pendingFollowUps: memberships.filter((m) => m.status === "pending")
           .length,
         latitude: mapCoordinate(group.location?.coordinates?.latitude),
