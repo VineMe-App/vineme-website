@@ -129,18 +129,47 @@ function toMember(user: MemberRow): Member {
 const memberColumns =
   "id, name, avatar_url, roles, bio, newcomer, created_at, group_memberships(role, status, created_at, groups(title))";
 
+/** Rows per request when loading every member. */
+const MEMBER_BATCH = 500;
+
+/**
+ * Every member, newest first: everyone at this church and service, test
+ * accounts excluded (see Member and Test account in docs/dashboard/glossary.md).
+ * Loads them all in batches, so search and counts on the page cover everyone.
+ */
 export async function fetchMembers({
   supabase,
   churchId,
+  serviceId,
 }: AdminContextValue): Promise<Member[]> {
-  const result = await supabase
-    .from("users")
-    .select(memberColumns)
-    .eq("church_id", churchId)
-    .order("created_at", { ascending: false })
-    .limit(500);
-  check(result);
-  return ((result.data ?? []) as unknown as MemberRow[]).map(toMember);
+  const batch = (from: number) => {
+    let query = supabase
+      .from("users")
+      .select(memberColumns, { count: "exact" })
+      .eq("church_id", churchId);
+    if (serviceId) query = query.eq("service_id", serviceId);
+    return query
+      .or("first_name.is.null,first_name.not.ilike.*test*")
+      .or("last_name.is.null,last_name.not.ilike.*test*")
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: true })
+      .range(from, from + MEMBER_BATCH - 1);
+  };
+
+  const rows: MemberRow[] = [];
+  let total = Infinity;
+  while (rows.length < total) {
+    const result = await batch(rows.length);
+    check(result);
+    const data = (result.data ?? []) as unknown as MemberRow[];
+    if (data.length === 0) break;
+    rows.push(...data);
+    // Without a count, keep going while batches come back full.
+    total =
+      result.count ??
+      (data.length === MEMBER_BATCH ? Infinity : rows.length);
+  }
+  return rows.map(toMember);
 }
 
 export async function fetchOverview({

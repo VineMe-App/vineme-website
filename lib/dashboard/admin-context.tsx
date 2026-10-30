@@ -14,6 +14,8 @@ export interface AdminContextValue {
   /** The church the dashboard is currently showing. */
   churchId: string;
   churchName: string | null;
+  /** The admin's own service, on their home church only. */
+  serviceId: string | null;
   serviceName: string | null;
   firstName: string;
   fullName: string;
