@@ -487,6 +487,8 @@ Metabase is being retired once the dashboard replaces it. Until then it's a usef
 **Done when**
 - Metabase is good enough to cross-check against until it's switched off. Close this issue when it is.
 
+**Note:** Metabase's Total Users donut shows 558 members, not 560: its test-account filter (`last_name not like '%Test%'`) drops the 2 members with no last name, who are members under DEC-1. A known difference, explained in `audit.md`; fix it only if Metabase is staying.
+
 ---
 
 ### FU-1 · Follow-ups: explanation, time limits and totals at the top
