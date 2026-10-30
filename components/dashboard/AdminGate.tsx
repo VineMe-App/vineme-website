@@ -32,6 +32,7 @@ interface AdminBase {
   fullName: string;
   avatarUrl: string | null;
   homeChurchId: string;
+  homeServiceId: string | null;
   homeServiceName: string | null;
   churches: ChurchOption[];
 }
@@ -75,6 +76,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
       churchId: church.id,
       churchName: church.name,
       // The service belongs to the admin's own church only.
+      serviceId: church.id === base.homeChurchId ? base.homeServiceId : null,
       serviceName:
         church.id === base.homeChurchId ? base.homeServiceName : null,
       firstName: base.firstName,
@@ -149,6 +151,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
           fullName: profile.name || profile.first_name || "VineMe admin",
           avatarUrl: profile.avatar_url || null,
           homeChurchId: home.id,
+          homeServiceId: profile.service_id ?? null,
           homeServiceName: service.data?.name ?? null,
           churches,
         });
