@@ -230,7 +230,11 @@ type GroupRow = {
   group_memberships: {
     role: string;
     status: string;
-    member: Maybe<{ name: string | null; avatar_url: string | null }>;
+    member: Maybe<{
+      name: string | null;
+      first_name: string | null;
+      avatar_url: string | null;
+    }>;
   }[];
 };
 
@@ -241,7 +245,7 @@ export async function fetchGroups({
   const result = await supabase
     .from("groups")
     .select(
-      "id, title, description, image_url, whatsapp_link, meeting_day, meeting_time, at_capacity, status, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name, avatar_url))",
+      "id, title, description, image_url, whatsapp_link, meeting_day, meeting_time, at_capacity, status, location, group_memberships(role, status, member:users!group_memberships_user_id_fkey(name, first_name, avatar_url))",
     )
     .eq("church_id", churchId)
     .in("status", ["approved", "closed"])
@@ -251,9 +255,13 @@ export async function fetchGroups({
   return ((result.data ?? []) as unknown as GroupRow[])
     .map((group) => {
       const memberships = group.group_memberships ?? [];
-      const leader = memberships.find(
-        (m) => m.status === "active" && m.role === "leader",
-      );
+      const leaders = memberships
+        .filter((m) => m.status === "active" && m.role === "leader")
+        .map((m) => {
+          const name = one(m.member)?.name || "Unnamed";
+          return { name, firstName: one(m.member)?.first_name?.trim() || name };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
       const time = group.meeting_time?.slice(0, 5);
 
       return {
@@ -282,7 +290,7 @@ export async function fetchGroups({
           [group.meeting_day ? `${group.meeting_day}s` : null, time]
             .filter(Boolean)
             .join(", ") || "Meeting time not set",
-        leader: one(leader?.member)?.name || "No leader yet",
+        leaders,
         members: memberships.filter((m) => m.status === "active").length,
         atCapacity: group.at_capacity,
         status: group.status,

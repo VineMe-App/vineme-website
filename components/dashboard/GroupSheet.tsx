@@ -4,7 +4,6 @@ import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { CalendarIcon, MapPinIcon } from "lucide-react";
 import Link from "next/link";
 import { GroupImage } from "@/components/dashboard/GroupImage";
-import { GroupTraits } from "@/components/dashboard/GroupTraits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +16,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { Group } from "@/lib/dashboard/types";
+import { ledByLabel } from "@/lib/dashboard/utils";
 
 interface GroupSheetProps {
   group: Group | null;
@@ -60,8 +60,8 @@ function GroupDetails({ group }: { group: Group }) {
           />
 
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="secondary" size="lg">
-              Led by {group.leader}
+            <Badge variant="secondary" size="lg" className="h-auto min-w-0 shrink whitespace-normal py-0.5 text-left sm:h-auto">
+              {ledByLabel(group.leaders.map((leader) => leader.name))}
             </Badge>
             {group.atCapacity ? (
               <Badge variant="error" size="lg">
@@ -77,7 +77,6 @@ function GroupDetails({ group }: { group: Group }) {
                 {group.pendingFollowUps} to follow up
               </Badge>
             ) : null}
-            <GroupTraits groupId={group.id} groupName={group.name} />
           </div>
 
           <section aria-labelledby="group-about">

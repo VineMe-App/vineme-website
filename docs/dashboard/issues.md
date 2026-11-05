@@ -1128,6 +1128,7 @@ The dashboard showed pet tags with no data behind them. They're a nice idea, but
 **What to do**
 - Let leaders set group details in the app, such as pet friendly.
 - Then show them on the Groups page.
+- Add an area field to group creation in the app (for example 'Chelsea'), separate from the map pin, and show it on group cards.
 
 **Done when**
 - Every tag on a group card comes from a field a leader set.
