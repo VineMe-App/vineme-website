@@ -12,7 +12,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 import { GroupImage } from "@/components/dashboard/GroupImage";
 import { GroupSheet } from "@/components/dashboard/GroupSheet";
-import { GroupTraits } from "@/components/dashboard/GroupTraits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { fetchGroups } from "@/lib/dashboard/queries";
 import type { Group } from "@/lib/dashboard/types";
+import { ledByLabel } from "@/lib/dashboard/utils";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 import { cn } from "@/lib/utils";
 
@@ -439,8 +439,8 @@ function GroupsView() {
                           </p>
                         ) : null}
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="secondary" size="sm">
-                            Led by {group.leader}
+                          <Badge variant="secondary" size="sm" className="h-auto min-w-0 shrink whitespace-normal py-0.5 text-left sm:h-auto">
+                            {ledByLabel(group.leaders.map((leader) => leader.firstName))}
                           </Badge>
                           {group.status === "closed" ? (
                             <Badge variant="secondary" size="sm">
@@ -455,11 +455,6 @@ function GroupsView() {
                               Taking new members
                             </Badge>
                           )}
-                          <GroupTraits
-                            groupId={group.id}
-                            groupName={group.name}
-                            size="sm"
-                          />
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-muted-foreground text-sm">
