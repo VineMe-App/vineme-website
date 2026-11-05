@@ -131,8 +131,12 @@ Rules:
 
 ## Layout and shape
 
-- Page container: `mx-auto w-full max-w-6xl`, horizontal padding `px-5 sm:px-6`,
-  vertical `py-10 lg:py-14`.
+- Page container: wrap every page in `DashboardPage`
+  (`components/dashboard/DashboardPage.tsx`), never a hand-written section. It
+  sets the spacing (`px-5 py-6 sm:px-6 lg:py-8`) and width (`max-w-6xl`, or
+  `wide` for `max-w-[90rem]`), so every page shares one top edge.
+  Narrow pages (Settings, Profile) are centred: a `mx-auto max-w-*` wrapper
+  inside it.
 - Cards: use coss `Card` / `CardFrame` (rounded-2xl, subtle border and
   shadow). The brand-dark hero card at the top of the overview is the one
   custom surface (`rounded-3xl bg-brand-dark`).
