@@ -1149,6 +1149,7 @@ Today the `church_admin` role opens the dashboard, and it isn't clear whether it
 - Design the roles with Aonghas: a service pastor sees their own service; a church pastor sees the whole church and can drill down into each service.
 - Make the request and person views (DATA-1, DATA-2) respect those roles through row-level security.
 - Add a service picker for anyone who can see more than one service.
+- Show the current church and service in the top bar, and let anyone who can see more than one switch between them there, using the church icon in the top right rather than adding a second control.
 
 **Done when**
 - Each role sees exactly its own scope, and church-wide request counts add up to the sum of each service's.
