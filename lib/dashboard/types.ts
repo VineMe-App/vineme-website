@@ -48,7 +48,8 @@ export interface Group {
   people: GroupPerson[];
   area: string;
   meets: string;
-  leader: string;
+  /** The group's active leaders, A to Z by full name. */
+  leaders: { name: string; firstName: string }[];
   members: number;
   atCapacity: boolean;
   /** Pending approval and denied groups are left out. */
