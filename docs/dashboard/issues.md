@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-60 issues, in working order. Each `###` entry below becomes one GitHub issue:
+61 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -1367,3 +1367,25 @@ Churches want people who join through VineMe to appear in their ChurchSuite data
 
 **Done when**
 - A church can connect ChurchSuite from Settings, and people who join through VineMe appear in its ChurchSuite database.
+
+---
+
+### QW-12 · One page layout: consistent spacing and alignment
+
+Labels: dashboard, shared, size:S
+Milestone: 2. Quick wins and bugs
+Number: #67
+
+**Body**
+
+**Why**
+Each page sets its own spacing and width, so they drift. The Groups map view has tighter top spacing than every other page (and the Groups cards view), so the heading jumps when you switch views. Settings and Profile are narrow and centred, while the other pages line up on the left.
+
+**What to do**
+- Add one shared page component, `components/dashboard/DashboardPage.tsx`, with the Groups map view's spacing (`py-4 lg:py-5`) and the standard width (`max-w-6xl`), plus a wider option for Groups.
+- Use it on every dashboard page, including loading and error messages: Overview, Follow-ups, Groups (both views), Members, Reports, Settings and Profile.
+- Settings and Profile use the standard width, so they line up on the left like the other pages; their forms keep their narrow width.
+- Point the "Page container" rule in `app/dashboard/DESIGN.md` at the component.
+
+**Done when**
+- Every dashboard page has the same top spacing and left edge, set in one shared component.
