@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-59 issues, in working order. Each `###` entry below becomes one GitHub issue:
+60 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -222,7 +222,7 @@ Number: #7
 **Body**
 
 **Why**
-The ChurchSuite connection isn't finished (DEV-5).
+The ChurchSuite connection isn't finished (DEV-14).
 
 **What to do**
 - Cover the ChurchSuite section with a grey panel saying "Coming soon". Nothing underneath can be clicked.
@@ -1057,6 +1057,7 @@ When a group isn't the right fit, the person should be pointed to another one, n
 Labels: dashboard, needs-dev, settings
 Milestone: 6. Dev backlog
 Number: #47
+Parked: closed as not planned. The plan changed: showing groups on church websites is being rethought, probably not through ChurchSuite. Syncing users into ChurchSuite is now DEV-14.
 
 **Body**
 
@@ -1343,3 +1344,25 @@ The dashboard seems to load its data once per session, so changes made in the ap
 
 **Done when**
 - Clergy can always see how fresh the numbers are, and get the latest with one click.
+
+---
+
+### DEV-14 · Sync VineMe users into ChurchSuite
+
+Labels: dashboard, needs-dev, settings
+Milestone: 6. Dev backlog
+Number: #64
+
+**Body**
+
+**Why**
+Churches want people who join through VineMe to appear in their ChurchSuite database. The Settings page already says this is coming (QW-2). It replaces DEV-5, which planned to sync groups for church websites and is closed while that's rethought.
+
+**What to do**
+- Agree what syncs: which people, which fields, and whether it's one-way (VineMe to ChurchSuite).
+- Start from what already exists, and check whether it works: the `trigger_sync_churchsuite_contact` trigger on `users` (it calls the `create-churchsuite-contact` edge function when someone's church is set), `users.churchsuite_id`, the `churchsuite_connections` table (with tags for matched, VineMe and vulnerable people) and `services.churchsuite_site_id`. One church has a connection today; no one at the 6:30pm Evening Service has a `churchsuite_id` yet.
+- Keep ChurchSuite credentials on the server. They should never reach the browser.
+- Replace the "Coming soon" panel in Settings with the real connection settings.
+
+**Done when**
+- A church can connect ChurchSuite from Settings, and people who join through VineMe appear in its ChurchSuite database.

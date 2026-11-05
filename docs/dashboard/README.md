@@ -193,7 +193,7 @@ The audit (AUD-1) answers five data questions the work depends on: whether churc
 
 **Settings**
 
-- "Coming soon" over ChurchSuite until the sync is ready.
+- "Coming soon" over ChurchSuite until users can sync into it (DEV-14).
 
 **Everywhere**
 
@@ -211,7 +211,7 @@ Twelve issues need work in the app or backend, beyond the dashboard. They're lab
 | DEV-2 | Notify the leader when an admin acts on their behalf | Leaders need to know their list changed |
 | DEV-3 | Group approval flow | New groups approved from the dashboard and flagged on Overview |
 | DEV-4 | Refer someone to a group | Re-refer after a poor fit, or place someone who asked for help. 12 requests so far were closed as "Not suitable" or "Group at capacity". |
-| DEV-5 | ChurchSuite sync in Settings | Groups shown on church websites, with capacity, memberships and website join requests flowing back into VineMe |
+| DEV-5 | ChurchSuite sync in Settings (closed) | Replaced by DEV-14. How groups appear on church websites is being rethought, probably not through ChurchSuite |
 | DEV-6 | Invite someone to the dashboard | Brings back the Invite button, with the roles from DEV-9 |
 | DEV-7 | Record who made each change, if missing | Separates leader actions from admin actions |
 | DEV-8 | Group details as real fields, like pet friendly | Lets the dashboard show them honestly |
@@ -219,6 +219,7 @@ Twelve issues need work in the app or backend, beyond the dashboard. They're lab
 | DEV-10 | Chart colour palette, built from the brand colours | Four shades of pink can't be told apart. Worth doing early: QW-8 and the Insights charts use it |
 | DEV-11 | A proper test-account flag | Matching "test" in names and emails can catch real people and miss real test accounts |
 | DEV-12 | Notes about a person, not tied to a group | Notes only exist on group memberships today, so a general conversation with someone has nowhere to go |
+| DEV-14 | Sync VineMe users into ChurchSuite | People who join through VineMe appear in the church's ChurchSuite database. Some of the sync already exists |
 
 **Where to start.** Everything you need is in the issues, `glossary.md` and `audit.md` (once AUD-1 is done). Pick up the next open issue in the current milestone. Each issue says what it depends on.
 
