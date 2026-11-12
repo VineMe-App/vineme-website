@@ -1,6 +1,6 @@
 # Clergy dashboard: GitHub issues
 
-61 issues, in working order. Each `###` entry below becomes one GitHub issue:
+62 issues, in working order. Each `###` entry below becomes one GitHub issue:
 
 - **Title:** the heading text after `### `, key included (for example `DATA-1 · Request view: one row per request, with stage and time limits`).
 - **Labels and milestone:** the lines under the heading.
@@ -1391,3 +1391,27 @@ Each page sets its own spacing and width, so they drift. The Groups map view has
 
 **Done when**
 - Every dashboard page has the same top spacing and left edge, set in one shared component.
+
+---
+
+### QW-13 · Follow-up drawer: open the member's drawer from their name
+
+Labels: dashboard, shared, size:S
+Milestone: 2. Quick wins and bugs
+Number: #71
+
+**Body**
+
+**Why**
+From a follow-up drawer there's no way to see the rest of the person: their other requests, contact details and bio. QW-5 added the opposite direction, a Review button in the member drawer that opens a request's follow-up drawer.
+
+**What to do**
+- Make the person's name in the follow-up drawer's header clickable, opening their member drawer. Reuse `MemberSheet`; don't build a second one.
+- Load the member by the follow-up's `userId`, using the same member query as the Members page.
+- Make it work wherever the follow-up drawer opens: the Follow-ups page, and Review from the member drawer. When it was opened from the member drawer, clicking the name goes back to that drawer rather than stacking another one.
+- Make it clear the name can be clicked (underline or pointer on hover) and reachable with the keyboard.
+
+**Done when**
+- Clicking the name in any follow-up drawer opens that person's member drawer.
+
+**Depends on:** QW-5

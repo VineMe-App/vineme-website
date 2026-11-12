@@ -2,7 +2,7 @@
 
 import { XIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,7 @@ import {
   type StageMeta,
 } from "@/components/dashboard/FollowUpSection";
 import { FollowUpSheet } from "@/components/dashboard/FollowUpSheet";
+import { MemberSheetById } from "@/components/dashboard/MemberSheet";
 import { Card, CardPanel } from "@/components/ui/card";
 import {
   addFollowUpNote,
@@ -105,6 +106,9 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
   const [people, setPeople] = useState<FollowUp[]>(initialPeople);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  // The person whose member drawer is open, from a follow-up drawer's name.
+  const [memberUserId, setMemberUserId] = useState<string | null>(null);
+  const closeMember = useCallback(() => setMemberUserId(null), []);
   const [groupBy, setGroupBy] = useState<"stage" | "leader">("leader");
 
   // Phone numbers are private, so look one up only when its sheet opens.
@@ -337,7 +341,12 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
         onAddNote={handleAddNote}
         onAddToGroup={handleAddToGroup}
         onArchive={handleArchive}
+        onOpenPerson={(userId) => {
+          setIsSheetOpen(false);
+          setMemberUserId(userId);
+        }}
       />
+      <MemberSheetById userId={memberUserId} onClose={closeMember} />
     </DashboardPage>
   );
 }

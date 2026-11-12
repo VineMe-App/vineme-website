@@ -53,6 +53,8 @@ interface FollowUpSheetProps {
   onAddNote: (id: string, note: string) => void;
   onAddToGroup: (id: string) => void;
   onArchive: (id: string, reason: string) => void;
+  /** When set, the person's name opens their member drawer. */
+  onOpenPerson?: (userId: string) => void;
 }
 
 export function FollowUpSheet({
@@ -78,6 +80,7 @@ function FollowUpEditor({
   onAddNote,
   onAddToGroup,
   onArchive,
+  onOpenPerson,
 }: Omit<FollowUpSheetProps, "person" | "open" | "onOpenChange"> & {
   person: FollowUp;
 }) {
@@ -105,7 +108,20 @@ function FollowUpEditor({
             fallbackClassName="text-sm"
           />
           <div>
-            <SheetTitle>{person.name}</SheetTitle>
+            <SheetTitle>
+              {onOpenPerson ? (
+                <button
+                  type="button"
+                  onClick={() => onOpenPerson(person.userId)}
+                  aria-label={`${person.name}: open their member details`}
+                  className="cursor-pointer rounded-sm text-left underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {person.name}
+                </button>
+              ) : (
+                person.name
+              )}
+            </SheetTitle>
             <SheetDescription>{getRequestedLabel(person)}</SheetDescription>
           </div>
         </div>

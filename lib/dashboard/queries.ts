@@ -205,6 +205,21 @@ export async function fetchMembers({
   return rows.map(toMember);
 }
 
+/** One person, by user ID, shaped like a row on the Members page. */
+export async function fetchMember(
+  { supabase, churchId }: AdminContextValue,
+  userId: string,
+): Promise<Member | null> {
+  const result = await supabase
+    .from("users")
+    .select(memberColumns)
+    .eq("church_id", churchId)
+    .eq("id", userId)
+    .maybeSingle();
+  check(result);
+  return result.data ? toMember(result.data as unknown as MemberRow) : null;
+}
+
 export async function fetchOverview({
   supabase,
   churchId,
