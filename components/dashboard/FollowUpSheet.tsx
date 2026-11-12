@@ -29,11 +29,12 @@ import {
 } from "@/lib/dashboard/follow-up-utils";
 import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
 import { cn } from "@/lib/utils";
+import { stages } from "@/lib/dashboard/terms";
 
 const steps: { id: FollowUpStep; label: string; historyLabel: string }[] = [
-  { id: "reachedOut", label: "Reached out", historyLabel: "Reached out" },
-  { id: "invited", label: "Invited", historyLabel: "Invited" },
-  { id: "attended", label: "Attended", historyLabel: "Attended" },
+  { id: "reachedOut", label: stages.reachedOut.label, historyLabel: stages.reachedOut.label },
+  { id: "invited", label: stages.spokenTo.label, historyLabel: stages.spokenTo.label },
+  { id: "attended", label: stages.attended.label, historyLabel: stages.attended.label },
 ];
 
 const archiveReasons = [
@@ -265,7 +266,7 @@ function FollowUpEditor({
         </Button>
         {!canAddToGroup ? (
           <p className="text-muted-foreground text-xs">
-            Unlocks once Attended is ticked.
+            Unlocks once {stages.attended.label} is ticked.
           </p>
         ) : null}
         <Field>

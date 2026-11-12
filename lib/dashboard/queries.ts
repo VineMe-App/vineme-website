@@ -10,6 +10,7 @@ import type {
   ReportsData,
   SignupOutcome,
 } from "@/lib/dashboard/types";
+import { people } from "@/lib/dashboard/terms";
 
 /**
  * The team's follow-up expectations (SLA), in days. Someone is overdue
@@ -118,9 +119,9 @@ function toMember(user: MemberRow): Member {
   const current = active ?? pending;
 
   const role = user.roles?.includes("church_admin")
-    ? "Admin"
+    ? people.admin.label
     : active && ["leader", "admin"].includes(active.role)
-      ? "Group Leader"
+      ? people.leader.label
       : "Congregation";
 
   const status = active

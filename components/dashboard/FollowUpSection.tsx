@@ -15,6 +15,7 @@ import {
 } from "@/lib/dashboard/follow-up-utils";
 import type { FollowUp } from "@/lib/dashboard/types";
 import { cn } from "@/lib/utils";
+import { followUpStates, needsAttentionAfter } from "@/lib/dashboard/terms";
 
 export type StageVariant = "followUp" | "attended";
 
@@ -53,8 +54,16 @@ function CountPill({ count }: { count: number }) {
  */
 function SlaBar({ overdue, onTrack }: { overdue: number; onTrack: number }) {
   const segments = [
-    { label: "overdue", count: overdue, color: "var(--destructive)" },
-    { label: "on track", count: onTrack, color: "var(--success)" },
+    {
+      label: needsAttentionAfter(overdue),
+      count: overdue,
+      color: "var(--destructive)",
+    },
+    {
+      label: followUpStates.onTrack.label.toLowerCase(),
+      count: onTrack,
+      color: "var(--success)",
+    },
   ].filter((segment) => segment.count > 0);
   const summary = segments
     .map((segment) => `${segment.count} ${segment.label}`)
@@ -247,7 +256,7 @@ export function FollowUpLeaderSection({
         className={accordionBar}
         aria-label={`${leader}, ${people.length} ${
           people.length === 1 ? "person" : "people"
-        }${overdue ? `, ${overdue} overdue` : ""}`}
+        }${overdue ? `, ${overdue} ${needsAttentionAfter(overdue)}` : ""}`}
       >
         <span className="min-w-0 flex-1">
           <span className="block truncate font-heading text-lg font-bold">

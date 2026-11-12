@@ -24,13 +24,14 @@ import {
 } from "@/lib/dashboard/follow-up-utils";
 import type { FollowUp } from "@/lib/dashboard/types";
 import { cn } from "@/lib/utils";
+import { stages as stageTerms } from "@/lib/dashboard/terms";
 
 /** Stages in journey order. Colours are an ordinal ramp: darkest = most urgent. */
 const stages: { id: FollowUpStage; label: string; color: string }[] = [
-  { id: "not-reached", label: "Not contacted", color: "var(--chart-stage-1)" },
-  { id: "reached-out", label: "Reached out", color: "var(--chart-stage-2)" },
-  { id: "invited", label: "Spoken to", color: "var(--chart-stage-3)" },
-  { id: "attended", label: "Attended", color: "var(--chart-stage-4)" },
+  { id: "not-reached", label: stageTerms.notContacted.label, color: "var(--chart-stage-1)" },
+  { id: "reached-out", label: stageTerms.reachedOut.label, color: "var(--chart-stage-2)" },
+  { id: "invited", label: stageTerms.spokenTo.label, color: "var(--chart-stage-3)" },
+  { id: "attended", label: stageTerms.attended.label, color: "var(--chart-stage-4)" },
 ];
 
 type GroupRow = {

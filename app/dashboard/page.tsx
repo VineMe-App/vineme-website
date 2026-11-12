@@ -24,6 +24,7 @@ import { useAdmin } from "@/lib/dashboard/admin-context";
 import { fetchFollowUps, fetchOverview } from "@/lib/dashboard/queries";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 import { DashboardPage } from "@/components/dashboard/DashboardPage";
+import { requestStatuses } from "@/lib/dashboard/terms";
 
 const SHOW_INVITE_USER = false;
 
@@ -42,7 +43,7 @@ export default function OverviewPage() {
   const followUps = useDashboardQuery(fetchFollowUps);
   const stats = [
     ["Total users", overview?.totalPeople],
-    ["Pending follow-ups", overview?.pendingFollowUps],
+    [`${requestStatuses.pending.label} requests`, overview?.pendingFollowUps],
     ["Groups at capacity", overview?.groupsAtCapacity],
   ];
 

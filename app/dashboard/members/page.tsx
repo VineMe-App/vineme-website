@@ -33,6 +33,7 @@ import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 import { memberStatusVariants } from "@/lib/dashboard/utils";
 import { cn } from "@/lib/utils";
 import { DashboardPage } from "@/components/dashboard/DashboardPage";
+import { people } from "@/lib/dashboard/terms";
 
 const PAGE_SIZE = 25;
 const NEW_WINDOW_DAYS = 30;
@@ -40,7 +41,7 @@ const NEW_WINDOW_DAYS = 30;
 type StatusFilter = "all" | keyof typeof memberStatusVariants;
 type Option = { label: string; value: string };
 
-const roles = ["Admin", "Group Leader", "Congregation"];
+const roles = [people.admin.label, people.leader.label, "Congregation"];
 
 const sortOptions: Option[] = [
   { label: "Newest first", value: "newest" },
@@ -319,7 +320,7 @@ export default function MembersPage() {
               <TableHead>Role</TableHead>
               <TableHead>Group</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
+              <TableHead>{people.signedUp.label}</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>

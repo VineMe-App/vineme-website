@@ -1,4 +1,5 @@
 import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
+import { stages } from "@/lib/dashboard/terms";
 
 export type FollowUpSectionId = "needs-attention" | "on-track" | "attended";
 
@@ -30,10 +31,14 @@ export function compareByUrgency(a: FollowUp, b: FollowUp): number {
 }
 
 export function getProgressLabel(person: FollowUp): string {
-  if (person.progress.attended) return `Attended ${person.progress.attended}`;
-  if (person.progress.invited) return "Invited · waiting to attend";
-  if (person.progress.reachedOut) return "Reached out · not yet invited";
-  return "Not reached out";
+  if (person.progress.attended) {
+    return `${stages.attended.label} ${person.progress.attended}`;
+  }
+  if (person.progress.invited) return `${stages.spokenTo.label} · waiting to attend`;
+  if (person.progress.reachedOut) {
+    return `${stages.reachedOut.label} · not yet spoken to`;
+  }
+  return stages.notContacted.label;
 }
 
 /** Second line under the current stage: when it last changed, and why. */

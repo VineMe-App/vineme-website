@@ -27,29 +27,30 @@ import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 import { cn } from "@/lib/utils";
 import { DashboardPage } from "@/components/dashboard/DashboardPage";
+import { followUpStates, needsAttentionLabel, stages as stageTerms } from "@/lib/dashboard/terms";
 
 const stages: (StageMeta & { note: string })[] = [
   {
     id: "not-reached",
-    title: "Not contacted",
+    title: stageTerms.notContacted.label,
     note: "Nobody has contacted them",
     variant: "followUp",
   },
   {
     id: "reached-out",
-    title: "Reached out to",
+    title: stageTerms.reachedOut.label,
     note: "Next: invite them to the group",
     variant: "followUp",
   },
   {
     id: "invited",
-    title: "Spoken to",
+    title: stageTerms.spokenTo.label,
     note: "Waiting for them to attend",
     variant: "followUp",
   },
   {
     id: "attended",
-    title: "Attended",
+    title: stageTerms.attended.label,
     note: "One step left",
     variant: "attended",
   },
@@ -172,9 +173,12 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
       .sort(compareByUrgency);
 
   const stats = [
-    { label: "Need attention", count: bySection("needs-attention").length },
-    { label: "On track", count: bySection("on-track").length },
-    { label: "Attended, not yet added", count: bySection("attended").length },
+    {
+      label: needsAttentionLabel(bySection("needs-attention").length),
+      count: bySection("needs-attention").length,
+    },
+    { label: followUpStates.onTrack.label, count: bySection("on-track").length },
+    { label: followUpStates.attendedNotAdded.label, count: bySection("attended").length },
   ];
   const needsAttentionCount = stats[0].count;
 
