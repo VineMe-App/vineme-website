@@ -295,10 +295,8 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
           key={`stage-${groupFilterId ?? "all"}`}
           className="mt-4 space-y-3"
           multiple
-          defaultValue={[
-            stages.find((stage) => byStage(stage.id).length > 0)?.id ??
-              stages[0].id,
-          ]}
+          // Every stage starts collapsed; click one to open it.
+          defaultValue={[]}
         >
           {stages.map((section) => (
             <FollowUpSection
@@ -317,7 +315,8 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
           key={`leader-${groupFilterId ?? "all"}`}
           className="mt-4 space-y-3"
           multiple
-          defaultValue={byLeader.length > 0 ? [byLeader[0].leader] : []}
+          // Every group starts collapsed; click one to open it.
+          defaultValue={[]}
         >
           {byLeader.map((entry) => (
             <FollowUpLeaderSection
@@ -332,10 +331,6 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
           ))}
         </Accordion>
       )}
-
-      <p className="mt-10 text-center text-muted-foreground text-sm">
-        That&apos;s everything for now. Your next digest arrives Monday.
-      </p>
 
       <FollowUpSheet
         person={selectedPerson}
