@@ -70,6 +70,8 @@ export function FollowUpReview({
       }
       onAddToGroup={onClose}
       onArchive={onClose}
+      // Opened from a member drawer: the name goes back to it.
+      onOpenPerson={onClose}
     />
   );
 }

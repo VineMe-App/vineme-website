@@ -14,7 +14,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAdmin } from "@/lib/dashboard/admin-context";
-import { fetchContactPhone } from "@/lib/dashboard/queries";
+import { fetchContactPhone, fetchMember } from "@/lib/dashboard/queries";
 import type { Member } from "@/lib/dashboard/types";
 import {
   memberStatusVariants,
@@ -40,6 +40,48 @@ export function MemberSheet({ member, open, onOpenChange }: MemberSheetProps) {
         {member ? <MemberDetails key={member.id} member={member} /> : null}
       </SheetPopup>
     </Sheet>
+  );
+}
+
+/**
+ * The member drawer for someone known only by user ID, for example from a
+ * follow-up drawer. Loads them the same way the Members page does.
+ */
+export function MemberSheetById({
+  userId,
+  onClose,
+}: {
+  /** The person to show, or null when closed. */
+  userId: string | null;
+  onClose: () => void;
+}) {
+  const admin = useAdmin();
+  const [member, setMember] = useState<Member | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    let isMounted = true;
+    fetchMember(admin, userId)
+      .catch(() => null)
+      .then((found) => {
+        if (!isMounted) return;
+        if (found) setMember(found);
+        else onClose();
+      });
+    return () => {
+      isMounted = false;
+      setMember(null);
+    };
+  }, [admin, userId, onClose]);
+
+  return (
+    <MemberSheet
+      member={member}
+      open={Boolean(userId && member)}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    />
   );
 }
 
