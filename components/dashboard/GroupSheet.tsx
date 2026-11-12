@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import type { Group } from "@/lib/dashboard/types";
 import { ledByLabel } from "@/lib/dashboard/utils";
+import { groupTerms, requestStatuses } from "@/lib/dashboard/terms";
 
 interface GroupSheetProps {
   group: Group | null;
@@ -65,11 +66,11 @@ function GroupDetails({ group }: { group: Group }) {
             </Badge>
             {group.atCapacity ? (
               <Badge variant="error" size="lg">
-                At capacity
+                {groupTerms.atCapacity.label}
               </Badge>
             ) : (
               <Badge variant="success" size="lg">
-                Taking new members
+                {groupTerms.takingNewMembers.label}
               </Badge>
             )}
             {group.pendingFollowUps > 0 ? (
@@ -133,7 +134,7 @@ function GroupDetails({ group }: { group: Group }) {
           {pendingPeople.length > 0 ? (
             <PeopleSection
               id="group-pending"
-              title={`Waiting to be followed up (${pendingPeople.length})`}
+              title={`${requestStatuses.pending.label} requests (${pendingPeople.length})`}
               people={pendingPeople}
             />
           ) : null}

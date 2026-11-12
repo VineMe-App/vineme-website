@@ -25,7 +25,7 @@ brand styling and must not use anything described here.
 | Route | Purpose |
 |---|---|
 | `/dashboard` | Overview (home): header, stats, user preview |
-| `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs your attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Each row ends with a "Review" button (chevron) and the whole row is clickable; both open a Sheet editor |
+| `/dashboard/follow-ups` | People waiting on a follow-up, split into "Needs attention", "On track" and "Attended, not yet added". Each section is a `CardFrame` + `Table`. Each row ends with a "Review" button (chevron) and the whole row is clickable; both open a Sheet editor |
 | `/dashboard/groups` | Compact group cards. Map is the default: two columns of cards beside a MapLibre map (OpenFreeMap tiles) that fills the screen under the nav and stays put while the cards scroll. Cards shows the grid only. On a small screen the map sits above the cards. A pin opens the same `GroupSheet`. Pins use `location.coordinates` |
 | `/dashboard/members` | Searchable members table. Rows (and the Overview "User database" rows) open a `MemberSheet` with badges, phone (looked up on open) with Call and WhatsApp, bio, group memberships, and links to the follow-ups and groups pages |
 | `/dashboard/reports` | Short underline tabs (Downloads, Pipeline, Groups, Team, Newcomers, Connection). The full question stays as the heading inside the panel. Charts are Recharts, church-scoped, and only where the table has the data. "Downloaded" is a signup with no live group, not a store download event |
@@ -129,6 +129,12 @@ Rules:
 - Never import another font in the dashboard. Add weights or families in
   `layout.tsx` only if the design genuinely needs them.
 
+## Labels
+
+- Every status, stage, follow-up state and measure label comes from
+  `lib/dashboard/terms.ts`, which matches `docs/dashboard/glossary.md`. Never
+  type one into a component: import it, so a term is renamed in one place.
+
 ## Layout and shape
 
 - Page container: wrap every page in `DashboardPage`
@@ -207,7 +213,7 @@ and subtract that padding (plus the 1px border) from the card radius.
   the church (see `docs/supabase/security-findings.md` on the auth-journey
   branch).
 - Follow-up steps map to `group_memberships.journey_status`: 1 reached out,
-  2 spoken to (shown as Invited), 3 attended group. Step dates come from
+  2 spoken to, 3 attended group. Step dates come from
   `journey_status_change` notes; the overdue window is
   `FOLLOW_UP_SLA` in `lib/dashboard/queries.ts`: reach out within 6 days of the
   request; follow up a reach out within 10 days; follow up a "spoken to" within

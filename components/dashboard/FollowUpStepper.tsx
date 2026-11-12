@@ -2,11 +2,12 @@ import { CheckIcon } from "lucide-react";
 import { getFirstOpenStep } from "@/lib/dashboard/follow-up-utils";
 import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
 import { cn } from "@/lib/utils";
+import { stages } from "@/lib/dashboard/terms";
 
 const steps: { id: FollowUpStep; label: string }[] = [
-  { id: "reachedOut", label: "Reached out" },
-  { id: "invited", label: "Invited" },
-  { id: "attended", label: "Attended" },
+  { id: "reachedOut", label: stages.reachedOut.label },
+  { id: "invited", label: stages.spokenTo.label },
+  { id: "attended", label: stages.attended.label },
 ];
 
 /** Three-step progress: done steps are filled, the next step is outlined. */

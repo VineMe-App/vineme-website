@@ -36,6 +36,12 @@ import type {
   ReportsData,
   SignupOutcome,
 } from "@/lib/dashboard/types";
+import {
+  followUpStates,
+  people as personTerms,
+  requestStatuses,
+  stages as stageTerms,
+} from "@/lib/dashboard/terms";
 
 const outcomes: { key: SignupOutcome; label: string; color: string }[] = [
   { key: "attended", label: "Attended", color: "var(--brand-pink)" },
@@ -44,10 +50,10 @@ const outcomes: { key: SignupOutcome; label: string; color: string }[] = [
 ];
 
 const stages: { key: ReportPerson["pendingStage"] & string; label: string; color: string }[] = [
-  { key: "not-reached", label: "Not contacted", color: "var(--chart-stage-1)" },
-  { key: "reached-out", label: "Reached out", color: "var(--chart-stage-2)" },
-  { key: "invited", label: "Invited", color: "var(--chart-stage-3)" },
-  { key: "attended", label: "Attended", color: "var(--chart-stage-4)" },
+  { key: "not-reached", label: stageTerms.notContacted.label, color: "var(--chart-stage-1)" },
+  { key: "reached-out", label: stageTerms.reachedOut.label, color: "var(--chart-stage-2)" },
+  { key: "invited", label: stageTerms.spokenTo.label, color: "var(--chart-stage-3)" },
+  { key: "attended", label: stageTerms.attended.label, color: "var(--chart-stage-4)" },
 ];
 
 const audiences = [
@@ -314,7 +320,7 @@ function DownloadsReport({ people }: { people: ReportPerson[] }) {
           <Donut slices={slices} centreLabel="Total" />
         </ChartCard>
         <ChartCard
-          title="People by the month they joined"
+          title="People by the month they signed up"
           description="Last 6 months, split by where they are now."
         >
           <div className="h-72">
@@ -372,7 +378,7 @@ function DownloadsReport({ people }: { people: ReportPerson[] }) {
             </ResponsiveContainer>
           </div>
           <p className="mt-2 text-center text-muted-foreground text-xs">
-            Joined
+            {personTerms.signedUp.label}
           </p>
         </ChartCard>
       </div>
@@ -528,7 +534,7 @@ function GroupsReport({ groups }: { groups: ReportGroup[] }) {
                           title={group.name}
                           rows={[
                             { label: "Members", value: group.members },
-                            { label: "Waiting", value: group.pending },
+                            { label: requestStatuses.pending.label, value: group.pending },
                           ]}
                         />
                       );
@@ -579,9 +585,9 @@ function teamSlice(people: ReportPerson[], now: number): Slice[] {
     else counts.track += 1;
   }
   return [
-    { key: "attention", label: "Needs your attention", value: counts.attention, color: "var(--chart-stage-1)" },
-    { key: "track", label: "On track", value: counts.track, color: "var(--chart-stage-2)" },
-    { key: "attended", label: "Attended, not yet added", value: counts.attended, color: "var(--brand-pink)" },
+    { key: "attention", label: followUpStates.needsAttention.label, value: counts.attention, color: "var(--chart-stage-1)" },
+    { key: "track", label: followUpStates.onTrack.label, value: counts.track, color: "var(--chart-stage-2)" },
+    { key: "attended", label: followUpStates.attendedNotAdded.label, value: counts.attended, color: "var(--brand-pink)" },
   ];
 }
 
@@ -608,13 +614,13 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
   const slices: Slice[] = [
     {
       key: "newcomer",
-      label: "Newcomer",
+      label: personTerms.newcomer.label,
       color: "var(--brand-pink)",
       value: people.filter((person) => person.isNewcomer).length,
     },
     {
       key: "returning",
-      label: "Not a newcomer",
+      label: personTerms.existingMember.label,
       color: "var(--brand-dark)",
       value: people.filter((person) => !person.isNewcomer).length,
     },
@@ -637,7 +643,7 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
           <Donut slices={slices} centreLabel="People" />
         </ChartCard>
         <ChartCard
-          title="Who joined, last 6 months"
+          title="Who signed up, last 6 months"
           description="Split by whether they are marked as a newcomer now."
         >
           <div className="h-72">
@@ -661,7 +667,7 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
                     );
                   }}
                 />
-                <Bar dataKey="returning" name="Not a newcomer" stackId="joined" fill="var(--brand-dark)" maxBarSize={40}>
+                <Bar dataKey="returning" name={personTerms.existingMember.label} stackId="joined" fill="var(--brand-dark)" maxBarSize={40}>
                   <LabelList
                     dataKey="total"
                     content={renderStackTotal(months, "returning", (row) =>
@@ -669,7 +675,7 @@ function NewcomersReport({ people }: { people: ReportPerson[] }) {
                     )}
                   />
                 </Bar>
-                <Bar dataKey="newcomer" name="Newcomer" stackId="joined" fill="var(--brand-pink)" maxBarSize={40} radius={[4, 4, 0, 0]}>
+                <Bar dataKey="newcomer" name={personTerms.newcomer.label} stackId="joined" fill="var(--brand-pink)" maxBarSize={40} radius={[4, 4, 0, 0]}>
                   <LabelList
                     dataKey="total"
                     content={renderStackTotal(months, "newcomer", (row) =>

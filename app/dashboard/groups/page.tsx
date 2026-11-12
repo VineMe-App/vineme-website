@@ -29,6 +29,7 @@ import { ledByLabel } from "@/lib/dashboard/utils";
 import { useDashboardQuery } from "@/lib/dashboard/use-dashboard-query";
 import { cn } from "@/lib/utils";
 import { DashboardPage } from "@/components/dashboard/DashboardPage";
+import { groupTerms } from "@/lib/dashboard/terms";
 
 const GroupsMap = dynamic(
   () =>
@@ -49,8 +50,8 @@ type GroupStatus = Group["status"];
 type CapacityFilter = "taking" | "at-capacity";
 
 const CAPACITY_FILTERS: { value: CapacityFilter; label: string }[] = [
-  { value: "taking", label: "Taking new members" },
-  { value: "at-capacity", label: "At capacity" },
+  { value: "taking", label: groupTerms.takingNewMembers.label },
+  { value: "at-capacity", label: groupTerms.atCapacity.label },
 ];
 
 function matchesCapacity(group: Group, filter: CapacityFilter | null) {
@@ -252,13 +253,13 @@ function GroupsView() {
           >
             <TabsList aria-label="Group status">
               <TabsTab value="approved">
-                Active
+                {groupTerms.active.label}
                 <Badge variant="outline" size="sm">
                   {statusCounts.approved}
                 </Badge>
               </TabsTab>
               <TabsTab value="closed">
-                Closed
+                {groupTerms.closed.label}
                 <Badge variant="outline" size="sm">
                   {statusCounts.closed}
                 </Badge>
@@ -442,15 +443,15 @@ function GroupsView() {
                         </Badge>
                         {group.status === "closed" ? (
                           <Badge variant="secondary" size="sm">
-                            Closed
+                            {groupTerms.closed.label}
                           </Badge>
                         ) : group.atCapacity ? (
                           <Badge variant="error" size="sm">
-                            At capacity
+                            {groupTerms.atCapacity.label}
                           </Badge>
                         ) : (
                           <Badge variant="success" size="sm">
-                            Taking new members
+                            {groupTerms.takingNewMembers.label}
                           </Badge>
                         )}
                       </div>

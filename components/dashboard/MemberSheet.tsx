@@ -20,6 +20,7 @@ import {
   memberStatusVariants,
   requestStatusLabel,
 } from "@/lib/dashboard/utils";
+import { people } from "@/lib/dashboard/terms";
 
 interface MemberSheetProps {
   member: Member | null;
@@ -76,7 +77,9 @@ function MemberDetails({ member }: { member: Member }) {
           />
           <div>
             <SheetTitle>{member.name}</SheetTitle>
-            <SheetDescription>Joined {member.joinedOn}</SheetDescription>
+            <SheetDescription>
+              {people.signedUp.label} {member.joinedOn}
+            </SheetDescription>
           </div>
         </div>
       </SheetHeader>
@@ -99,7 +102,7 @@ function MemberDetails({ member }: { member: Member }) {
             </Badge>
             {member.isNewcomer ? (
               <Badge variant="info" size="lg">
-                New to church
+                {people.newcomer.label}
               </Badge>
             ) : null}
           </div>
