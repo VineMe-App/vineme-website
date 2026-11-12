@@ -64,10 +64,12 @@ function check(...results: { error: unknown }[]) {
 }
 
 type MembershipRow = {
+  id: string;
   role: string;
   status: string;
+  journey_status: number | null;
   created_at: string;
-  groups: Maybe<{ title: string }>;
+  groups: Maybe<{ title: string; status: string }>;
 };
 
 type MemberRow = {
@@ -116,18 +118,20 @@ function toMember(user: MemberRow): Member {
     bio: user.bio?.trim() ?? "",
     isNewcomer: Boolean(user.newcomer),
     memberships: [...memberships]
-      .filter((m) => m.status === "active" || m.status === "pending")
       .sort((a, b) => b.created_at.localeCompare(a.created_at))
       .map((m) => ({
+        id: m.id,
         group: one(m.groups)?.title ?? "Unknown group",
+        groupClosed: one(m.groups)?.status === "closed",
         role: m.role,
         status: m.status,
+        stage: m.journey_status,
       })),
   };
 }
 
 const memberColumns =
-  "id, name, avatar_url, roles, bio, newcomer, created_at, group_memberships(role, status, created_at, groups(title))";
+  "id, name, avatar_url, roles, bio, newcomer, created_at, group_memberships(id, role, status, journey_status, created_at, groups(title, status))";
 
 /** Rows per request when loading every member. */
 const MEMBER_BATCH = 500;

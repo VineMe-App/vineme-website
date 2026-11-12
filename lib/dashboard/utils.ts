@@ -20,3 +20,14 @@ export function ledByLabel(leaders: string[]): string {
   if (!second) return `Led by ${first}`;
   return `Led by ${first} and ${second}${rest.length ? ` +${rest.length}` : ""}`;
 }
+
+const stageNames = ["Not contacted", "Reached out", "Spoken to", "Attended"];
+
+/** A request's status in glossary words: "Pending · Spoken to", "Added", "Left" or "Archived". */
+export function requestStatusLabel(status: string, stage: number | null): string {
+  if (status === "pending") return `Pending · ${stageNames[stage ?? 0] ?? stageNames[0]}`;
+  if (status === "active") return "Added";
+  if (status === "inactive") return "Left";
+  if (status === "archived") return "Archived";
+  return status;
+}

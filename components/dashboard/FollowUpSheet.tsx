@@ -232,7 +232,7 @@ function FollowUpEditor({
               <Input
                 name="note"
                 value={note}
-                placeholder="Seen by leaders of this group"
+                placeholder="Send a note to this group's leaders"
                 onChange={(event) => setNote(event.target.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {

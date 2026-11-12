@@ -1,14 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { FollowUpReview } from "@/components/dashboard/FollowUpReview";
 import { PersonAvatar } from "@/components/dashboard/PersonAvatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetPanel,
   SheetPopup,
@@ -17,7 +16,10 @@ import {
 import { useAdmin } from "@/lib/dashboard/admin-context";
 import { fetchContactPhone } from "@/lib/dashboard/queries";
 import type { Member } from "@/lib/dashboard/types";
-import { memberStatusVariants } from "@/lib/dashboard/utils";
+import {
+  memberStatusVariants,
+  requestStatusLabel,
+} from "@/lib/dashboard/utils";
 
 interface MemberSheetProps {
   member: Member | null;
@@ -59,7 +61,8 @@ function MemberDetails({ member }: { member: Member }) {
 
   const phone = phoneState.status === "ready" ? phoneState.phone : "";
   const phoneDigits = phone.replace(/\D/g, "");
-  const hasPending = member.memberships.some((m) => m.status === "pending");
+  const [reviewId, setReviewId] = useState<string | null>(null);
+  const closeReview = useCallback(() => setReviewId(null), []);
 
   return (
     <>
@@ -166,26 +169,48 @@ function MemberDetails({ member }: { member: Member }) {
             </h3>
             {member.memberships.length === 0 ? (
               <p className="mt-1 text-muted-foreground text-sm">
-                Not in a group yet and has no open request.
+                Hasn&apos;t asked to join a group yet.
               </p>
             ) : (
               <ul className="mt-2 space-y-2">
-                {member.memberships.map((membership, index) => (
+                {member.memberships.map((membership) => (
                   <li
-                    key={`${membership.group}-${index}`}
-                    className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm"
+                    key={membership.id}
+                    className="flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2.5 text-sm"
                   >
-                    <span className="flex-1 font-medium">
+                    <span className="min-w-0 flex-1 font-medium">
                       {membership.group}
                     </span>
+                    {membership.groupClosed ? (
+                      <Badge variant="outline">Group closed</Badge>
+                    ) : null}
                     {membership.role === "leader" ? (
                       <Badge variant="secondary">Leader</Badge>
                     ) : null}
+                    <Badge
+                      variant={
+                        membership.status === "pending"
+                          ? "warning"
+                          : membership.status === "active"
+                            ? "secondary"
+                            : "outline"
+                      }
+                    >
+                      {requestStatusLabel(membership.status, membership.stage)}
+                    </Badge>
                     {membership.status === "pending" ? (
-                      <Badge variant="warning">Waiting</Badge>
-                    ) : (
-                      <Badge variant="success">Member</Badge>
-                    )}
+                      <Badge
+                        render={
+                          <button
+                            type="button"
+                            onClick={() => setReviewId(membership.id)}
+                            aria-label={`Review the request to ${membership.group}`}
+                          />
+                        }
+                      >
+                        Review
+                      </Badge>
+                    ) : null}
                   </li>
                 ))}
               </ul>
@@ -194,25 +219,7 @@ function MemberDetails({ member }: { member: Member }) {
         </div>
       </SheetPanel>
 
-      <SheetFooter className="flex-col sm:flex-col">
-        {hasPending ? (
-          <Button
-            size="xl"
-            className="w-full"
-            render={<Link href="/dashboard/follow-ups" />}
-          >
-            Review their follow-up
-          </Button>
-        ) : null}
-        <Button
-          size="xl"
-          variant="outline"
-          className="w-full"
-          render={<Link href="/dashboard/groups" />}
-        >
-          Browse groups
-        </Button>
-      </SheetFooter>
+      <FollowUpReview requestId={reviewId} onClose={closeReview} />
     </>
   );
 }

@@ -660,6 +660,7 @@ Number: #27
 The drawer should be the one place to see everything about a person. Today it leaves out requests that were archived, or whose group has since closed, and it shows no notes. For example, one member asked to join a group, the request was archived, and the drawer doesn't show it.
 
 **What to do**
+- QW-5 already lists every request, including archived ones and requests to closed groups, with a Review button on pending requests that opens the follow-up drawer. This issue still adds the stage and timing wording, the collapsed "Past requests" section, the counts in the heading and the notes history.
 - List every request the person has made, including archived requests and requests to groups that have since closed. Each row shows the stage and timing in the same wording and colours as the follow-up cards (FU-2). Clicking a row opens that request's follow-up drawer, reusing the component.
 - Put archived requests in a collapsed "Past requests" section, with their archive reasons and dates.
 - Show the counts in the heading, for example "Groups · 4 requests, 1 archived".
