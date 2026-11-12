@@ -1,4 +1,4 @@
-import type { FollowUp } from "@/lib/dashboard/types";
+import type { FollowUp, FollowUpStep } from "@/lib/dashboard/types";
 
 export type FollowUpSectionId = "needs-attention" | "on-track" | "attended";
 
@@ -70,4 +70,17 @@ export function getFirstOpenStep(
   if (!person.progress.invited) return "invited";
   if (!person.progress.attended) return "attended";
   return null;
+}
+
+/** Ticks or unticks a step on screen. Nothing is saved yet (DEV-13). */
+export function toggleFollowUpStep(person: FollowUp, step: FollowUpStep): FollowUp {
+  return {
+    ...person,
+    progress: { ...person.progress, [step]: person.progress[step] ? null : "Today" },
+  };
+}
+
+/** Adds a note on screen. Nothing is saved yet (DEV-13). */
+export function addFollowUpNote(person: FollowUp, note: string): FollowUp {
+  return { ...person, notes: [...person.notes, note] };
 }

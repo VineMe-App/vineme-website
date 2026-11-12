@@ -13,11 +13,13 @@ import {
 import { FollowUpSheet } from "@/components/dashboard/FollowUpSheet";
 import { Card, CardPanel } from "@/components/ui/card";
 import {
+  addFollowUpNote,
   compareByUrgency,
   getFollowUpSection,
   getFollowUpStage,
   type FollowUpSectionId,
   type FollowUpStage,
+  toggleFollowUpStep,
 } from "@/lib/dashboard/follow-up-utils";
 import { useAdmin } from "@/lib/dashboard/admin-context";
 import { fetchContactPhone, fetchFollowUps } from "@/lib/dashboard/queries";
@@ -140,20 +142,11 @@ function FollowUpsView({ initialPeople }: { initialPeople: FollowUp[] }) {
   };
 
   const handleToggleStep = (id: string, step: FollowUpStep) => {
-    updatePerson(id, (person) => ({
-      ...person,
-      progress: {
-        ...person.progress,
-        [step]: person.progress[step] ? null : "Today",
-      },
-    }));
+    updatePerson(id, (person) => toggleFollowUpStep(person, step));
   };
 
   const handleAddNote = (id: string, note: string) => {
-    updatePerson(id, (person) => ({
-      ...person,
-      notes: [...person.notes, note],
-    }));
+    updatePerson(id, (person) => addFollowUpNote(person, note));
   };
 
   const handleAddToGroup = (id: string) => {

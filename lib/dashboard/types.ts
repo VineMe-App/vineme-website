@@ -60,9 +60,16 @@ export interface Group {
 }
 
 export interface MemberGroup {
+  /** The request (group membership) id. */
+  id: string;
   group: string;
+  /** The group has been closed (`groups.status = 'closed'`). */
+  groupClosed: boolean;
   role: string;
+  /** pending, active (Added), inactive (Left) or archived. */
   status: string;
+  /** `journey_status`: empty, 1, 2 or 3. */
+  stage: number | null;
 }
 
 export interface Member {
@@ -76,7 +83,7 @@ export interface Member {
   joinedOn: string;
   bio: string;
   isNewcomer: boolean;
-  /** Every group membership (active or pending), newest first. */
+  /** Every request the person has made, in any status, newest first. */
   memberships: MemberGroup[];
   /** ISO timestamp, for sorting and "new this month". */
   joinedAt: string;
