@@ -63,6 +63,34 @@ function check(...results: { error: unknown }[]) {
   if (failed) throw failed.error;
 }
 
+/** Rows per request when a query loads everything. */
+const BATCH = 500;
+
+/**
+ * Every row a query matches, fetched in batches, so nothing is cut off by a
+ * row limit (Supabase's own cap included). `page` must ask for an exact count
+ * and keep a stable order.
+ */
+async function fetchAllRows<T>(
+  page: (
+    from: number,
+    to: number,
+  ) => PromiseLike<{ data: unknown[] | null; error: unknown; count: number | null }>,
+): Promise<T[]> {
+  const rows: T[] = [];
+  let total = Infinity;
+  while (rows.length < total) {
+    const result = await page(rows.length, rows.length + BATCH - 1);
+    check(result);
+    const data = (result.data ?? []) as T[];
+    if (data.length === 0) break;
+    rows.push(...data);
+    // Without a count, keep going while batches come back full.
+    total = result.count ?? (data.length === BATCH ? Infinity : rows.length);
+  }
+  return rows;
+}
+
 type MembershipRow = {
   id: string;
   role: string;
@@ -329,25 +357,34 @@ export async function fetchFollowUps({
   supabase,
   churchId,
 }: AdminContextValue): Promise<FollowUp[]> {
+  // Every pending request and every note, however many there are.
   const [requests, notes, leaders] = await Promise.all([
-    supabase
-      .from("group_memberships")
-      .select(
-        "id, user_id, group_id, created_at, journey_status, member:users!group_memberships_user_id_fkey(name, avatar_url), groups!inner(title, church_id)",
-      )
-      .eq("groups.church_id", churchId)
-      .eq("status", "pending")
-      .order("created_at", { ascending: true })
-      .limit(200),
-    supabase
-      .from("group_membership_notes")
-      .select(
-        "membership_id, note_type, note_text, new_journey_status, created_at, groups!inner(church_id)",
-      )
-      .eq("groups.church_id", churchId)
-      .in("note_type", ["manual", "journey_status_change"])
-      .order("created_at", { ascending: true })
-      .limit(2000),
+    fetchAllRows<FollowUpRow>((from, to) =>
+      supabase
+        .from("group_memberships")
+        .select(
+          "id, user_id, group_id, created_at, journey_status, member:users!group_memberships_user_id_fkey(name, avatar_url), groups!inner(title, church_id)",
+          { count: "exact" },
+        )
+        .eq("groups.church_id", churchId)
+        .eq("status", "pending")
+        .order("created_at", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, to),
+    ),
+    fetchAllRows<NoteRow>((from, to) =>
+      supabase
+        .from("group_membership_notes")
+        .select(
+          "membership_id, note_type, note_text, new_journey_status, created_at, groups!inner(church_id)",
+          { count: "exact" },
+        )
+        .eq("groups.church_id", churchId)
+        .in("note_type", ["manual", "journey_status_change"])
+        .order("created_at", { ascending: true })
+        .order("id", { ascending: true })
+        .range(from, to),
+    ),
     supabase
       .from("group_memberships")
       .select(
@@ -357,7 +394,7 @@ export async function fetchFollowUps({
       .eq("role", "leader")
       .eq("status", "active"),
   ]);
-  check(requests, notes, leaders);
+  check(leaders);
 
   const leadersByGroup = new Map<string, string[]>();
   for (const row of (leaders.data ?? []) as unknown as {
@@ -373,7 +410,7 @@ export async function fetchFollowUps({
   }
 
   const notesByMembership = new Map<string, NoteRow[]>();
-  for (const note of (notes.data ?? []) as unknown as NoteRow[]) {
+  for (const note of notes) {
     const list = notesByMembership.get(note.membership_id) ?? [];
     list.push(note);
     notesByMembership.set(note.membership_id, list);
@@ -381,7 +418,7 @@ export async function fetchFollowUps({
 
   const now = Date.now();
 
-  return ((requests.data ?? []) as unknown as FollowUpRow[]).map((row) => {
+  return requests.map((row) => {
     const history = notesByMembership.get(row.id) ?? [];
     const journey = row.journey_status ?? 0;
 
